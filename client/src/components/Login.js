@@ -20,9 +20,8 @@ export default class Login extends Component {
             verticalAlign="middle"
           >
             <Grid.Column style={{ maxWidth: 450 }}>
-              <Header as="h2" color="teal" textAlign="center">
-								Login to your account
-                {/* <Image src="/favicon.ico" /> Log-in to your account */}
+              <Header as="h2" color="red" textAlign="center">
+                <Image src="/favicon.ico" /> Log-in to your account
               </Header>
               <Form size="large">
                 <Segment stacked>
@@ -40,7 +39,7 @@ export default class Login extends Component {
                     type="password"
                   />
 
-                  <Button color="teal" fluid size="large">
+                  <Button color="red" fluid size="large">
                     Login
                   </Button>
                 </Segment>
