@@ -1,7 +1,8 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 import Login from './components/Login'
-import './App.css';
+import Main from './components/Main'
+import './App.css'
 
 class App extends Component {
   state = {
@@ -15,7 +16,7 @@ class App extends Component {
   };
 
   logout = () => {
-    this.setState({ isLoggedIn: false });
+    this.setState({ isLoggedIn: false })
   };
 
   // componentDidMount() {
@@ -29,10 +30,11 @@ class App extends Component {
   render() {
     return (
       <Router>
-        <div id="App">
-          <div className="site-content">
+        <div id='App'>
+          <div className='site-content'>
             <Switch>
-              <Route exact path="/" component={Login} />
+              <Route path='/login' component={Login} />
+              <Route path='/' component={Main} />
             </Switch>
           </div>
         </div>
@@ -41,4 +43,4 @@ class App extends Component {
   }
 }
 
-export default App;
+export default App
