@@ -4,7 +4,7 @@ export default class Sms extends Component {
   render() {
     return (
       <div>
-        
+        sms here
       </div>
     )
   }
