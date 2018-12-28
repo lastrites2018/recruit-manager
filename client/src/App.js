@@ -1,7 +1,12 @@
 import React, { Component } from 'react'
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
+import { Switch, BrowserRouter as Router, Route } from 'react-router-dom'
 import Login from './components/Login'
+import Job from './components/menu/Job'
+import Mail from './components/menu/Mail'
+import People from './components/menu/People'
+import Sms from './components/menu/Sms'
 import Main from './components/Main'
+import Navbar from './components/Navbar/';
 import './App.css'
 
 class App extends Component {
@@ -31,10 +36,15 @@ class App extends Component {
     return (
       <Router>
         <div id='App'>
+          <Navbar />
           <div className='site-content'>
             <Switch>
+              <Route exact path='/' component={Main} />
               <Route path='/login' component={Login} />
-              <Route path='/' component={Main} />
+              <Route path='/job' component={Job} />
+              <Route path='/mail' component={Mail} />
+              <Route path='/people' component={People} />
+              <Route path='/sms' component={Sms} />
             </Switch>
           </div>
         </div>
