@@ -1,64 +1,84 @@
 import React, { Component } from 'react'
 import { Redirect } from 'react-router-dom'
 import { Button, Form, Grid, Header, Image, Segment } from 'semantic-ui-react'
-// import { ToastContainer, toast } from 'react-toastify'
-// import 'react-toastify/dist/ReactToastify.min.css'
+import axios from 'axios'
+import API from '../util/api'
 
 export default class Login extends Component {
 	state = {
-		email: '',
+		user_id: '',
 		password: '',
 		isAdminLoggedIn: false
-	}
+  }
+
+  _checkLogin() {
+    axios
+      .post(API.loginValidation, {
+        user_id: this.state.user_id,
+        password: this.state.password
+      })
+      .then(res => {
+        console.log(res)
+      })
+      .catch(err => {
+        console.log(err.response)
+      })
+  }
+
+  _handleUsername(data) {
+    this.setState({
+      user_id: data.value
+    })
+  }
+
+  _handlePassword(data) {
+    this.setState({
+      password: data.value
+    })
+  }
+
   render() {
+    if (!this.state.isAdminLoggedIn) {
     return (
       <div>
-        <div className="login-form" style={{ paddingTop: '30vh' }}>
+        <div className='login-form' style={{ paddingTop: '30vh' }}>
           <Grid
-            textAlign="center"
+            textAlign='center'
             style={{ height: '100%' }}
-            verticalAlign="middle"
+            verticalAlign='middle'
           >
             <Grid.Column style={{ maxWidth: 450 }}>
-              <Header as="h2" color="red" textAlign="center">
-                <Image src="/favicon.ico" /> Log-in to your account
+              <Header as='h2' color='red' textAlign='center'>
+                <Image src='/favicon.ico' />
+                Login to your account
               </Header>
-              <Form size="large">
+              <Form size='large' onSubmit={() => this._checkLogin()}>
                 <Segment stacked>
                   <Form.Input
                     fluid
-                    icon="user"
-                    iconPosition="left"
-                    placeholder="ID"
+                    icon='user'
+                    iconPosition='left'
+                    placeholder='아이디'
+                    onChange={(e, data) => this._handleUsername(data)}
                   />
                   <Form.Input
                     fluid
-                    icon="lock"
-                    iconPosition="left"
-                    placeholder="Password"
-                    type="password"
+                    icon='lock'
+                    iconPosition='left'
+                    placeholder='비밀번호'
+                    type='password'
+                    onChange={(e, data) => this._handlePassword(data)}
                   />
-
-                  <Button color="red" fluid size="large">
-                    Login
-                  </Button>
+                  <Button color='red' fluid size='large'>로그인</Button>
                 </Segment>
               </Form>
             </Grid.Column>
           </Grid>
-          {/* <ToastContainer
-            position="top-right"
-            autoClose={3000}
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick
-            rtl={false}
-            pauseOnVisibilityChange
-            draggable={false}
-            pauseOnHover
-          /> */}
         </div>
       </div>
     )
+  } else {
+    return <Redirect to={'/main'} />
+    }
   }
 }

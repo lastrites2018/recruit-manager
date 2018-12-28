@@ -17,20 +17,24 @@ class App extends Component {
   login = () => {
     this.setState(prevState => ({
       isLoggedIn: true
-    }));
-  };
+    }))
+  }
 
   logout = () => {
     this.setState({ isLoggedIn: false })
-  };
+  }
 
-  // componentDidMount() {
-  //   if (util.isLoggedIn()) {
-  //     this.login();
-  //   } else {
-  //     this.logout();
-  //   }
-  // }
+  isLoggedIn = () => {
+    return localStorage.getItem('userData') !== null
+  }
+
+  componentDidMount() {
+    if (this.isLoggedIn()) {
+      this.login()
+    } else {
+      this.logout()
+    }
+  }
 
   render() {
     return (
