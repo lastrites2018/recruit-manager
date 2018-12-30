@@ -18,7 +18,14 @@ export default class Login extends Component {
         password: this.state.password
       })
       .then(res => {
-        console.log(res)
+        if (res.data.result === true) {
+          this.setState({ isAdminLoggedIn: true })
+          localStorage.setItem('adminLoggedIn', this.state.isAdminLoggedIn)
+          console.log(localStorage)
+        }
+        else {
+          console.log('ERROR: Invalid username or password')
+        }
       })
       .catch(err => {
         console.log(err.response)
@@ -78,7 +85,7 @@ export default class Login extends Component {
       </div>
     )
   } else {
-    return <Redirect to={'/main'} />
+    return <Redirect to={'/'} />
     }
   }
 }
