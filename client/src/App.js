@@ -15,9 +15,7 @@ class App extends Component {
   }
 
   login = () => {
-    this.setState(prevState => ({
-      isLoggedIn: true
-    }))
+    this.setState(prevState => ({ isLoggedIn: true }))
   }
 
   logout = () => {
@@ -25,7 +23,7 @@ class App extends Component {
   }
 
   isLoggedIn = () => {
-    return localStorage.getItem('userData') !== null
+    return localStorage.getItem('adminLoggedIn')
   }
 
   componentDidMount() {
@@ -43,12 +41,14 @@ class App extends Component {
           <Navbar />
           <div className='site-content'>
             <Switch>
-              <Route exact path='/' component={Main} />
-              <Route path='/login' component={Login} />
+            <Route exact path='/' render={() => (
+              this.state.isLoggedIn ? ( <Route component={Main} />)
+              : (<Route component={Login} />)
+            )} />
               <Route path='/job' component={Job} />
               <Route path='/mail' component={Mail} />
               <Route path='/people' component={People} />
-              <Route path='/sms' component={Sms} />
+              <Route path='/sms' component={Sms} /> 
             </Switch>
           </div>
         </div>

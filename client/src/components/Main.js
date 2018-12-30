@@ -3,12 +3,14 @@ import { Grid } from 'semantic-ui-react'
 // import { Grid, Menu } from 'semantic-ui-react'
 
 export default class Main extends Component {
-  state = {}
+  state = {
+
+  }
 
   handleItemClick = (e, { name }) => this.setState({ activeItem: name })
 
   render() {
-    const { activeItem } = this.state
+    // const { activeItem } = this.state
 
     return (
 
@@ -17,7 +19,7 @@ export default class Main extends Component {
           <Grid.Column>
            아직 안 쓰는 메인 페이지 -> 추후 people을 메인으로 둬야 함. 
            음... 그냥 login을 메인으로 두고, 로그인 하면 바로 people로 넘어가고 이건 날려도 될 듯
-           
+      
         </Grid.Column>
         </Grid.Row>
       </Grid>

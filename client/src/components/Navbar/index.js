@@ -11,10 +11,10 @@ class Navbar extends Component {
     return (
       <React.Fragment>
         <Menu>
-          <Menu.Item as={Link} to="/login" header>Recruit Manager</Menu.Item>
+          <Menu.Item as={Link} to='/' header>Recruit Manager</Menu.Item>
           <Menu.Item
             as={Link}
-            to="/job"
+            to='/job'
             name='Job'
             active={activeItem === 'Job'}
             onClick={this.handleItemClick}
@@ -24,7 +24,7 @@ class Navbar extends Component {
 
           <Menu.Item
             as={Link}
-            to="/people"
+            to='/people'
             name='People'
             active={activeItem === 'People'}
             onClick={this.handleItemClick}
@@ -34,7 +34,7 @@ class Navbar extends Component {
 
           <Menu.Item
             as={Link}
-            to="/mail"
+            to='/mail'
             name='Mail'
             active={activeItem === 'Mail'}
             onClick={this.handleItemClick}>
@@ -43,7 +43,7 @@ class Navbar extends Component {
 
           <Menu.Item
             as={Link}
-            to="/sms"
+            to='/sms'
             name='SMS'
             active={activeItem === 'SMS'}
             onClick={this.handleItemClick}
