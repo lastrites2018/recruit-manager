@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Switch, BrowserRouter as Router, Route, Redirect } from 'react-router-dom'
+import { Switch, BrowserRouter as Router, Route } from 'react-router-dom'
 import Login from './components/Login'
 import Job from './components/menu/Job'
 import Mail from './components/menu/Mail'
