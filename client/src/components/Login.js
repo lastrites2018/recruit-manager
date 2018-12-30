@@ -85,7 +85,7 @@ export default class Login extends Component {
       </div>
     )
   } else {
-    return <Redirect to={'/'} />
+    return <Redirect to={'/people'} />
     }
   }
 }

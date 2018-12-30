@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Switch, BrowserRouter as Router, Route } from 'react-router-dom'
+import { Switch, BrowserRouter as Router, Route, Redirect } from 'react-router-dom'
 import Login from './components/Login'
 import Job from './components/menu/Job'
 import Mail from './components/menu/Mail'
@@ -13,24 +13,17 @@ class App extends Component {
     isLoggedIn: false
   }
 
-  login = () => {
-    this.setState(prevState => ({ isLoggedIn: true }))
-  }
+  login = () => this.setState(prevState => ({ isLoggedIn: true }))
 
-  logout = () => {
-    this.setState({ isLoggedIn: false })
-  }
+  logout = () => this.setState({ isLoggedIn: false })
 
   isLoggedIn = () => {
     return localStorage.getItem('adminLoggedIn')
   }
 
   componentDidMount() {
-    if (this.isLoggedIn()) {
-      this.login()
-    } else {
-      this.logout()
-    }
+    if (this.isLoggedIn()) this.login()
+    else this.logout()
   }
 
   render() {
@@ -45,6 +38,7 @@ class App extends Component {
                 : (<Route component={Login} />)
               )} />
               <Route path='/job' component={Job} />
+              <Route path='/people' component={People} />
               <Route path='/mail' component={Mail} />
               <Route path='/sms' component={Sms} /> 
             </Switch>

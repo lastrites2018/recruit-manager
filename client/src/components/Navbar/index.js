@@ -11,7 +11,7 @@ class Navbar extends Component {
     return (
       <React.Fragment>
         <Menu>
-          <Menu.Item as={Link} to='/' header>Recruit Manager</Menu.Item>
+          <Menu.Item as={Link} to='/people' header>Recruit Manager</Menu.Item>
 
           <Menu.Item
             as={Link}
@@ -25,7 +25,7 @@ class Navbar extends Component {
 
           <Menu.Item
             as={Link}
-            to='/'
+            to='/people'
             name='People'
             active={activeItem === 'People'}
             onClick={this.handleItemClick}
