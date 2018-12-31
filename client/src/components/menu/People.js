@@ -1,18 +1,89 @@
-import React, { Component } from 'react';
-import Axios from 'axios';
-import API from '../../util/api';
-import ReactTable from 'react-table';
-import 'react-table/react-table.css';
-import { Container, Grid } from 'semantic-ui-react';
+import React, { Component } from 'react'
+import Axios from 'axios'
+import API from '../../util/api'
+import ReactTable from 'react-table'
+import 'react-table/react-table.css'
+import {
+  Container, Grid, Modal, 
+  Divider, Checkbox, Table, Header, Rating } from 'semantic-ui-react'
 
 export default class People extends Component {
   state = {
     loading: false,
-    peopleData: []
-  };
+    peopleData: [],
+    clickedPerson: null,
+    clickedSchool: null,
+    clickedCompany: null
+
+  }
+
+  PeopleModal = () => (
+    <Modal trigger={<Checkbox />}>
+      <Modal.Header>{this.state.clickedPerson}</Modal.Header>
+      <Modal.Content>
+        <Grid padded>
+          <Grid.Row>  
+            <Grid.Column width={15}>
+              [School]<br></br>{this.state.clickedSchool}
+            </Grid.Column>
+          </Grid.Row>
+          <Divider />
+          <Grid.Row>
+            <Grid.Column width={15}>
+              [Company]<br></br>{this.state.clickedCompany}
+            </Grid.Column>
+          </Grid.Row>
+          <Divider />
+          <Grid.Row>  
+            <Grid.Column width={15}>
+              [Others]<br></br>
+            </Grid.Column>
+          </Grid.Row>
+          <Divider />
+          <Grid.Row>
+            <Grid.Column width={15}>
+              [Position and Memo]<br></br><Table celled padded>
+                <Table.Header>
+                  <Table.Row>
+                    <Table.HeaderCell singleLine>Position</Table.HeaderCell>
+                    <Table.HeaderCell>Client</Table.HeaderCell>
+                    <Table.HeaderCell>담당헤드헌터</Table.HeaderCell>
+                    <Table.HeaderCell>일시</Table.HeaderCell>
+                    <Table.HeaderCell>메모</Table.HeaderCell>
+                  </Table.Row>
+                </Table.Header>
+
+                <Table.Body>
+                  <Table.Row>
+                    <Table.Cell singleLine>Java 개발자 과장급</Table.Cell>
+                    <Table.Cell singleLine>Brandi</Table.Cell>
+                    <Table.Cell singleLine>강상모</Table.Cell>
+                    <Table.Cell singleLine>2018.12.30</Table.Cell>
+                    <Table.Cell>
+                      노트다 노트다 노트다 노트다 노트다 노트다 노트다 노트다 노트다 노트다 노트다 노트다
+                      노트다 노트다 노트다 노트다 노트다 노트다 노트다 노트다 노트다 노트다 노트다 노트다
+                    </Table.Cell>
+                  </Table.Row>
+                  <Table.Row>
+                    <Table.Cell singleLine></Table.Cell>
+                    <Table.Cell singleLine></Table.Cell>
+                    <Table.Cell singleLine></Table.Cell>
+                    <Table.Cell singleLine></Table.Cell>
+                    <Table.Cell>
+                    </Table.Cell>
+                  </Table.Row>
+                </Table.Body>
+              </Table>
+            </Grid.Column>
+          </Grid.Row>
+        </Grid>
+      </Modal.Content>
+    </Modal>
+  )
 
   _renderTable() {
-    const { peopleData } = this.state;
+    const { peopleData } = this.state
+    console.log('clicked', this.state.clickedPerson)
     return (
       <ReactTable
         data={peopleData}
@@ -21,12 +92,22 @@ export default class People extends Component {
           return {
             style: {
               textAlign: 'center'
+            },
+            onClick: () => {
+              this.setState({clickedPerson: rowInfo.original.name})
+              this.setState({clickedSchool: rowInfo.original.school})
+              this.setState({clickedCompany: rowInfo.original.company})
             }
-          };
+          }
         }}
         columns={[
           {
             columns: [
+              {
+                Header: 'Checkbox',
+                accessor: 'Checkbox',
+                Cell: props => <this.PeopleModal />
+              },
               {
                 Header: '이름',
                 accessor: 'name',
@@ -79,13 +160,13 @@ export default class People extends Component {
         defaultPageSize={10}
         className="-striped -highlight"
       />
-    );
+    )
   }
 
   async componentDidMount() {
     this.setState({
       loading: true
-    });
+    })
     await Axios.post(API.mainTable, {
       under_age: 0,
       upper_age: 70,
@@ -93,21 +174,20 @@ export default class People extends Component {
       keyword: 'python'
     })
       .then(res => {
-        console.log(res);
         this.setState({
           peopleData: res.data.result,
           loading: false
-        });
+        })
       })
       .catch(err => {
-        console.log(err.response);
-      });
+        console.log(err.response)
+      })
   }
 
   render() {
-    const { loading } = this.state;
+    const { loading } = this.state
+    // console.log(this.state.peopleData)
 
-    console.log(this.state.peopleData);
     return loading ? (
       <div>people loading</div>
     ) : (
@@ -122,6 +202,6 @@ export default class People extends Component {
           </Grid.Row>
         </Grid>
       </Container>
-    );
+    )
   }
 }
