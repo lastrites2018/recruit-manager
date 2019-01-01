@@ -3,7 +3,7 @@ import Axios from 'axios';
 import API from '../../util/api';
 import ReactTable from 'react-table';
 import 'react-table/react-table.css';
-import { Container, Grid, Button, Loader } from 'semantic-ui-react';
+import { Container, Grid } from 'semantic-ui-react';
 
 export default class People extends Component {
   state = {

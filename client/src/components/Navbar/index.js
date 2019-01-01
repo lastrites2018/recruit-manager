@@ -11,7 +11,8 @@ class Navbar extends Component {
     return (
       <React.Fragment>
         <Menu>
-          <Menu.Item as={Link} to='/' header>Recruit Manager</Menu.Item>
+          <Menu.Item as={Link} to='/people' header>Recruit Manager</Menu.Item>
+
           <Menu.Item
             as={Link}
             to='/job'

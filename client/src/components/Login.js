@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import { Redirect } from 'react-router-dom'
 import { Button, Form, Grid, Header, Image, Segment } from 'semantic-ui-react'
+import { ToastContainer, toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.min.css'
 import axios from 'axios'
 import API from '../util/api'
 
@@ -21,10 +23,10 @@ export default class Login extends Component {
         if (res.data.result === true) {
           this.setState({ isAdminLoggedIn: true })
           localStorage.setItem('adminLoggedIn', this.state.isAdminLoggedIn)
-          console.log(localStorage)
         }
         else {
           console.log('ERROR: Invalid username or password')
+          toast.error('Authentication failed')
         }
       })
       .catch(err => {
@@ -33,15 +35,11 @@ export default class Login extends Component {
   }
 
   _handleUsername(data) {
-    this.setState({
-      user_id: data.value
-    })
+    this.setState({ user_id: data.value })
   }
 
   _handlePassword(data) {
-    this.setState({
-      password: data.value
-    })
+    this.setState({ password: data.value })
   }
 
   render() {
@@ -81,11 +79,12 @@ export default class Login extends Component {
               </Form>
             </Grid.Column>
           </Grid>
+          <ToastContainer />
         </div>
       </div>
     )
   } else {
-    return <Redirect to={'/'} />
+    return <Redirect to={'/people'} />
     }
   }
 }
