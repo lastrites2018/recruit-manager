@@ -128,24 +128,9 @@ export default class Mail extends Component {
       <Container>
         <Grid.Row>
           <Grid.Column width={13}>
-            <Breadcrumb>
-              {/* mail/sms 이동하는 별도의 메뉴 */}
-              <Breadcrumb.Section link active>
-                Mail
-              </Breadcrumb.Section>
-              <Breadcrumb.Divider>|</Breadcrumb.Divider>
-              <Breadcrumb.Section link>SMS</Breadcrumb.Section>
-              <Breadcrumb.Divider>|</Breadcrumb.Divider>
-            </Breadcrumb>
-          </Grid.Column>
-          <Grid.Column width={3}>
-            <Breadcrumb>
-              <Breadcrumb.Section link>Follow up</Breadcrumb.Section>
-              <Breadcrumb.Divider>|</Breadcrumb.Divider>
-              <Breadcrumb.Section>
-                <a href="/">새로운 메일</a>
-              </Breadcrumb.Section>
-            </Breadcrumb>
+          <Button compact mini floated='right' color='teal'>
+          Follow Up
+          </Button>
           </Grid.Column>
         </Grid.Row>
 

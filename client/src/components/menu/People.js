@@ -254,24 +254,25 @@ export default class People extends Component {
       <Container>
         <Form>
           <Form.Group inline>
-            <Form.Input placeholder='25세' width={2} />
-            <Form.Input placeholder='35세' width={2} />
+            <Form.Input placeholder='25세' width={2} size='mini' />
+            <Form.Input placeholder='35세' width={2} size='mini' />
             <Form.Checkbox label='Top School' />
           </Form.Group>
           <Form.Group>
-            <Form.Input placeholder='검색어 (And, Or)' width={4}/>
-            <Form.Button>Search</Form.Button>
+            <Form.Input placeholder='검색어 (And, Or)' width={4} size='mini' />
+            <Form.Button compact mini>Search</Form.Button>
           </Form.Group>
           <br></br>
           <br></br>
         </Form>
         <Dropdown
-          placeholder='Position' fluid selection
+          placeholder='Position'
+          fluid multiple selection compact
           options={this.positionOptions}
-          style={{maxWidth:'20em'}}
+          style={{minWidth:'10em', maxWidth:'25em'}}
           >
         </Dropdown>
-        <Button.Group inline>
+        <Button.Group inline compact mini>
           <this.MailModal />
           <Button.Or />
           <this.SMSModal />
