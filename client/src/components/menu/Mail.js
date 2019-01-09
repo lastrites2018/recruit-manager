@@ -1,20 +1,14 @@
-import React, { Component } from 'react';
-import Axios from 'axios';
-import API from '../../util/api';
-import ReactTable from 'react-table';
-import 'react-table/react-table.css';
+import React, { Component } from 'react'
+import Axios from 'axios'
+import API from '../../util/api'
+import Loader from '../../util/Loader'
+import ReactTable from 'react-table'
+import 'react-table/react-table.css'
 import {
   Container,
   Grid,
-  Modal,
-  Divider,
-  Checkbox,
-  Table,
-  Form,
-  Dropdown,
-  Button,
-  Breadcrumb
-} from 'semantic-ui-react';
+  Button
+} from 'semantic-ui-react'
 
 export default class Mail extends Component {
   state = {
@@ -32,12 +26,12 @@ export default class Mail extends Component {
     // peopleData: [],
     clickedData: [],
     mail: `안녕하세요 ㅇㅇㅇ 님, 어제 제안드렸던 Position 에 대해서 어떻게 생각해보셨는지 문의차 다시 메일 드립니다. 간략히 검토후 의향에 대해서 회신 주시면 감사하겠습니다. ㅇㅇㅇ 드림`
-  };
+  }
 
   _renderTable() {
-    const { peopleData } = this.state;
+    const { peopleData } = this.state
 
-    console.log('clicked', this.state.clickedData);
+    console.log('clicked', this.state.clickedData)
     return (
       <ReactTable
         data={peopleData}
@@ -48,9 +42,9 @@ export default class Mail extends Component {
               textAlign: 'center'
             },
             onClick: () => {
-              this.setState({ clickedData: rowInfo.original });
+              this.setState({ clickedData: rowInfo.original })
             }
-          };
+          }
         }}
         columns={[
           {
@@ -95,13 +89,13 @@ export default class Mail extends Component {
         defaultPageSize={15}
         className="-striped -highlight"
       />
-    );
+    )
   }
 
   async componentDidMount() {
     this.setState({
       loading: true
-    });
+    })
     await Axios.post(API.mainTable, {
       // 제대로 된 API 주소 나오면 변경해야 함.
       under_age: 0,
@@ -113,23 +107,25 @@ export default class Mail extends Component {
         this.setState({
           // peopleData: res.data.result,
           loading: false
-        });
+        })
       })
       .catch(err => {
-        console.log(err.response);
-      });
+        console.log(err.response)
+      })
   }
   render() {
-    const { loading } = this.state;
+    const { loading } = this.state
 
     return loading ? (
-      <div>people loading</div>
+      <Loader />
     ) : (
       <Container>
         <Grid.Row>
           <Grid.Column width={13}>
-          <Button compact mini floated='right' color='teal'>
-          Follow Up
+          <Button 
+            compact mini floated='right' color='teal'
+            icon='mail' content='Follow Up'
+            >
           </Button>
           </Grid.Column>
         </Grid.Row>
@@ -138,6 +134,6 @@ export default class Mail extends Component {
         <br />
         {this._renderTable()}
       </Container>
-    );
+    )
   }
 }
