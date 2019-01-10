@@ -1,8 +1,10 @@
 import React, { Component } from 'react'
 import Axios from 'axios'
 import API from '../../util/api'
+import Loader from '../../util/Loader'
 import ReactTable from 'react-table'
 import 'react-table/react-table.css'
+import './menu.css'
 import {
   Container, Grid, Modal, 
   Divider, Checkbox, Table, Form, Dropdown, Button } from 'semantic-ui-react'
@@ -11,16 +13,20 @@ export default class People extends Component {
   state = {
     loading: false,
     peopleData: [],
+    clicked: false,
     clickedData: [],
-    mail: 
-      `안녕하세요 ㅇㅇㅇ 님, 어제 제안드렸던 Position 에 대해서 어떻게 생각해보셨는지 문의차 다시 메일 드립니다. 간략히 검토후 의향에 대해서 회신 주시면 감사하겠습니다. ㅇㅇㅇ 드림`,
-    sms: 
-      `안녕하세요 ㅇㅇㅇ 님, 어제 제안드렸던 Position 에 대해서 어떻게 생각해보셨는지 문의차 다시 메일 드립니다. 간략히 검토후 의향에 대해서 회신 주시면 감사하겠습니다. ㅇㅇㅇ 드림`,
-
+    isOpen: false,
   }
 
+  _openModal = () => this.setState({ isOpen: true })
+  _closeModal = () => this.setState({ isOpen: !this.state.isOpen })
+
   PeopleModal = () => (
-    <Modal trigger={<Checkbox />}>
+    <Modal
+      open={this.state.isOpen}
+      onClose={this._closeModal}
+      closeOnDimmerClick={false}
+      >
       <Modal.Header>{this.state.clickedData.name}</Modal.Header>
       <Modal.Content>
         <Grid padded>
@@ -80,17 +86,25 @@ export default class People extends Component {
           </Grid.Row>
         </Grid>
       </Modal.Content>
+      <Modal.Actions>
+        <Button
+          onClick={this._closeModal}
+          color='teal'
+          icon='checkmark'
+          content='Close'
+        ></Button>
+      </Modal.Actions>
     </Modal>
   )
 
   MailModal = () => (
     <Modal trigger={<Button>Mail</Button>}>
-      <Modal.Header>Mail: OOO</Modal.Header>
+      <Modal.Header>Mail: {this.state.clickedData.name}</Modal.Header>
       <Modal.Content>
         <Form>
           <Form.TextArea
             autoHeight
-            value={this.state.mail}
+            value={`안녕하세요 ${this.state.clickedData.name} 님, 어제 제안드렸던 Position 에 대해서 어떻게 생각해보셨는지 문의차 다시 메일 드립니다. 간략히 검토후 의향에 대해서 회신 주시면 감사하겠습니다. ㅇㅇㅇ 드림`}
             onChange={this._handleMailTextChange}
           />
           <Form.Button>Send</Form.Button>
@@ -110,12 +124,12 @@ export default class People extends Component {
 
   SMSModal = () => (
     <Modal trigger={<Button>SMS</Button>}>
-      <Modal.Header>SMS: </Modal.Header>
+      <Modal.Header>SMS: {this.state.clickedData.name} </Modal.Header>
       <Modal.Content>
         <Form>
         <Form.TextArea
             autoHeight
-            value={this.state.sms}
+            value={`안녕하세요 ${this.state.clickedData.name} 님, 어제 제안드렸던 Position 에 대해서 어떻게 생각해보셨는지 문의차 다시 메일 드립니다. 간략히 검토후 의향에 대해서 회신 주시면 감사하겠습니다. ㅇㅇㅇ 드림`}
             onChange={this._handleSMSTextChange}
           />
           <Form.Button>Send</Form.Button>
@@ -128,8 +142,7 @@ export default class People extends Component {
     this.setState({sms: event.target.value})
   }
 
-  _handleSMSSubmit = (event) => {
-    // add SMS api
+  _handleSMSSubmit = (event) => { // add SMS api
     event.preventDefault()
   }
 
@@ -146,7 +159,7 @@ export default class People extends Component {
 
   _renderTable() {
     const { peopleData } = this.state
-    console.log('clicked', this.state.clickedData)
+
     return (
       <ReactTable
         data={peopleData}
@@ -157,7 +170,7 @@ export default class People extends Component {
               textAlign: 'center'
             },
             onClick: () => {
-              this.setState({clickedData: rowInfo.original})
+              this.setState({clickedData: rowInfo.original, clicked: true})
             }
           }
         }}
@@ -167,12 +180,12 @@ export default class People extends Component {
               {
                 Header: 'Checkbox',
                 accessor: 'Checkbox',
-                Cell: props => <this.PeopleModal />
+                Cell: <Checkbox />
               },
               {
                 Header: '이름',
                 accessor: 'name',
-                Cell: props => <span>{props.value}</span>
+                Cell: props => <span onClick={this._openModal}>{props.value}</span>
               },
               {
                 Header: '나이',
@@ -183,7 +196,6 @@ export default class People extends Component {
                 Header: '최종학력',
                 accessor: 'school',
                 Cell: props => <span>{props.value}</span>
-                // Cell: props => <span>{props.value}</span>
               },
               {
                 Header: '주요직장',
@@ -245,39 +257,53 @@ export default class People extends Component {
       })
   }
 
+  MainPage = () => (
+    <div>
+      <Form>
+        <Form.Group inline>
+          <Form.Input placeholder='25세' width={2} size='mini' />
+          <Form.Input placeholder='35세' width={2} size='mini' />
+          <Form.Checkbox label='Top School' />
+        </Form.Group>
+        <Form.Group>
+          <Form.Input placeholder='검색어 (And, Or)' width={4} size='mini' />
+          <Form.Button compact mini>Search</Form.Button>
+        </Form.Group>
+        <br></br>
+        <br></br>
+      </Form>
+      <Dropdown
+        placeholder='Position'
+        fluid multiple selection compact
+        options={this.positionOptions}
+        style={{minWidth:'10em', maxWidth:'25em'}}
+        >
+      </Dropdown>
+      <Button.Group inline compact mini>
+        <this.MailModal />
+        <Button.Or />
+        <this.SMSModal />
+      </Button.Group>
+      <br></br>
+    </div>
+  )
+
   render() {
     const { loading } = this.state
+    console.log(this.state)
 
     return loading ? (
-      <div>people loading</div>
+      <Container>
+        <this.MainPage />
+        <br></br>
+        <Loader />
+      </Container>
     ) : (
       <Container>
-        <Form>
-          <Form.Group inline>
-            <Form.Input placeholder='25세' width={2} />
-            <Form.Input placeholder='35세' width={2} />
-            <Form.Checkbox label='Top School' />
-          </Form.Group>
-          <Form.Group>
-            <Form.Input placeholder='검색어 (And, Or)' width={4}/>
-            <Form.Button>Search</Form.Button>
-          </Form.Group>
-          <br></br>
-          <br></br>
-        </Form>
-        <Dropdown
-          placeholder='Position' fluid selection
-          options={this.positionOptions}
-          style={{maxWidth:'20em'}}
-          >
-        </Dropdown>
-        <Button.Group inline>
-          <this.MailModal />
-          <Button.Or />
-          <this.SMSModal />
-        </Button.Group>
+        <this.MainPage />
         <br></br>
         {this._renderTable()}
+        <this.PeopleModal />
       </Container>
     )
   }
