@@ -26,7 +26,8 @@ export default class People extends Component {
       clicked: false,
       clickedData: [],
       isOpen: false,
-      mail: '',
+      mailText: '',
+      mailSubject: '',
       SMS: ''
     }
   }
@@ -119,22 +120,40 @@ export default class People extends Component {
 
   MailModal = () => (
     <Modal trigger={<Button>Mail</Button>}>
-      <Modal.Header>Mail: {this.state.clickedData.name}</Modal.Header>
-      <Modal.Content>
-        <Form onSubmit={this._handleMailSubmit}>
+      <Form onSubmit={this._handleMailSubmit}>
+        <Modal.Header>
+          <br />
+          <Form.Group inline>
+            <Form.Input
+              // fluid
+              mini
+              id="form-subcomponent-shorthand-input-first-name"
+              label="Mail:"
+              name="mailSubject"
+              placeholder="Mail Subject"
+              onChange={this._handleChange}
+              style={{ minWidth: '20em', maxWidth: '65em' }}
+            />
+            <Form.Field>
+              <label>수신인 : {this.state.clickedData.name}</label>
+            </Form.Field>
+          </Form.Group>
+        </Modal.Header>
+        {/* <Modal.Header>Mail: {this.state.clickedData.name}</Modal.Header> */}
+        <Modal.Content>
           <Form.Input
-            name="mail"
+            name="mailText"
             required
             control="textarea"
             onChange={this._handleChange}
             defaultValue={`안녕하세요 ${
               this.state.clickedData.name
-            } 님, 어제 제안드렸던 Position 에 대해서 어떻게 생각해보셨는지 문의차 다시 메일 드립니다. 간략히 검토후 의향에 대해서 회신 주시면 감사하겠습니다. ㅇㅇㅇ 드림`}
+            } 님, 어제 제안드렸던 Position 에 대해서 어떻게 생각해보셨는지 문의차 다시 메일 드립니다. 간략히 검토후 의향에 대해서 회신 주시면 감사하겠습니다. 강상모 드림`}
             type="text"
           />
           <Form.Button type="submit">Send</Form.Button>
-        </Form>
-      </Modal.Content>
+        </Modal.Content>
+      </Form>
     </Modal>
   )
 
@@ -147,21 +166,27 @@ export default class People extends Component {
   _handleMailSubmit = event => {
     // add mailgun api
     event.preventDefault()
+    const { mailText, mailSubject } = this.state
     this.setState({
       loading: true
     })
-    console.log('mailcontent!', this.state.mail)
+    console.log('mailcontent!', this.state)
     Axios.post(API.sendMail, {
+      user_id: 'rmrm',
+      rm_id: 'linkedin_1',
       sender: 'sender@gmail.com',
       recipent: 'jaewankim@codestates.com',
-      subject: 'test_subject',
-      body: 'test_body'
+      // recipent: 'krama9181@gmail.com',
+      subject: mailSubject,
+      body: mailText,
+      position: 'KT|자연어처리'
     })
       .then(res => {
         console.log('mailsend?', res) //현재 메일 보내면 400 error, postman 테스트 해보기
         this.setState({
           loading: false,
-          mail: ''
+          mailSubject: '',
+          mailText: ''
         })
       })
       .catch(err => {
@@ -181,7 +206,7 @@ export default class People extends Component {
             onChange={this._handleChange}
             defaultValue={`안녕하세요 ${
               this.state.clickedData.name
-            } 님, 어제 제안드렸던 Position 에 대해서 어떻게 생각해보셨는지 문의차 다시 메일 드립니다. 간략히 검토후 의향에 대해서 회신 주시면 감사하겠습니다. ㅇㅇㅇ 드림`}
+            } 님, 어제 제안드렸던 Position 에 대해서 어떻게 생각해보셨는지 문의차 다시 메일 드립니다. 간략히 검토후 의향에 대해서 회신 주시면 감사하겠습니다. 강상모 드림`}
             type="text"
           />
           <Form.Button>Send</Form.Button>
