@@ -152,10 +152,13 @@ export default class People extends Component {
     })
     console.log('mailcontent!', this.state.mail)
     Axios.post(API.sendMail, {
+      user_id: 'rmrm',
+      rm_id: 'linkedin_1',
       sender: 'sender@gmail.com',
-      recipent: 'jaewankim@codestates.com',
+      recipent: 'krama9181@gmail.com',
       subject: 'test_subject',
-      body: 'test_body'
+      body: 'test_body',
+      position: 'KT|자연어처리'
     })
       .then(res => {
         console.log('mailsend?', res) //현재 메일 보내면 400 error, postman 테스트 해보기
