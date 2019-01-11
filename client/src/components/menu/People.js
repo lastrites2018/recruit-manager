@@ -1,10 +1,10 @@
-import React, { Component } from 'react';
-import Axios from 'axios';
-import API from '../../util/api';
-import Loader from '../../util/Loader';
-import ReactTable from 'react-table';
-import 'react-table/react-table.css';
-import './menu.css';
+import React, { Component } from 'react'
+import Axios from 'axios'
+import API from '../../util/api'
+import Loader from '../../util/Loader'
+import ReactTable from 'react-table'
+import 'react-table/react-table.css'
+import './menu.css'
 import {
   Container,
   Grid,
@@ -15,20 +15,24 @@ import {
   Form,
   Dropdown,
   Button
-} from 'semantic-ui-react';
+} from 'semantic-ui-react'
 
 export default class People extends Component {
-  state = {
-    loading: false,
-    peopleData: [],
-    clicked: false,
-    clickedData: [],
-    isOpen: false,
-    mail: ''
-  };
+  constructor(props) {
+    super(props)
+    this.state = {
+      loading: false,
+      peopleData: [],
+      clicked: false,
+      clickedData: [],
+      isOpen: false,
+      mail: '',
+      SMS: ''
+    }
+  }
 
-  _openModal = () => this.setState({ isOpen: true });
-  _closeModal = () => this.setState({ isOpen: !this.state.isOpen });
+  _openModal = () => this.setState({ isOpen: true })
+  _closeModal = () => this.setState({ isOpen: !this.state.isOpen })
 
   PeopleModal = () => (
     <Modal
@@ -111,40 +115,42 @@ export default class People extends Component {
         />
       </Modal.Actions>
     </Modal>
-  );
+  )
 
   MailModal = () => (
     <Modal trigger={<Button>Mail</Button>}>
       <Modal.Header>Mail: {this.state.clickedData.name}</Modal.Header>
       <Modal.Content>
         <Form onSubmit={this._handleMailSubmit}>
-          <Form.TextArea
-            autoHeight
-            value={`안녕하세요 ${
+          <Form.Input
+            name="mail"
+            required
+            control="textarea"
+            onChange={this._handleChange}
+            defaultValue={`안녕하세요 ${
               this.state.clickedData.name
             } 님, 어제 제안드렸던 Position 에 대해서 어떻게 생각해보셨는지 문의차 다시 메일 드립니다. 간략히 검토후 의향에 대해서 회신 주시면 감사하겠습니다. ㅇㅇㅇ 드림`}
-            onChange={(event, data) => this._handleMailTextChange(data)}
+            type="text"
           />
-          {/* 텍스트 내용 변경 없이 보낼 경우에는 메세지 데이터가 전혀 들어가지 않는 문제가 있음. 조금이라도 바꿔줘야 됨. 어떻게 할 건지 코드스테이츠 가서 생각해보기. */}
           <Form.Button type="submit">Send</Form.Button>
         </Form>
       </Modal.Content>
     </Modal>
-  );
+  )
 
-  _handleMailTextChange = event => {
-    console.log('mailtext', event.value);
-    this.setState({ mail: event.value });
-  };
+  _handleChange = e => {
+    console.log('etn', e.target.name)
+    console.log('etv', e.target.value)
+    this.setState({ [e.target.name]: e.target.value })
+  }
 
   _handleMailSubmit = event => {
     // add mailgun api
-    event.preventDefault();
+    event.preventDefault()
     this.setState({
       loading: true
-    });
-    console.log('mailcontent!', this.state.mail);
-    console.log('mailsubmitEvent!', event);
+    })
+    console.log('mailcontent!', this.state.mail)
     Axios.post(API.sendMail, {
       sender: 'sender@gmail.com',
       recipent: 'jaewankim@codestates.com',
@@ -152,42 +158,60 @@ export default class People extends Component {
       body: 'test_body'
     })
       .then(res => {
-        console.log('mailsend?', res); //현재 메일 보내면 400 error, postman 테스트 해보기
+        console.log('mailsend?', res) //현재 메일 보내면 400 error, postman 테스트 해보기
         this.setState({
-          loading: false
-        });
+          loading: false,
+          mail: ''
+        })
       })
       .catch(err => {
-        console.log(err.response);
-      });
-  };
+        console.log(err.response)
+      })
+  }
 
   SMSModal = () => (
     <Modal trigger={<Button>SMS</Button>}>
       <Modal.Header>SMS: {this.state.clickedData.name} </Modal.Header>
       <Modal.Content>
-        <Form>
-          <Form.TextArea
-            autoHeight
-            value={`안녕하세요 ${
+        <Form onSubmit={this._handleSMSSubmit}>
+          <Form.Input
+            name="SMS"
+            required
+            control="textarea"
+            onChange={this._handleChange}
+            defaultValue={`안녕하세요 ${
               this.state.clickedData.name
             } 님, 어제 제안드렸던 Position 에 대해서 어떻게 생각해보셨는지 문의차 다시 메일 드립니다. 간략히 검토후 의향에 대해서 회신 주시면 감사하겠습니다. ㅇㅇㅇ 드림`}
-            onChange={this._handleSMSTextChange}
+            type="text"
           />
           <Form.Button>Send</Form.Button>
         </Form>
       </Modal.Content>
     </Modal>
-  );
-
-  _handleSMSTextChange = event => {
-    this.setState({ sms: event.target.value });
-  };
+  )
 
   _handleSMSSubmit = event => {
     // add SMS api
-    event.preventDefault();
-  };
+    event.preventDefault()
+    this.setState({
+      loading: true
+    })
+    console.log('SMSContent!', this.state.SMS)
+    Axios.post(API.sendSMS, {
+      recipent: '01073004123',
+      body: 'test'
+    })
+      .then(res => {
+        console.log('SMSsend?', res)
+        this.setState({
+          loading: false,
+          SMS: ''
+        })
+      })
+      .catch(err => {
+        console.log('SMSERR', err)
+      })
+  }
 
   positionOptions = [
     // need api (post)
@@ -199,10 +223,10 @@ export default class People extends Component {
       text: 'Position 2',
       value: 'Position 2'
     }
-  ];
+  ]
 
   _renderTable() {
-    const { peopleData } = this.state;
+    const { peopleData } = this.state
 
     return (
       <ReactTable
@@ -214,9 +238,9 @@ export default class People extends Component {
               textAlign: 'center'
             },
             onClick: () => {
-              this.setState({ clickedData: rowInfo.original, clicked: true });
+              this.setState({ clickedData: rowInfo.original, clicked: true })
             }
-          };
+          }
         }}
         columns={[
           {
@@ -281,13 +305,13 @@ export default class People extends Component {
         defaultPageSize={10}
         className="-striped -highlight"
       />
-    );
+    )
   }
 
   async componentDidMount() {
     this.setState({
       loading: true
-    });
+    })
     await Axios.post(API.mainTable, {
       // under_age: 0,
       // upper_age: 70,
@@ -302,11 +326,11 @@ export default class People extends Component {
         this.setState({
           peopleData: res.data.result,
           loading: false
-        });
+        })
       })
       .catch(err => {
-        console.log(err.response);
-      });
+        console.log(err.response)
+      })
   }
 
   MainPage = () => (
@@ -326,7 +350,7 @@ export default class People extends Component {
                   width={4}
                   size="mini"
                 />
-                <Form.Button compact mini>
+                <Form.Button compact mini="true">
                   Search
                 </Form.Button>
               </Form.Group>
@@ -346,7 +370,7 @@ export default class People extends Component {
             />
           </Grid.Column>
           <Grid.Column width={3}>
-            <Button.Group inline compact mini>
+            <Button.Group inline compact mini="true">
               <this.MailModal />
               <Button.Or />
               <this.SMSModal />
@@ -355,11 +379,11 @@ export default class People extends Component {
         </Grid.Row>
       </Grid>
     </div>
-  );
+  )
 
   render() {
-    const { loading } = this.state;
-    console.log(this.state);
+    const { loading } = this.state
+    console.log(this.state)
 
     return loading ? (
       <Container>
@@ -374,6 +398,6 @@ export default class People extends Component {
         {this._renderTable()}
         <this.PeopleModal />
       </Container>
-    );
+    )
   }
 }
