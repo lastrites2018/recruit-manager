@@ -164,6 +164,9 @@ export default class People extends Component {
     console.log('etn', e.target.name)
     console.log('etv', e.target.value)
     this.setState({ [e.target.name]: e.target.value })
+    if (e.target.name === 'SMSText') {
+      this._validatePhoneNumber(e.target.value)
+    }
   }
 
   _handleMailSubmit = event => {
@@ -206,14 +209,14 @@ export default class People extends Component {
             <Form.Input
               // fluid
               mini
-              id="form-subcomponent-shorthand-input-first-name"
+              id="form-subcomponent-shorthand-input-second-name"
               label="SMS:"
               name="phoneNumber"
-              placeholder="phone number"
-              onChange={e => {
-                this.setState({ [e.target.name]: e.target.value })
-                this._validatePhoneNumber(e.target.value)
-              }}
+              placeholder="Phone number"
+              // onChange={e => {
+              //   this.setState({ [e.target.name]: e.target.value })
+              //   this._validatePhoneNumber(e.target.value)
+              // }}
               // onChange={this._handleChange this._validatePhoneNumber}
               // onChange={this._handleChange}
               style={{ minWidth: '20em', maxWidth: '35em' }}
@@ -230,12 +233,16 @@ export default class People extends Component {
             required
             control="textarea"
             onChange={this._handleChange}
+            // onChange={e => {
+            //   this.setState({ [e.target.name]: e.target.value })
+            //   this._validatePhoneNumber(e.target.value)
+            // }}
             defaultValue={`안녕하세요 ${
               this.state.clickedData.name
             } 님, 어제 제안드렸던 Position 에 대해서 어떻게 생각해보셨는지 문의차 다시 메일 드립니다. 간략히 검토후 의향에 대해서 회신 주시면 감사하겠습니다. 강상모 드림`}
             type="text"
           />
-          <Form.Button>Send</Form.Button>
+          <Form.Button type="submit">Send</Form.Button>
         </Modal.Content>
       </Form>
     </Modal>
@@ -247,7 +254,8 @@ export default class People extends Component {
     this.setState({
       loading: true
     })
-    console.log('SMSContent!', this.state)
+    console.log('SMSContent!', SMSText)
+    console.log('phoneNumber!', phoneNumber)
     Axios.post(API.sendSMS, {
       user_id: 'rmrm',
       recipent: phoneNumber,
@@ -284,7 +292,7 @@ export default class People extends Component {
     if (!this.state.inValidPhoneNumber) {
       return (
         <Label basic size="large" color="red" pointing="left">
-          숫자 번호를 끝까지 입력해주세요!
+          숫자를 전화번호 자리수(11자리)에 맞춰서 입력해주세요!
         </Label>
       )
     }
