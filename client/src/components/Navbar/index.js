@@ -59,6 +59,15 @@ class Navbar extends Component {
           >
             SMS
           </Menu.Item>
+          <Menu.Item
+            as={Link}
+            to="/crawling"
+            name="Crawling"
+            active={activeItem === 'Crawling'}
+            onClick={this.handleItemClick}
+          >
+            Crawling
+          </Menu.Item>
         </Menu>
       </React.Fragment>
     )

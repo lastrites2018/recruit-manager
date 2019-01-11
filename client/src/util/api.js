@@ -1,6 +1,7 @@
 const BASE_URL = 'http://128.199.203.161:8000';
 
 export default {
+  crawling: `${BASE_URL}/resume/crawling`,
   loginValidation: `${BASE_URL}/resume/login`,
   mainTable: `${BASE_URL}/resume/view_main_table`,
   sendMail: `${BASE_URL}/resume/mail_send`,
