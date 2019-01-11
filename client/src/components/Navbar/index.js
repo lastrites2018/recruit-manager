@@ -19,9 +19,9 @@ class Navbar extends Component {
             name='Job'
             active={activeItem === 'Job'}
             onClick={this.handleItemClick}
-          >
+            >
             Job
-        </Menu.Item>
+          </Menu.Item>
 
           <Menu.Item
             as={Link}
@@ -29,18 +29,19 @@ class Navbar extends Component {
             name='People'
             active={activeItem === 'People'}
             onClick={this.handleItemClick}
-          >
+            >
             People
-        </Menu.Item>
+          </Menu.Item>
 
           <Menu.Item
             as={Link}
             to='/mail'
             name='Mail'
             active={activeItem === 'Mail'}
-            onClick={this.handleItemClick}>
+            onClick={this.handleItemClick}
+            >
             Mail
-        </Menu.Item>
+          </Menu.Item>
 
           <Menu.Item
             as={Link}
@@ -48,9 +49,18 @@ class Navbar extends Component {
             name='SMS'
             active={activeItem === 'SMS'}
             onClick={this.handleItemClick}
-          >
+            >
             SMS
-        </Menu.Item>
+          </Menu.Item>
+          <Menu.Item
+            as={Link}
+            to='/crawling'
+            name='Crawling'
+            active={activeItem === 'Crawling'}
+            onClick={this.handleItemClick}
+            >
+            Crawling
+          </Menu.Item>
         </Menu>
       </React.Fragment>
     );

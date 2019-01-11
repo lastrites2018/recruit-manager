@@ -5,7 +5,8 @@ import Job from './components/menu/Job'
 import Mail from './components/menu/Mail'
 import People from './components/menu/People'
 import Sms from './components/menu/Sms'
-import Navbar from './components/Navbar/';
+import Navbar from './components/Navbar/'
+import Crawling from './components/menu/Crawling'
 import './App.css'
 
 class App extends Component {
@@ -40,7 +41,8 @@ class App extends Component {
               <Route path='/job' component={Job} />
               <Route path='/people' component={People} />
               <Route path='/mail' component={Mail} />
-              <Route path='/sms' component={Sms} /> 
+              <Route path='/sms' component={Sms} />
+              <Route path='/crawling' component={Crawling} /> 
             </Switch>
           </div>
         </div>
