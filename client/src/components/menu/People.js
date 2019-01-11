@@ -408,7 +408,6 @@ export default class People extends Component {
 
   render() {
     const { loading } = this.state
-    console.log(this.state)
 
     return loading ? (
       <Container>
