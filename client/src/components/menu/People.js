@@ -14,7 +14,8 @@ import {
   Table,
   Form,
   Dropdown,
-  Button
+  Button,
+  Label
 } from 'semantic-ui-react'
 
 export default class People extends Component {
@@ -28,7 +29,9 @@ export default class People extends Component {
       isOpen: false,
       mailText: '',
       mailSubject: '',
-      SMS: ''
+      phoneNumber: '',
+      SMSText: '',
+      inValidPhoneNumber: true
     }
   }
 
@@ -196,11 +199,34 @@ export default class People extends Component {
 
   SMSModal = () => (
     <Modal trigger={<Button>SMS</Button>}>
-      <Modal.Header>SMS: {this.state.clickedData.name} </Modal.Header>
-      <Modal.Content>
-        <Form onSubmit={this._handleSMSSubmit}>
+      <Form onSubmit={this._handleSMSSubmit}>
+        <Modal.Header>
+          <br />
+          <Form.Group inline>
+            <Form.Input
+              // fluid
+              mini
+              id="form-subcomponent-shorthand-input-first-name"
+              label="SMS:"
+              name="phoneNumber"
+              placeholder="phone number"
+              onChange={e => {
+                this.setState({ [e.target.name]: e.target.value })
+                this._validatePhoneNumber(e.target.value)
+              }}
+              // onChange={this._handleChange this._validatePhoneNumber}
+              // onChange={this._handleChange}
+              style={{ minWidth: '20em', maxWidth: '35em' }}
+            />
+            {this.state.inValidPhoneNumber ? null : this._alertInvalidString()}
+            <Form.Field>
+              <label>수신인 : {this.state.clickedData.name}</label>
+            </Form.Field>
+          </Form.Group>
+        </Modal.Header>
+        <Modal.Content>
           <Form.Input
-            name="SMS"
+            name="SMSText"
             required
             control="textarea"
             onChange={this._handleChange}
@@ -210,32 +236,58 @@ export default class People extends Component {
             type="text"
           />
           <Form.Button>Send</Form.Button>
-        </Form>
-      </Modal.Content>
+        </Modal.Content>
+      </Form>
     </Modal>
   )
 
   _handleSMSSubmit = event => {
-    // add SMS api
     event.preventDefault()
+    const { phoneNumber, SMSText } = this.state
     this.setState({
       loading: true
     })
-    console.log('SMSContent!', this.state.SMS)
+    console.log('SMSContent!', this.state)
     Axios.post(API.sendSMS, {
-      recipent: '01073004123',
-      body: 'test'
+      user_id: 'rmrm',
+      recipent: phoneNumber,
+      body: SMSText
     })
       .then(res => {
         console.log('SMSsend?', res)
         this.setState({
           loading: false,
-          SMS: ''
+          phoneNumber: '',
+          SMSText: ''
         })
       })
       .catch(err => {
         console.log('SMSERR', err)
       })
+  }
+
+  _validatePhoneNumber(phonenumber) {
+    const isValidNumber = /^(?:(010-?\d{4})|(01[1|6|7|8|9]-?\d{3,4}))-?\d{4}$/.test(
+      phonenumber
+    )
+    const onlyNumber = phonenumber.split('-').join('')
+
+    if (isValidNumber) {
+      this.setState({ inValidPhoneNumber: true, phoneNumber: onlyNumber })
+      return true
+    } else {
+      this.setState({ inValidPhoneNumber: false })
+      return false
+    }
+  }
+  _alertInvalidString() {
+    if (!this.state.inValidPhoneNumber) {
+      return (
+        <Label basic size="large" color="red" pointing="left">
+          숫자 번호를 끝까지 입력해주세요!
+        </Label>
+      )
+    }
   }
 
   positionOptions = [
