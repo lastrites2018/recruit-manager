@@ -4,11 +4,7 @@ import API from '../../util/api'
 import Loader from '../../util/Loader'
 import ReactTable from 'react-table'
 import 'react-table/react-table.css'
-import {
-  Container,
-  Grid,
-  Button
-} from 'semantic-ui-react'
+import { Container, Grid, Button } from 'semantic-ui-react'
 
 export default class SMS extends Component {
   state = {
@@ -58,13 +54,18 @@ export default class SMS extends Component {
                 Cell: props => <span>{props.value}</span>
               },
               {
+                Header: 'SMS No.',
+                accessor: 'mail_id',
+                Cell: props => <span>{props.value}</span>
+              },
+              {
                 Header: '수신인',
                 accessor: 'name',
                 Cell: props => <span>{props.value}</span>
               },
               {
                 Header: '발송시간',
-                accessor: 'time',
+                accessor: 'send_date',
                 Cell: props => <span>{props.value}</span>
               },
               {
@@ -96,12 +97,9 @@ export default class SMS extends Component {
     this.setState({
       loading: true
     })
-    await Axios.post(API.mainTable, {
-      // 제대로 된 API 주소 나오면 변경해야 함.
-      under_age: 0,
-      upper_age: 70,
-      top_school: true,
-      keyword: 'python'
+    await Axios.post(API.viewSMS, {
+      rm_id: 'rm_1',
+      user_id: 'rmrm'
     })
       .then(res => {
         this.setState({
@@ -122,11 +120,14 @@ export default class SMS extends Component {
       <Container>
         <Grid.Row>
           <Grid.Column width={13}>
-          <Button 
-            compact mini floated='right' color='teal'
-            icon='send' content='Follow Up'
-            >
-          </Button>
+            <Button
+              compact
+              mini
+              floated="right"
+              color="teal"
+              icon="send"
+              content="Follow Up"
+            />
           </Grid.Column>
         </Grid.Row>
 
