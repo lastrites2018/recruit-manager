@@ -25,6 +25,7 @@ export default class People extends Component {
       peopleData: [],
       clicked: false,
       clickedData: [],
+      resumeDetailData: [],
       isOpen: false,
       mail: '',
       SMS: ''
@@ -55,6 +56,8 @@ export default class People extends Component {
             <Grid.Column width={15}>
               [Company]
               <br />
+              {/* {this.state.resumeDetailData[0].company} */}
+              {/* 사실 위의 어레이 값중 컴퍼니 데이터가 왜 들어오는지는 문의해야 함..., 데이터의 형태가 이상... */}
               {this.state.clickedData.company}
             </Grid.Column>
           </Grid.Row>
@@ -137,6 +140,35 @@ export default class People extends Component {
       </Modal.Content>
     </Modal>
   )
+
+  async _getResumeDetail(rm_code) {
+    if (rm_code) {
+      this.setState({
+        loading: true
+      })
+      await console.log('userid', this.props.user_id)
+      await console.log('rm_code', rm_code)
+      await Axios.post('http://128.199.203.161:8000/resume/rm_detail', {
+        //모두 머지되면 아래 주소로 변경
+        // await Axios.post(API.rmDetail, {
+        user_id: this.props.user_id,
+        rm_id: rm_code
+      })
+        .then(res => {
+          console.log('_getResumeDetail_res', res.data.result)
+          this.setState({
+            resumeDetailData: res.data.result,
+            loading: false
+          })
+        })
+        .catch(err => {
+          console.log(err.response)
+          this.setState({
+            loading: false
+          })
+        })
+    }
+  }
 
   _handleChange = e => {
     console.log('etn', e.target.name)
@@ -239,6 +271,8 @@ export default class People extends Component {
             },
             onClick: () => {
               this.setState({ clickedData: rowInfo.original, clicked: true })
+              this._getResumeDetail(rowInfo.original.rm_code)
+              // this._getResumeDetail(this.state.clickedData.rm_code)
             }
           }
         }}
@@ -370,7 +404,7 @@ export default class People extends Component {
             />
           </Grid.Column>
           <Grid.Column width={3}>
-            <Button.Group inline compact mini="true">
+            <Button.Group compact mini="true">
               <this.MailModal />
               <Button.Or />
               <this.SMSModal />

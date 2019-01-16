@@ -5,49 +5,64 @@ import Job from './components/menu/Job'
 import Mail from './components/menu/Mail'
 import People from './components/menu/People'
 import Sms from './components/menu/Sms'
-import Navbar from './components/Navbar/';
+import Navbar from './components/Navbar/'
 import './App.css'
 
 class App extends Component {
   state = {
-    isLoggedIn: false
+    isLoggedIn: false,
+    user_id: ''
   }
 
-  login = () => this.setState(prevState => ({ isLoggedIn: true }))
+  login = user_id => this.setState(prevState => ({ isLoggedIn: true, user_id }))
 
   logout = () => this.setState({ isLoggedIn: false })
 
   isLoggedIn = () => {
-    return localStorage.getItem('adminLoggedIn')
+    return sessionStorage.getItem('adminLoggedIn')
   }
 
   componentDidMount() {
-    if (this.isLoggedIn()) this.login()
-    else this.logout()
+    if (this.isLoggedIn()) {
+      this.login(sessionStorage.getItem('user_id'))
+    } else this.logout()
   }
 
   render() {
+    console.log('실행?')
     return (
       <Router>
-        <div id='App'>
+        <div id="App">
           <Navbar />
-          <div className='site-content'>
+          <div className="site-content">
             <Switch>
-              <Route exact path='/' render={() => (
-                this.state.isLoggedIn ? ( <Route component={People} />)
-                : (<Route component={Login} />)
-              )} />
-              <Route path='/job' component={Job} />
-              <Route path='/people' component={People} />
-              <Route path='/mail' component={Mail} />
-              <Route path='/sms' component={Sms} /> 
+              {this.state.isLoggedIn ? (
+                <Route exact path="/" component={People} />
+              ) : (
+                <Route
+                  path="/"
+                  render={() => (
+                    <Login
+                      isLoggedIn={this.state.isLoggedIn}
+                      login={this.login}
+                    />
+                  )}
+                />
+              )}
+              <Route path="/job" component={Job} />
+              {/* <Route path="/people" component={People} /> */}
+              <Route
+                path="/people"
+                render={() => <People user_id={this.state.user_id} />}
+              />
+              <Route path="/mail" component={Mail} />
+              <Route path="/sms" component={Sms} />
             </Switch>
           </div>
         </div>
       </Router>
-    );
+    )
   }
-
 }
 
 export default App
