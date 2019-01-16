@@ -14,7 +14,8 @@ import {
   Table,
   Form,
   Dropdown,
-  Button
+  Button,
+  Label
 } from 'semantic-ui-react'
 
 export default class People extends Component {
@@ -27,8 +28,11 @@ export default class People extends Component {
       clickedData: [],
       resumeDetailData: [],
       isOpen: false,
-      mail: '',
-      SMS: ''
+      mailText: '',
+      mailSubject: '',
+      phoneNumber: '',
+      SMSText: '',
+      inValidPhoneNumber: true
     }
   }
 
@@ -122,22 +126,40 @@ export default class People extends Component {
 
   MailModal = () => (
     <Modal trigger={<Button>Mail</Button>}>
-      <Modal.Header>Mail: {this.state.clickedData.name}</Modal.Header>
-      <Modal.Content>
-        <Form onSubmit={this._handleMailSubmit}>
+      <Form onSubmit={this._handleMailSubmit}>
+        <Modal.Header>
+          <br />
+          <Form.Group inline>
+            <Form.Input
+              // fluid
+              mini
+              id="form-subcomponent-shorthand-input-first-name"
+              label="Mail:"
+              name="mailSubject"
+              placeholder="Mail Subject"
+              onChange={this._handleChange}
+              style={{ minWidth: '20em', maxWidth: '65em' }}
+            />
+            <Form.Field>
+              <label>수신인 : {this.state.clickedData.name}</label>
+            </Form.Field>
+          </Form.Group>
+        </Modal.Header>
+        {/* <Modal.Header>Mail: {this.state.clickedData.name}</Modal.Header> */}
+        <Modal.Content>
           <Form.Input
-            name="mail"
+            name="mailText"
             required
             control="textarea"
             onChange={this._handleChange}
             defaultValue={`안녕하세요 ${
               this.state.clickedData.name
-            } 님, 어제 제안드렸던 Position 에 대해서 어떻게 생각해보셨는지 문의차 다시 메일 드립니다. 간략히 검토후 의향에 대해서 회신 주시면 감사하겠습니다. ㅇㅇㅇ 드림`}
+            } 님, 어제 제안드렸던 Position 에 대해서 어떻게 생각해보셨는지 문의차 다시 메일 드립니다. 간략히 검토후 의향에 대해서 회신 주시면 감사하겠습니다. 강상모 드림`}
             type="text"
           />
           <Form.Button type="submit">Send</Form.Button>
-        </Form>
-      </Modal.Content>
+        </Modal.Content>
+      </Form>
     </Modal>
   )
 
@@ -174,26 +196,35 @@ export default class People extends Component {
     console.log('etn', e.target.name)
     console.log('etv', e.target.value)
     this.setState({ [e.target.name]: e.target.value })
+    if (e.target.name === 'SMSText') {
+      this._validatePhoneNumber(e.target.value)
+    }
   }
 
   _handleMailSubmit = event => {
     // add mailgun api
     event.preventDefault()
+    const { mailText, mailSubject } = this.state
     this.setState({
       loading: true
     })
-    console.log('mailcontent!', this.state.mail)
+    console.log('mailcontent!', this.state)
     Axios.post(API.sendMail, {
+      user_id: 'rmrm',
+      rm_id: 'linkedin_1',
       sender: 'sender@gmail.com',
       recipent: 'jaewankim@codestates.com',
-      subject: 'test_subject',
-      body: 'test_body'
+      // recipent: 'krama9181@gmail.com',
+      subject: mailSubject,
+      body: mailText,
+      position: 'KT|자연어처리'
     })
       .then(res => {
         console.log('mailsend?', res) //현재 메일 보내면 400 error, postman 테스트 해보기
         this.setState({
           loading: false,
-          mail: ''
+          mailSubject: '',
+          mailText: ''
         })
       })
       .catch(err => {
@@ -203,46 +234,100 @@ export default class People extends Component {
 
   SMSModal = () => (
     <Modal trigger={<Button>SMS</Button>}>
-      <Modal.Header>SMS: {this.state.clickedData.name} </Modal.Header>
-      <Modal.Content>
-        <Form onSubmit={this._handleSMSSubmit}>
+      <Form onSubmit={this._handleSMSSubmit}>
+        <Modal.Header>
+          <br />
+          <Form.Group inline>
+            <Form.Input
+              // fluid
+              mini
+              id="form-subcomponent-shorthand-input-second-name"
+              label="SMS:"
+              name="phoneNumber"
+              placeholder="Phone number"
+              // onChange={e => {
+              //   this.setState({ [e.target.name]: e.target.value })
+              //   this._validatePhoneNumber(e.target.value)
+              // }}
+              // onChange={this._handleChange this._validatePhoneNumber}
+              // onChange={this._handleChange}
+              style={{ minWidth: '20em', maxWidth: '35em' }}
+            />
+            {this.state.inValidPhoneNumber ? null : this._alertInvalidString()}
+            <Form.Field>
+              <label>수신인 : {this.state.clickedData.name}</label>
+            </Form.Field>
+          </Form.Group>
+        </Modal.Header>
+        <Modal.Content>
           <Form.Input
-            name="SMS"
+            name="SMSText"
             required
             control="textarea"
             onChange={this._handleChange}
+            // onChange={e => {
+            //   this.setState({ [e.target.name]: e.target.value })
+            //   this._validatePhoneNumber(e.target.value)
+            // }}
             defaultValue={`안녕하세요 ${
               this.state.clickedData.name
-            } 님, 어제 제안드렸던 Position 에 대해서 어떻게 생각해보셨는지 문의차 다시 메일 드립니다. 간략히 검토후 의향에 대해서 회신 주시면 감사하겠습니다. ㅇㅇㅇ 드림`}
+            } 님, 어제 제안드렸던 Position 에 대해서 어떻게 생각해보셨는지 문의차 다시 메일 드립니다. 간략히 검토후 의향에 대해서 회신 주시면 감사하겠습니다. 강상모 드림`}
             type="text"
           />
-          <Form.Button>Send</Form.Button>
-        </Form>
-      </Modal.Content>
+          <Form.Button type="submit">Send</Form.Button>
+        </Modal.Content>
+      </Form>
     </Modal>
   )
 
   _handleSMSSubmit = event => {
-    // add SMS api
     event.preventDefault()
+    const { phoneNumber, SMSText } = this.state
     this.setState({
       loading: true
     })
-    console.log('SMSContent!', this.state.SMS)
+    console.log('SMSContent!', SMSText)
+    console.log('phoneNumber!', phoneNumber)
     Axios.post(API.sendSMS, {
-      recipent: '01073004123',
-      body: 'test'
+      user_id: 'rmrm',
+      recipent: phoneNumber,
+      body: SMSText
     })
       .then(res => {
         console.log('SMSsend?', res)
         this.setState({
           loading: false,
-          SMS: ''
+          phoneNumber: '',
+          SMSText: ''
         })
       })
       .catch(err => {
         console.log('SMSERR', err)
       })
+  }
+
+  _validatePhoneNumber(phonenumber) {
+    const isValidNumber = /^(?:(010-?\d{4})|(01[1|6|7|8|9]-?\d{3,4}))-?\d{4}$/.test(
+      phonenumber
+    )
+    const onlyNumber = phonenumber.split('-').join('')
+
+    if (isValidNumber) {
+      this.setState({ inValidPhoneNumber: true, phoneNumber: onlyNumber })
+      return true
+    } else {
+      this.setState({ inValidPhoneNumber: false })
+      return false
+    }
+  }
+  _alertInvalidString() {
+    if (!this.state.inValidPhoneNumber) {
+      return (
+        <Label basic size="large" color="red" pointing="left">
+          숫자를 전화번호 자리수(11자리)에 맞춰서 입력해주세요!
+        </Label>
+      )
+    }
   }
 
   positionOptions = [
@@ -417,7 +502,6 @@ export default class People extends Component {
 
   render() {
     const { loading } = this.state
-    console.log(this.state)
 
     return loading ? (
       <Container>
