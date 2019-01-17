@@ -7,10 +7,10 @@ import axios from 'axios'
 import API from '../util/api'
 
 export default class Login extends Component {
-	state = {
-		user_id: '',
-		password: '',
-		isAdminLoggedIn: false
+  state = {
+    user_id: '',
+    password: '',
+    isAdminLoggedIn: false
   }
 
   _checkLogin() {
@@ -22,9 +22,10 @@ export default class Login extends Component {
       .then(res => {
         if (res.data.result === true) {
           this.setState({ isAdminLoggedIn: true })
-          localStorage.setItem('adminLoggedIn', this.state.isAdminLoggedIn)
-        }
-        else {
+          this.props.login(this.state.user_id)
+          sessionStorage.setItem('adminLoggedIn', this.state.isAdminLoggedIn)
+          sessionStorage.setItem('user_id', this.state.user_id)
+        } else {
           console.log('ERROR: Invalid username or password')
           toast.error('Authentication failed')
         }
@@ -43,48 +44,51 @@ export default class Login extends Component {
   }
 
   render() {
+    console.log('실행2sss?')
     if (!this.state.isAdminLoggedIn) {
-    return (
-      <div>
-        <div className='login-form' style={{ paddingTop: '30vh' }}>
-          <Grid
-            textAlign='center'
-            style={{ height: '100%' }}
-            verticalAlign='middle'
-          >
-            <Grid.Column style={{ maxWidth: 450 }}>
-              <Header as='h2' color='red' textAlign='center'>
-                <Image src='/favicon.ico' />
-                Login to your account
-              </Header>
-              <Form size='large' onSubmit={() => this._checkLogin()}>
-                <Segment stacked>
-                  <Form.Input
-                    fluid
-                    icon='user'
-                    iconPosition='left'
-                    placeholder='아이디'
-                    onChange={(e, data) => this._handleUsername(data)}
-                  />
-                  <Form.Input
-                    fluid
-                    icon='lock'
-                    iconPosition='left'
-                    placeholder='비밀번호'
-                    type='password'
-                    onChange={(e, data) => this._handlePassword(data)}
-                  />
-                  <Button color='red' fluid size='large'>로그인</Button>
-                </Segment>
-              </Form>
-            </Grid.Column>
-          </Grid>
-          <ToastContainer />
+      return (
+        <div>
+          <div className="login-form" style={{ paddingTop: '30vh' }}>
+            <Grid
+              textAlign="center"
+              style={{ height: '100%' }}
+              verticalAlign="middle"
+            >
+              <Grid.Column style={{ maxWidth: 450 }}>
+                <Header as="h2" color="red" textAlign="center">
+                  <Image src="/favicon.ico" />
+                  Login to your account
+                </Header>
+                <Form size="large" onSubmit={() => this._checkLogin()}>
+                  <Segment stacked>
+                    <Form.Input
+                      fluid
+                      icon="user"
+                      iconPosition="left"
+                      placeholder="아이디"
+                      onChange={(e, data) => this._handleUsername(data)}
+                    />
+                    <Form.Input
+                      fluid
+                      icon="lock"
+                      iconPosition="left"
+                      placeholder="비밀번호"
+                      type="password"
+                      onChange={(e, data) => this._handlePassword(data)}
+                    />
+                    <Button color="red" fluid size="large">
+                      로그인
+                    </Button>
+                  </Segment>
+                </Form>
+              </Grid.Column>
+            </Grid>
+            <ToastContainer />
+          </div>
         </div>
-      </div>
-    )
-  } else {
-    return <Redirect to={'/people'} />
+      )
+    } else {
+      return <Redirect to={'/people'} />
     }
   }
 }
