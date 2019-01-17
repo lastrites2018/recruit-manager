@@ -3,6 +3,7 @@ import Axios from 'axios'
 import API from '../../util/api'
 import Loader from '../../util/Loader'
 import ReactTable from 'react-table'
+import EditableTable from './PeopleTable'
 import 'react-table/react-table.css'
 import './menu.css'
 import {
@@ -17,6 +18,9 @@ import {
   Button,
   Label
 } from 'semantic-ui-react'
+import {
+  Input, Select, Button as Buttonn, Checkbox as Checkboxx
+} from 'antd';
 
 export default class People extends Component {
   constructor(props) {
@@ -452,6 +456,10 @@ export default class People extends Component {
       })
   }
 
+  checkTopschool = (e) => {
+    console.log(`isTopSchool === ${e.target.checked}`);
+  }
+
   MainPage = () => (
     <div>
       <Grid container stackable verticalAlign="middle">
@@ -502,6 +510,8 @@ export default class People extends Component {
 
   render() {
     const { loading } = this.state
+    const InputGroup = Input.Group;
+    const Option = Select.Option;
 
     return loading ? (
       <Container>
@@ -514,6 +524,21 @@ export default class People extends Component {
         <this.MainPage />
         <br />
         {this._renderTable()}
+
+        <br />
+        <InputGroup compact>
+          <Input style={{ width: '10%' }} placeholder='min age' />
+          <Input style={{ width: '10%' }} placeholder='max age' />
+          <Checkboxx onChange={this.checkTopschool}>Top School?</Checkboxx>
+        </InputGroup>
+        <Input style={{ width: '20%' }} defaultValue='검색어 (And, Or' />
+        <Select style={{ width: '30%' }} placeholder="Positions...">
+            <Option value='Position1'>Position1</Option>
+            <Option value='Position2'>Position2</Option>
+        </Select>
+        <Buttonn type='primary'>Search</Buttonn>
+        <br />
+        <EditableTable />
         <this.PeopleModal />
       </Container>
     )
