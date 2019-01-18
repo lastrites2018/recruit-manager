@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
 import Axios from 'axios'
 import API from '../../util/api'
-import Loader from '../../util/Loader'
 import ReactTable from 'react-table'
+import EditableTable from './PeopleTable'
 import 'react-table/react-table.css'
 import './menu.css'
 import {
@@ -17,6 +17,9 @@ import {
   Button,
   Label
 } from 'semantic-ui-react'
+import {
+  Input, Select, Button as Buttonn, Checkbox as Checkboxx, Spin
+} from 'antd'
 
 export default class People extends Component {
   constructor(props) {
@@ -95,7 +98,7 @@ export default class People extends Component {
                     <Table.Cell singleLine>강상모</Table.Cell>
                     <Table.Cell singleLine>2018.12.30</Table.Cell>
                     <Table.Cell>
-                      노트다 노트다 노트다 노트다 노트다 노트다 노트다 노트다
+                      다 노트다 노트다 노트다 노트다 노트다 노트다 노트다
                       노트다 노트다 노트다 노트다 노트다 노트다 노트다 노트다
                       노트다 노트다 노트다 노트다 노트다 노트다 노트다 노트다
                     </Table.Cell>
@@ -203,6 +206,7 @@ export default class People extends Component {
 
   _handleMailSubmit = event => {
     // add mailgun api
+    console.log('mail')
     event.preventDefault()
     const { mailText, mailSubject } = this.state
     this.setState({
@@ -432,10 +436,6 @@ export default class People extends Component {
       loading: true
     })
     await Axios.post(API.mainTable, {
-      // under_age: 0,
-      // upper_age: 70,
-      // top_school: true,
-      // keyword: 'python'
       under_age: 0,
       upper_age: 40,
       top_school: true,
@@ -450,6 +450,10 @@ export default class People extends Component {
       .catch(err => {
         console.log(err.response)
       })
+  }
+
+  checkTopschool = (e) => {
+    console.log(`isTopSchool === ${e.target.checked}`);
   }
 
   MainPage = () => (
@@ -502,18 +506,37 @@ export default class People extends Component {
 
   render() {
     const { loading } = this.state
+    const InputGroup = Input.Group;
+    const Option = Select.Option;
 
     return loading ? (
       <Container>
         <this.MainPage />
         <br />
-        <Loader />
+        <Spin tip='Loading...' size='large' />
       </Container>
     ) : (
       <Container>
         <this.MainPage />
         <br />
         {this._renderTable()}
+
+        <br />
+        <InputGroup compact>
+          <Input style={{ width: '10%' }} placeholder='min age' />
+          <Input style={{ width: '10%' }} placeholder='max age' />
+          <Checkboxx onChange={this.checkTopschool}>Top School?</Checkboxx>
+        </InputGroup>
+        <br />
+        <Input style={{ width: '20%' }} defaultValue='검색어 (And, Or' />
+        <br />
+        <Select style={{ width: '30%' }} placeholder="Choose a position">
+            <Option value='Position1'>Position1</Option>
+            <Option value='Position2'>Position2</Option>
+        </Select>
+        <Buttonn type='primary' icon='search'>Search</Buttonn>
+        <br />
+        <EditableTable />
         <this.PeopleModal />
       </Container>
     )

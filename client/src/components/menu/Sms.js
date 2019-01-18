@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import Axios from 'axios'
 import API from '../../util/api'
-import Loader from '../../util/Loader'
+import { Spin } from 'antd'
 import ReactTable from 'react-table'
 import 'react-table/react-table.css'
 import { Container, Grid, Button } from 'semantic-ui-react'
@@ -115,7 +115,7 @@ export default class SMS extends Component {
     const { loading } = this.state
 
     return loading ? (
-      <Loader />
+      <Spin />
     ) : (
       <Container>
         <Grid.Row>

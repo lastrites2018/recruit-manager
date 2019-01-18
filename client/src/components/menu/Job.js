@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import Axios from 'axios'
 import API from '../../util/api'
-import Loader from '../../util/Loader'
+import { Spin } from 'antd'
 import ReactTable from 'react-table'
 import 'react-table/react-table.css'
 import './menu.css'
@@ -293,7 +293,7 @@ export default class Job extends Component {
       <Container>
         <this.MainPage />
         <br />
-        <Loader />
+        <Spin />
       </Container>
     ) : (
       <Container>
