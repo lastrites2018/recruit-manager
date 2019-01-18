@@ -12,7 +12,12 @@ class EditableTable extends React.Component {
       selectedRowKeys: [],
       manualKey: 0, // will need to change this later
       clickedData: [],
-      visible: false
+      visible: false,
+      resumeDetailData: [],
+      mailText: '',
+      mailSubject: '',
+      phoneNumber: '',
+      SMSText: ''
     }
 
     this.columns = [
@@ -153,6 +158,35 @@ class EditableTable extends React.Component {
       count: count + 1,
       manualKey: manualKey + 1
     })
+  }
+
+  async getResumeDetail(rm_code) {
+    if (rm_code) {
+      this.setState({
+        loading: true
+      })
+      await console.log('userid', this.props.user_id)
+      await console.log('rm_code', rm_code)
+      await Axios.post('http://128.199.203.161:8000/resume/rm_detail', {
+        //모두 머지되면 아래 주소로 변경
+        // await Axios.post(API.rmDetail, {
+        user_id: this.props.user_id,
+        rm_id: rm_code
+      })
+        .then(res => {
+          console.log('getResumeDetail_res', res.data.result)
+          this.setState({
+            resumeDetailData: res.data.result,
+            loading: false
+          })
+        })
+        .catch(err => {
+          console.log(err.response)
+          this.setState({
+            loading: false
+          })
+        })
+    }
   }
 
   handleSave = row => {
