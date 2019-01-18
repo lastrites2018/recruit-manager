@@ -1,140 +1,109 @@
 import React, { Component } from 'react'
 import Axios from 'axios'
 import API from '../../util/api'
-import { Spin } from 'antd'
-import ReactTable from 'react-table'
-import 'react-table/react-table.css'
-import { Container, Grid, Button } from 'semantic-ui-react'
+import { Button, Table } from 'antd'
+
+const columns = [{
+  title: '수신인',
+  dataIndex: 'name',
+  render: e => <a href='javascript:'>{e}</a>
+}, {
+  title: '발송시간',
+  dataIndex: 'send_date',
+  sorter: true
+}, {
+  title: 'Client',
+  dataIndex: 'client',
+}, {
+  title: 'Position',
+  dataIndex: 'position',
+}, {
+  title: '수신확인',
+  dataIndex: '수신확인'
+}]
+
+const rowSelection = {
+  onChange: (selectedRowKeys, selectedRows) => {
+    console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows)
+  },
+  getCheckboxProps: record => ({
+    disabled: record.name === 'Disabled User', // Column configuration not to be checked
+    name: record.name,
+  }),
+}
 
 export default class SMS extends Component {
   state = {
-    loading: false,
-    peopleData: [
-      // 임시 데이터
-      {
-        name: 'Sangmo Kang',
-        time: '2018.10.24 12:05:24',
-        client: 'Samsung',
-        position: 'BigData Enginner 채용',
-        수신확인: 'receiving confirmed'
-      }
-    ],
-    // peopleData: [],
-    clickedData: [],
-    mail: `안녕하세요 ㅇㅇㅇ 님, 어제 제안드렸던 Position 에 대해서 어떻게 생각해보셨는지 문의차 다시 메일 드립니다. 간략히 검토후 의향에 대해서 회신 주시면 감사하겠습니다. ㅇㅇㅇ 드림`
+    loading: true,
+    data: [],
+    pagination: {}
   }
 
-  _renderTable() {
-    const { peopleData } = this.state
-
-    console.log('clicked', this.state.clickedData)
-    return (
-      <ReactTable
-        data={peopleData}
-        showPageSizeOptions={false}
-        getTrProps={(state, rowInfo, column) => {
-          return {
-            style: {
-              textAlign: 'center'
-            },
-            onClick: () => {
-              this.setState({ clickedData: rowInfo.original })
-            }
-          }
-        }}
-        columns={[
-          {
-            columns: [
-              {
-                Header: 'Checkbox',
-                accessor: 'Checkbox',
-                textAlign: 'center',
-                maxWidth: 90,
-                // Cell: props => <this.PeopleModal />
-                Cell: props => <span>{props.value}</span>
-              },
-              {
-                Header: 'SMS No.',
-                accessor: 'mail_id',
-                Cell: props => <span>{props.value}</span>
-              },
-              {
-                Header: '수신인',
-                accessor: 'name',
-                Cell: props => <span>{props.value}</span>
-              },
-              {
-                Header: '발송시간',
-                accessor: 'send_date',
-                Cell: props => <span>{props.value}</span>
-              },
-              {
-                Header: 'Client', // 요청한 회사
-                accessor: 'client',
-                Cell: props => <span>{props.value}</span>
-                // Cell: props => <span>{props.value}</span>
-              },
-              {
-                Header: 'Position',
-                accessor: 'position',
-                Cell: props => <span>{props.value}</span>
-              },
-              {
-                Header: '발신내용',
-                accessor: 'content',
-                Cell: props => <span>{props.value}</span>
-              }
-            ]
-          }
-        ]}
-        defaultPageSize={15}
-        className="-striped -highlight"
-      />
-    )
+  componentDidMount() {
+    this.fetch()
   }
 
-  async componentDidMount() {
+  fetch = () => {
+    Axios.post(API.getSMS, {
+      user_id: 'rmrm',
+      rm_id: '*'
+    }).then((data) => {
+      const pagination = { ...this.state.pagination }
+      // Read total count from server
+      // pagination.total = data.totalCount
+      this.setState({
+        loading: false,
+        data: data.data.result,
+        pagination,
+      })
+    })
+  }
+
+  handleTableChange = (pagination, filters, sorter) => {
+    const pager = { ...this.state.pagination }
+    pager.current = pagination.current
     this.setState({
-      loading: true
+      pagination: pager,
     })
-    await Axios.post(API.viewSMS, {
-      rm_id: 'rm_1',
-      user_id: 'rmrm'
+    this.fetch({
+      results: pagination.pageSize,
+      page: pagination.current,
+      sortField: sorter.field,
+      sortOrder: sorter.order,
+      ...filters,
     })
-      .then(res => {
-        this.setState({
-          // peopleData: res.data.result,
-          loading: false
-        })
-      })
-      .catch(err => {
-        console.log(err.response)
-      })
   }
+
+  sendSMS = () => {
+    // API 안됌, 일단 mail api는 보류!
+    Axios.post(API.sendSMS, {
+      user_id: 'rmrm',
+      recipent: '01072214890',
+      subject:'test_subject',
+      'body':'test_body'
+    })
+  }
+    
   render() {
-    const { loading } = this.state
-
-    return loading ? (
-      <Spin />
-    ) : (
-      <Container>
-        <Grid.Row>
-          <Grid.Column width={13}>
-            <Button
-              compact
-              mini
-              floated="right"
-              color="teal"
-              icon="send"
-              content="Follow Up"
-            />
-          </Grid.Column>
-        </Grid.Row>
-
-        <br />
-        <br />
-        {this._renderTable()}
-      </Container>
+    return (
+      <div>
+        <Button
+          type='primary'
+          icon='message'
+          onClick={this.sendSMS}
+        >
+          Follow up
+        </Button>
+        <Table
+          columns={columns}
+          // rowKey={record => record.login.uuid}
+          dataSource={this.state.data}
+          pagination={this.state.pagination}
+          loading={this.state.loading}
+          onChange={this.handleTableChange}
+          rowSelection={rowSelection}
+        />
+      </div>
     )
   }
 }

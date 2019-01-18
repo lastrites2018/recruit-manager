@@ -1,309 +1,150 @@
 import React, { Component } from 'react'
 import Axios from 'axios'
 import API from '../../util/api'
-import { Spin } from 'antd'
-import ReactTable from 'react-table'
-import 'react-table/react-table.css'
-import './menu.css'
-import {
-  Container,
-  Grid,
-  Modal,
-  Checkbox,
-  Form,
-  Breadcrumb,
+import JobForm from '../forms/JobForm'
+import { 
   Button,
-  Header,
-  Icon,
-  Dropdown,
-  Input,
-  TextArea
-} from 'semantic-ui-react'
+  Divider,
+  Form,
+  message,
+  Modal,
+  Popconfirm,
+  Table,
+  Tag } from 'antd'
 
-export default class Job extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      loading: false,
-      peopleData: [],
-      isAppendModalOpen: false,
-      isDeleteModalOpen: false,
-      isEditModalOpen: false,
-    }
-  }
-
-  _openAppendModal = () => this.setState({ isAppendModalOpen: true })
-  _closeAppendModal = () => this.setState({ isAppendModalOpen: !this.state.isAppendModalOpen })
-
-  _openDeleteModal = () => this.setState({ isDeleteModalOpen: true })
-  _closeDeleteModal = () => this.setState({ isDeleteModalOpen: !this.state.isDeleteModalOpen })
-
-  _openEditModal = () => this.setState({ isEditModalOpen: true })
-  _closeEditModal = () => this.setState({ isEditModalOpen: !this.state.isEditModalOpen })
-
-  _handleAppend = () => {
-    // 등록을 눌렀을 때
-    console.log('append')
-    this._closeAppendModal()
-  }
-
-  _handleAppendSubmit = () => {
-    console.log('appended!')
-    this._closeAppendModal()
-  }
-
-  _handleDelete = () => {
-    // 삭제를 눌렀을 때
-    console.log('delete')
-    this._closeDeleteModal()
-  }
-
-  _handleDontDelete = () => {
-    // 삭제 하려다가 안 했을 때
-    console.log('don\t delete')
-    this._closeDeleteModal()
-  }
-
-  _handleEdit = () => {
-    // 편집을 눌렀을 때
-    console.log('edit')
-    this._closeEditModal()
-  }
-
-  JobModalDelete = () => (
-    <Modal
-      open={this.state.isDeleteModalOpen}
-      onClose={this._closeDeleteModal}
-      closeOnDimmerClick={false}
-    >
-    <Header icon='archive' content='삭제' />
-    <Modal.Content>
-      <p>정말 삭제 하시겠습니까?</p>
-    </Modal.Content>
-    <Modal.Actions>
-      <Button
-        onClick={this._handleDontDelete}
-        color='red'
-        inverted>
-        <Icon name='remove' /> No
-      </Button>
-      <Button
-        onClick={this._handleDelete}
-        color='green'
-        inverted
-        >
-        <Icon name='checkmark' /> Yes
-      </Button>
-    </Modal.Actions>
-  </Modal>
+const columns = [{
+	title: '포지션 제목',
+	dataIndex: 'title'
+}, {
+	title: '포지션 회사',
+  dataIndex: 'company',
+}, {
+	title: '키워드',
+  dataIndex: 'keyword',
+  render: (e) => (
+    <span>
+      {e.split(', ').map(tag => <Tag color="blue">{tag}</Tag>)}
+    </span>
   )
+}, {
+	title: '등록일시',
+	dataIndex: '',
+}, {
+	title: 'Status',
+	dataIndex: ''
+}];
 
-  JobModalAppend = () => (
-    <Modal
-      open={this.state.isAppendModalOpen}
-      onClose={this._closeAppendModal}
-      closeOnDimmerClick={false}
-    >
-    <Modal.Header>등록</Modal.Header>
-    <Modal.Content>
-      <Form>
-        <Form.Input
-          label='Position'
-          required
-          placeholder='Java 개발자 (과장급)'
-        />
-        <Form.Input
-          label='Team'
-          required
-          placeholder='Naver Clova 팀'
-        />
-        <Form.TextArea
-          label='Notes'
-        />
-        <Form.Group inline>
-          <Form.Input
-            placeholder='28세'
-            width={2}
-          />
-          ~
-          <Form.Input
-            placeholder='38세'
-            width={2}
-          />
-          <Form.Input
-          label='Location'
-          placeholder='서울시 강남구'
-          width={16}
-        />
-        </Form.Group>
-        <Form.Input
-          label='Keyword'
-          placeholder='#python, #Django, #orm'
-        />
-        <Form.Button onClick={this._handleAppendSubmit}>등록</Form.Button>
-      </Form>
-    </Modal.Content>
-  </Modal>
-  )
+const rowSelection = {
+	onChange: (selectedRowKeys, selectedRows) => {
+    console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows)
+	},
+	getCheckboxProps: record => ({
+    disabled: record.name === 'Disabled User', // Column configuration not to be checked
+		name: record.name
+	}),
+};
 
-  progressOptions = [
-    // need api (post)
-    {
-      text: 'Alive',
-      value: 'Alive'
-    },
-    {
-      text: 'Holding',
-      value: 'Holding'
-    },
-    {
-      text: 'Done',
-      value: 'Done'
-    }
-  ]
-
-  _renderTable() {
-    const { peopleData } = this.state
-
-    return (
-      <ReactTable
-        data={peopleData}
-        showPageSizeOptions={false}
-        getTrProps={(state, rowInfo, column) => {
-          return {
-            style: {
-              textAlign: 'center'
-            },
-            onClick: () => {
-              this.setState({ clickedData: rowInfo.original, clicked: true })
-            }
-          }
-        }}
-        columns={[
-          {
-            columns: [
-              {
-                Header: 'Checkbox',
-                accessor: 'Checkbox',
-                Cell: <Checkbox />
-              },
-              {
-                Header: '포지션 제목',
-                accessor: 'name',
-                Cell: props => (
-                  <span onClick={this._openModal}>{props.value}</span>
-                )
-              },
-              {
-                Header: '포지션 회사',
-                accessor: 'age',
-                Cell: props => (
-                  <span onClick={this._openModal}>{props.value}</span>
-                )
-              },
-              {
-                Header: '키워드',
-                accessor: 'school',
-                Cell: props => <span>{props.value}</span>
-              },
-              {
-                Header: '등록일시',
-                accessor: 'company',
-                Cell: props => <span>{props.value}</span>
-              },
-              {
-                Header: 'Status',
-                accessor: 'career',
-                Cell: props => <span>{props.value}</span>
-              },
-              {
-                Header: 'Progress',
-                accessor: 'career',
-                Cell: props => <Dropdown options={this.progressOptions}/>
-              }
-            ]
-          }
-        ]}
-        defaultPageSize={10}
-        className="-striped -highlight"
-      />
-    )
+export default class Jobb extends Component {
+	state = {
+    loading: true,
+    data: [],
+		pagination: {},
+		visible: false
+	}
+	
+	componentDidMount() {
+    this.fetch()
   }
 
-  async componentDidMount() {
+  fetch = () => {
+    Axios.post(API.getPosition, {
+      user_id: 'rmrm'
+    }).then((data) => {
+      const pagination = { ...this.state.pagination }
+      // Read total count from server
+      // pagination.total = data.totalCount
+      this.setState({
+        loading: false,
+        data: data.data.result,
+        pagination,
+      })
+    })
+  }
+
+  handleTableChange = (pagination, filters, sorter) => {
+    const pager = { ...this.state.pagination }
+    pager.current = pagination.current
     this.setState({
-      loading: true
+      pagination: pager,
     })
-    // need new API
-    await Axios.post(API.mainTable, {
-      under_age: 0,
-      upper_age: 40,
-      top_school: true,
-      keyword: '인폼'
+    this.fetch({
+      results: pagination.pageSize,
+      page: pagination.current,
+      sortField: sorter.field,
+      sortOrder: sorter.order,
+      ...filters,
     })
-      .then(res => {
-        this.setState({
-          peopleData: res.data.result,
-          loading: false
-        })
-      })
-      .catch(err => {
-        console.log(err.response)
-      })
+	}
+	
+	handleDeleteConfirm = (e) => {
+		message.success('Deleted!')
+	}
+
+	handleDeleteCancel = (e) => {
+		message.error('Delete canceled.')
+	}
+
+	jobModal = () => (
+    <div>
+      <Modal
+        title=''
+        visible={this.state.visible}
+        onOk={this.handleModalOk}
+        onCancel={this.handleModalCancel}
+      >
+      <JobForm.JobRegistration />
+      
+      </Modal>
+    </div>
+	)
+	
+	showModal = () => {
+    this.setState({ visible: true })
   }
 
-  Breadcrumb = () => (
-    <Breadcrumb>
-      <Breadcrumb.Section onClick={this._openEditModal}>편집</Breadcrumb.Section>
-      <Breadcrumb.Divider />
-      <Breadcrumb.Section onClick={this._openDeleteModal}>삭제</Breadcrumb.Section>
-      <Breadcrumb.Divider />
-      <Breadcrumb.Section onClick={this._openAppendModal}>등록</Breadcrumb.Section>
-  </Breadcrumb>
-  )
+  handleModalOk = () => {
+    this.setState({ visible: false })
+  }
 
-  MainPage = () => (
-    <div>
-      <Grid container stackable verticalAlign="middle">
-        <Grid.Row>
-          <Grid.Column width={16}>
-            <Form>
-              <Form.Group>
-                <Form.Input
-                  placeholder="검색어 (And, Or)"
-                  width={4}
-                  size="mini"
-                />
-                <Form.Button compact mini="true">
-                  Search
-                </Form.Button>
-              </Form.Group>
-            </Form>
-          </Grid.Column>
-        </Grid.Row>
-        <br />
-      </Grid>
-    </div>
-  )
+  handleModalCancel = () => {
+    this.setState({ visible: false })
+  }
 
   render() {
-    const { loading } = this.state
-
-    return loading ? (
-      <Container>
-        <this.MainPage />
-        <br />
-        <Spin />
-      </Container>
-    ) : (
-      <Container>
-        <this.MainPage />
-        <br />
-        <this.Breadcrumb />
-        {this._renderTable()}
-        <this.JobModalDelete />
-        <this.JobModalAppend />
-      </Container>
+    return (
+      <div>
+				<Popconfirm title='Are you sure you want to delete this?'
+					onConfirm={this.handleDeleteConfirm} 
+					onCancel={this.handleDeleteCancel}
+					okText="OK"
+					cancelText="Cancel">
+    			<a href="#">삭제</a>
+  			</Popconfirm>
+				<a> | </a>
+				<a href="#" onClick={this.showModal}>등록</a>
+				<this.jobModal />
+        <Table
+          columns={columns}
+          // rowKey={record => record.login.uuid}
+          size='small'
+					bordered
+          dataSource={this.state.data}
+          pagination={this.state.pagination}
+          loading={this.state.loading}
+          onChange={this.handleTableChange}
+          rowSelection={rowSelection}
+        />
+      </div>
     )
   }
 }
