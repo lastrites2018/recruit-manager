@@ -1,8 +1,6 @@
 import React from 'react'
 import Axios from 'axios'
-import {
-    Button, Divider, Modal, Popconfirm, Table
-  } from 'antd'
+import { Button, Divider, Modal, Popconfirm, Table } from 'antd'
 import { EditableFormRow, EditableCell } from '../../util/Table'
 import API from '../../util/api'
 
@@ -14,25 +12,30 @@ class EditableTable extends React.Component {
       selectedRowKeys: [],
       manualKey: 0, // will need to change this later
       clickedData: [],
-      visible: false
+      visible: false,
+      resumeDetailData: [],
+      mailText: '',
+      mailSubject: '',
+      phoneNumber: '',
+      SMSText: ''
     }
-    
+
     this.columns = [
       {
         key: 'name',
         title: '이름',
-        dataIndex: 'name',
-      }, 
+        dataIndex: 'name'
+      },
       {
         key: 'age',
         title: '나이',
         dataIndex: 'age'
-      }, 
+      },
       {
         key: 'school',
         title: '최종학력',
         dataIndex: 'school'
-      }, 
+      },
       {
         key: 'company',
         title: '주요직장',
@@ -46,7 +49,7 @@ class EditableTable extends React.Component {
       {
         key: 'keyword',
         title: '핵심 키워드',
-        dataIndex: 'keyword',
+        dataIndex: 'keyword'
       },
       {
         key: 'resume_title',
@@ -69,43 +72,44 @@ class EditableTable extends React.Component {
         // 이건 나중에 지워서 breadcrumb 으로 만들기
         // row 삭제 api 필요 예) delete/rm_code/10 이런식
         // 현재 row onClick 하면 모달이랑 같이 뜸.
-        render: (text, record) => (
-          this.state.dataSource.length >= 1
-            ? (
-              <Popconfirm title='삭제?' onConfirm={() => this.handleDelete(record.key)}>
-                <a href='javascript:'>삭제</a>
-              </Popconfirm>
-            ) : null
-        ),
-      },
+        render: (text, record) =>
+          this.state.dataSource.length >= 1 ? (
+            <Popconfirm
+              title="삭제?"
+              onConfirm={() => this.handleDelete(record.key)}
+            >
+              <a href="javascript:">삭제</a>
+            </Popconfirm>
+          ) : null
+      }
     ]
   }
-  
+
   sendMail = () => {
     alert(`send Mail to [${this.state.selectedRowKeys}]`)
     // empty after sending mail
     setTimeout(() => {
       this.setState({
-        selectedRowKeys: [],
+        selectedRowKeys: []
       })
     }, 1000)
   }
 
-  onSelectChange = (selectedRowKeys) => {
+  onSelectChange = selectedRowKeys => {
     console.log('selectedRowKeys changed: ', selectedRowKeys)
     this.setState({ selectedRowKeys })
   }
-  
-  handleDelete = (key) => {
+
+  handleDelete = key => {
     const dataSource = [...this.state.dataSource]
-    this.setState({ 
-      dataSource: dataSource.filter(item => item.key !== key) 
+    this.setState({
+      dataSource: dataSource.filter(item => item.key !== key)
     })
   }
-  
-  handleClick = (clickedData) => {
+
+  handleClick = clickedData => {
     this.showModal()
-    this.setState({clickedData: clickedData})
+    this.setState({ clickedData: clickedData })
   }
 
   fetch = () => {
@@ -114,7 +118,7 @@ class EditableTable extends React.Component {
       upper_age: 40,
       top_school: true,
       keyword: '인폼'
-    }).then((data) => {
+    }).then(data => {
       const pagination = { ...this.state.pagination }
       // Read total count from server
       // pagination.total = data.totalCount
@@ -125,12 +129,12 @@ class EditableTable extends React.Component {
       })
     })
   }
-  
+
   async componentDidMount() {
     await this.fetch()
   }
 
-  handleDelete = (key) => {
+  handleDelete = key => {
     const dataSource = [...this.state.dataSource]
     this.setState({ dataSource: dataSource.filter(item => item.key !== key) })
   }
@@ -142,8 +146,8 @@ class EditableTable extends React.Component {
 
       // Warning: Each record in table should have a unique `key` prop,
       // or set `rowKey` to an unique primary key.
-      
-      rowKey: this.state.manualKey, // unique key 값을 안 준다 
+
+      rowKey: this.state.manualKey, // unique key 값을 안 준다
       name: 'sunny',
       age: '100',
       school: 'uc berkeley',
@@ -156,13 +160,42 @@ class EditableTable extends React.Component {
     })
   }
 
-  handleSave = (row) => {
+  async getResumeDetail(rm_code) {
+    if (rm_code) {
+      this.setState({
+        loading: true
+      })
+      await console.log('userid', this.props.user_id)
+      await console.log('rm_code', rm_code)
+      await Axios.post('http://128.199.203.161:8000/resume/rm_detail', {
+        //모두 머지되면 아래 주소로 변경
+        // await Axios.post(API.rmDetail, {
+        user_id: this.props.user_id,
+        rm_id: rm_code
+      })
+        .then(res => {
+          console.log('getResumeDetail_res', res.data.result)
+          this.setState({
+            resumeDetailData: res.data.result,
+            loading: false
+          })
+        })
+        .catch(err => {
+          console.log(err.response)
+          this.setState({
+            loading: false
+          })
+        })
+    }
+  }
+
+  handleSave = row => {
     const newData = [...this.state.dataSource]
     const index = newData.findIndex(item => row.key === item.key)
     const item = newData[index]
     newData.splice(index, 1, {
       ...item,
-      ...row,
+      ...row
     })
     this.setState({ dataSource: newData })
   }
@@ -187,11 +220,13 @@ class EditableTable extends React.Component {
         onOk={this.handleOk}
         onCancel={this.handleCancel}
       >
-        <div>[School]
+        <div>
+          [School]
           <p>{this.state.clickedData.school}</p>
         </div>
         <Divider />
-        <div>[Company]
+        <div>
+          [Company]
           <p>{this.state.clickedData.company}</p>
         </div>
         <Divider />
@@ -203,16 +238,16 @@ class EditableTable extends React.Component {
     const { dataSource, selectedRowKeys } = this.state
     const rowSelection = {
       selectedRowKeys,
-      onChange: this.onSelectChange,
+      onChange: this.onSelectChange
     }
     const hasSelected = selectedRowKeys.length > 0
     const components = {
       body: {
         row: EditableFormRow,
-        cell: EditableCell,
-      },
+        cell: EditableCell
+      }
     }
-    const columns = this.columns.map((col) => {
+    const columns = this.columns.map(col => {
       if (!col.editable) {
         return col
       }
@@ -223,8 +258,8 @@ class EditableTable extends React.Component {
           editable: col.editable,
           dataIndex: col.dataIndex,
           title: col.title,
-          handleSave: this.handleSave,
-        }),
+          handleSave: this.handleSave
+        })
       }
     })
 
@@ -233,26 +268,23 @@ class EditableTable extends React.Component {
     return (
       <div>
         <br />
-        <Button 
+        <Button
           onClick={this.handleAdd}
-          type='primary'
-          icon='user-add'
-          style={{ marginBottom: 16 }}>
+          type="primary"
+          icon="user-add"
+          style={{ marginBottom: 16 }}
+        >
           등록
         </Button>
         <Button
-          type='primary'
-          icon='mail'
+          type="primary"
+          icon="mail"
           onClick={this.sendMail}
           disabled={!hasSelected}
         >
           메일
         </Button>
-        <Button
-          type='primary'
-          icon='message'
-          disabled={!hasSelected}
-        >
+        <Button type="primary" icon="message" disabled={!hasSelected}>
           SMS
         </Button>
         <p style={{ marginLeft: 8 }}>
@@ -260,14 +292,14 @@ class EditableTable extends React.Component {
         </p>
         <Table
           components={components}
-          rowKey='rm_code'
+          rowKey="rm_code"
           rowClassName={() => 'editable-row'}
           bordered
           dataSource={dataSource}
           rowSelection={rowSelection}
-          onRow={(record) => ({
+          onRow={record => ({
             onClick: () => this.handleClick(record)
-        })}
+          })}
           columns={columns}
         />
         <this.peopleModal />
