@@ -1,77 +1,57 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { Link } from 'react-router-dom'
-import { Menu } from 'semantic-ui-react'
+import { Menu, Icon } from 'antd'
 
-class Navbar extends Component {
-  state = { activeItem: 'People' }
-  handleItemClick = (e, { name }) => this.setState({ activeItem: name })
-  handlePeopleItemActive = e => this.setState({ activeItem: 'People' })
+export default class Test extends React.Component {
+  state = {
+    current: 'people'
+  }
+
+  handleClick = (e) => {
+    this.setState({
+      current: e.key
+    })
+  }
+
   render() {
-    const { activeItem } = this.state
+    console.log('state?!', this.state)
     return (
-      <React.Fragment>
-        <Menu>
-          <Menu.Item
-            as={Link}
-            to="/people"
-            onClick={this.handlePeopleItemActive}
-            header
+      <Menu
+        onClick={this.handleClick}
+        selectedKeys={this.state.current}
+        mode='horizontal'
+        >
+        <Menu.Item 
+          key='people'
+          onClick={this.handleClick}
           >
-            Recruit Manager
-          </Menu.Item>
-
-          <Menu.Item
-            as={Link}
-            to="/job"
-            name="Job"
-            active={activeItem === 'Job'}
-            onClick={this.handleItemClick}
+          <Link to='/'><span><Icon type='home' /><span>Recruit Manager</span></span></Link>
+        </Menu.Item>
+        <Menu.Item 
+          key='job'
+          onClick={this.handleClick}
           >
-            Job
-          </Menu.Item>
-
-          <Menu.Item
-            as={Link}
-            to="/people"
-            name="People"
-            active={activeItem === 'People'}
-            onClick={this.handleItemClick}
+          <Link to='/job'><span>Job</span></Link>
+        </Menu.Item>
+        <Menu.Item 
+          key='mail'
+          onClick={this.handleClick}
           >
-            People
-          </Menu.Item>
-
-          <Menu.Item
-            as={Link}
-            to="/mail"
-            name="Mail"
-            active={activeItem === 'Mail'}
-            onClick={this.handleItemClick}
+          <Link to='/mail'><span>Mail</span></Link>
+        </Menu.Item>
+        <Menu.Item 
+          key='SMS'
+          onClick={this.handleClick}
           >
-            Mail
-          </Menu.Item>
-
-          <Menu.Item
-            as={Link}
-            to="/sms"
-            name="SMS"
-            active={activeItem === 'SMS'}
-            onClick={this.handleItemClick}
+          <Link to='/sms'><span>SMS</span></Link>
+        </Menu.Item>
+        <Menu.Item 
+          key='crawling'
+          onClick={this.handleClick}
           >
-            SMS
-          </Menu.Item>
-          <Menu.Item
-            as={Link}
-            to="/crawling"
-            name="Crawling"
-            active={activeItem === 'Crawling'}
-            onClick={this.handleItemClick}
-          >
-            Crawling
-          </Menu.Item>
-        </Menu>
-      </React.Fragment>
+          <Link to='/crawling'><span>Crawling</span></Link>
+        </Menu.Item>
+      </Menu>
     )
   }
 }
-
-export default Navbar
