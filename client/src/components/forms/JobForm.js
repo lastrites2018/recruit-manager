@@ -1,7 +1,5 @@
 import React from 'react'
-import { Form, Input, Tooltip, Icon, Cascader, Select, Button, AutoComplete, } from 'antd'
-const { Option } = Select
-const AutoCompleteOption = AutoComplete.Option
+import { Button, Cascader, Form, Input } from 'antd'
 
 const residences = [{
   value: '서울',
@@ -13,12 +11,7 @@ const residences = [{
     ],
 }]
 
-class RegistrationForm extends React.Component {
-  state = {
-    confirmDirty: false,
-    autoCompleteResult: [],
-  }
-
+class JobForm extends React.Component {
   handleSubmit = (e) => {
     e.preventDefault();
     this.props.form.validateFieldsAndScroll((err, values) => {
@@ -30,7 +23,6 @@ class RegistrationForm extends React.Component {
 
   render() {
     const { getFieldDecorator } = this.props.form;
-    const { autoCompleteResult } = this.state;
 
     const formItemLayout = {
       labelCol: {
@@ -78,10 +70,7 @@ class RegistrationForm extends React.Component {
           {getFieldDecorator('team', {
             rules: [{ required: true, message: 'Please fill in the team.' }],
           })(
-            <AutoComplete
-            >
-              <Input />
-            </AutoComplete>
+            <Input />
           )}
         </Form.Item>
         <Form.Item
@@ -89,10 +78,7 @@ class RegistrationForm extends React.Component {
           label='Notes'
         >
           {getFieldDecorator('notes')(
-            <AutoComplete
-            >
-              <Input.TextArea rows={4} />
-            </AutoComplete>
+            <Input.TextArea rows={4} />
           )}
         </Form.Item>
         
@@ -134,10 +120,7 @@ class RegistrationForm extends React.Component {
           {getFieldDecorator('keyword', {
             rules: [{ required: true, message: 'Please fill in the keyword.' }],
           })(
-            <AutoComplete
-            >
               <Input />
-            </AutoComplete>
           )}
         </Form.Item>
         <Form.Item {...tailFormItemLayout}>
@@ -148,7 +131,7 @@ class RegistrationForm extends React.Component {
   }
 }
 
-const WrappedRegistrationForm = Form.create({ name: 'register' })(RegistrationForm)
+const WrappedRegistrationForm = Form.create({ name: 'job' })(JobForm)
 
 export default {
     JobRegistration: WrappedRegistrationForm
