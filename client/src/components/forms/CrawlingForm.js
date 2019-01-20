@@ -96,8 +96,7 @@ class CrawlingForm extends React.Component {
             ]
           })(
             <Select
-              value={0}
-              size={0}
+              size="default"
               placeholder="LinkedIn | Jobkorea | Saramin | Incruit"
               onChange={this.handleOption}
             >

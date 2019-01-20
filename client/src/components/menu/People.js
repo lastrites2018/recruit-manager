@@ -5,17 +5,7 @@ import API from '../../util/api'
 import { EditableFormRow, EditableCell } from '../../util/Table'
 import 'react-table/react-table.css'
 import './menu.css'
-import {
-  Modal,
-  Input,
-  Select,
-  Button,
-  Checkbox,
-  Spin,
-  Divider,
-  Popconfirm,
-  Table
-} from 'antd'
+import { Modal, Input, Select, Button, Checkbox, Divider, Table } from 'antd'
 export default class People extends Component {
   constructor(props) {
     super(props)
