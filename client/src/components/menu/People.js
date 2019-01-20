@@ -40,64 +40,78 @@ export default class People extends Component {
       {
         key: 'name',
         title: '이름',
-        dataIndex: 'name'
+        dataIndex: 'name',
+        align: 'center'
       },
       {
         key: 'age',
         title: '나이',
-        dataIndex: 'age'
+        dataIndex: 'age',
+        width: 70,
+        align: 'center'
       },
       {
         key: 'school',
         title: '최종학력',
-        dataIndex: 'school'
+        dataIndex: 'school',
+        align: 'center'
       },
       {
         key: 'company',
         title: '주요직장',
-        dataIndex: 'company'
+        dataIndex: 'company',
+        align: 'center'
       },
       {
         key: 'career',
         title: '총 경력',
-        dataIndex: 'career'
+        dataIndex: 'career',
+        align: 'center'
       },
       {
         key: 'keyword',
         title: '핵심 키워드',
-        dataIndex: 'keyword'
+        dataIndex: 'keyword',
+        align: 'center'
       },
       {
         key: 'resume_title',
         title: 'Resume Title',
-        dataIndex: 'resume_title'
+        dataIndex: 'resume_title',
+        align: 'center',
+        width: 130
       },
       {
         key: 'salary',
         title: '연봉',
-        dataIndex: 'salary'
+        dataIndex: 'salary',
+        width: 120
       },
       {
         key: 'rate',
         title: 'Rate',
-        dataIndex: 'rate'
-      },
-      {
-        title: 'Action',
-        dataIndex: '',
-        // 이건 나중에 지워서 breadcrumb 으로 만들기
-        // row 삭제 api 필요 예) delete/rm_code/10 이런식
-        // 현재 row onClick 하면 모달이랑 같이 뜸.
-        render: (text, record) =>
-          this.state.dataSource.length >= 1 ? (
-            <Popconfirm
-              title="삭제?"
-              onConfirm={() => this.handleDelete(record.key)}
-            >
-              <a href="javascript:">삭제</a>
-            </Popconfirm>
-          ) : null
+        dataIndex: 'rate',
+        sorter: (a, b) => a.rate - b.rate,
+        sortOrder: 'descend',
+        width: 70,
+        align: 'center'
       }
+      // {
+      //   title: 'Action',
+      //   dataIndex: '',
+      //   // 이건 나중에 지워서 breadcrumb 으로 만들기
+      //   // row 삭제 api 필요 예) delete/rm_code/10 이런식
+      //   // 현재 row onClick 하면 모달이랑 같이 뜸.
+      //   render: (text, record) =>
+      //     this.state.dataSource.length >= 1 ? (
+      //       <Popconfirm
+      //         title="삭제?"
+      //         onConfirm={() => this.handleDelete(record.key)}
+      //       >
+      //         <a href="javascript:">삭제</a>
+      //       </Popconfirm>
+      //     ) : null
+      // }
     ]
   }
 
@@ -329,13 +343,18 @@ export default class People extends Component {
         <br />
         <InputGroup compact>
           <Input
-            style={{ width: '10%' }}
+            style={{
+              marginLeft: '20px',
+              width: '5%'
+            }}
             placeholder="min age"
             name="minAge"
             onChange={this.handleAgeChange}
           />
           <Input
-            style={{ width: '10%' }}
+            style={{
+              width: '5%'
+            }}
             placeholder="max age"
             name="maxAge"
             onChange={this.handleAgeChange}
@@ -348,11 +367,14 @@ export default class People extends Component {
           </Checkbox>
         </InputGroup>
         <br />
-        <Input style={{ width: '20%' }} defaultValue="검색어 (And, Or)" />
+        <Input
+          style={{ marginLeft: '20px', width: '20%' }}
+          defaultValue="검색어 (And, Or)"
+        />
         <br />
         <Select
           showSearch
-          style={{ width: '30%' }}
+          style={{ marginTop: '1px', marginLeft: '20px', width: '30%' }}
           placeholder="Choose a position"
           optionFilterProp="children"
           onChange={this.handlePositionChange}
@@ -362,7 +384,6 @@ export default class People extends Component {
           }
         >
           <Option value="개발자">개발자</Option>
-          <Option value="관리자">관리자</Option>
           <Option value="매니저">매니저</Option>
           <Option value="프론트엔드">프론트엔드</Option>
           <Option value="백엔드">백엔드</Option>
@@ -376,7 +397,7 @@ export default class People extends Component {
           Search
         </Button>
         <br />
-        <div>
+        <div style={{ marginLeft: '20px' }}>
           <br />
           <Button
             onClick={this.handleAdd}
@@ -407,6 +428,7 @@ export default class People extends Component {
             {hasSelected ? `Selected ${selectedRowKeys.length} items` : ''}
           </p>
           <Table
+            style={{ width: '85%' }}
             components={components}
             rowKey="rm_code"
             rowClassName={() => 'editable-row'}
