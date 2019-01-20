@@ -107,16 +107,46 @@ class EditableTable extends React.Component {
     })
   }
 
+  async getResumeDetail(rm_code) {
+    if (rm_code) {
+      // this.setState({
+      //   loading: true
+      // })
+      await console.log('userid', this.props.user_id)
+      await console.log('rm_code', rm_code)
+      await Axios.post(API.rmDetail, {
+        // user_id: this.props.user_id,
+        // rm_id: rm_code
+        user_id: 'rmrm',
+        rm_id: 'linkedin_1'
+      })
+        .then(res => {
+          console.log('getResumeDetail_res', res.data.result)
+          this.setState({
+            resumeDetailData: res.data.result
+            // loading: false
+          })
+        })
+        .catch(err => {
+          console.log(err.response)
+          this.setState({
+            // loading: false
+          })
+        })
+    }
+  }
+
   handleClick = clickedData => {
     this.showModal()
     this.setState({ clickedData: clickedData })
+    this.getResumeDetail(clickedData.rm_code)
   }
 
   fetch = () => {
     Axios.post(API.mainTable, {
       under_age: 0,
-      upper_age: 40,
-      top_school: true,
+      upper_age: 90,
+      top_school: false,
       keyword: '인폼'
     }).then(data => {
       const pagination = { ...this.state.pagination }
@@ -158,35 +188,6 @@ class EditableTable extends React.Component {
       count: count + 1,
       manualKey: manualKey + 1
     })
-  }
-
-  async getResumeDetail(rm_code) {
-    if (rm_code) {
-      this.setState({
-        loading: true
-      })
-      await console.log('userid', this.props.user_id)
-      await console.log('rm_code', rm_code)
-      await Axios.post('http://128.199.203.161:8000/resume/rm_detail', {
-        //모두 머지되면 아래 주소로 변경
-        // await Axios.post(API.rmDetail, {
-        user_id: this.props.user_id,
-        rm_id: rm_code
-      })
-        .then(res => {
-          console.log('getResumeDetail_res', res.data.result)
-          this.setState({
-            resumeDetailData: res.data.result,
-            loading: false
-          })
-        })
-        .catch(err => {
-          console.log(err.response)
-          this.setState({
-            loading: false
-          })
-        })
-    }
   }
 
   handleSave = row => {
@@ -272,7 +273,7 @@ class EditableTable extends React.Component {
           onClick={this.handleAdd}
           type="primary"
           icon="user-add"
-          style={{ marginBottom: 16 }}
+          style={{ marginRight: 5, marginBottom: 16 }}
         >
           등록
         </Button>
@@ -280,11 +281,17 @@ class EditableTable extends React.Component {
           type="primary"
           icon="mail"
           onClick={this.sendMail}
+          style={{ marginRight: 5 }}
           disabled={!hasSelected}
         >
           메일
         </Button>
-        <Button type="primary" icon="message" disabled={!hasSelected}>
+        <Button
+          type="primary"
+          icon="message"
+          style={{ marginRight: 5 }}
+          disabled={!hasSelected}
+        >
           SMS
         </Button>
         <p style={{ marginLeft: 8 }}>
@@ -302,7 +309,8 @@ class EditableTable extends React.Component {
           })}
           columns={columns}
         />
-        <this.peopleModal />
+        {this.state.visible && <this.peopleModal />}
+        {/* <this.peopleModal /> */}
       </div>
     )
   }
