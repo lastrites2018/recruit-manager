@@ -8,37 +8,42 @@ import './menu.css'
 export default class Crawling extends Component {
   constructor(props) {
     super(props)
-    this.state = {
-    }
-	}
-	
-	_handleSearch(event) {
-		event.preventDefault()
-		console.log('search button has been clicked!')
+    this.state = {}
+  }
 
-		Axios.post(API.crawling, {
-      user_id: 'rmrm',
-      area: '서울',
-      age: '30',
-      career: '13년',
-      crawling_site: 'incrute'
+  handleSearch({ min_age, max_age, keyword, area, websites }) {
+    {
+    }
+    console.log('search button has been clicked!')
+    console.log('crawling-userid', this.props.user_id)
+    Axios.post(API.crawling, {
+      user_id: this.props.user_id,
+      keyword: keyword,
+      area: area,
+      age: `${min_age}|${max_age}`,
+      career: '',
+      crawling_site: websites,
+      page_threshold: ''
+      // keyword: keyword,
+      // area: '서울',
+      // age: '20|25',
+      // career: '삼성전자',
+      // crawling_site: 'incrute',
+      // page_threshold: ''
     })
       .then(res => {
         console.log('crawling?', res) // currently cooking api, need to wait
-        // this.setState({
-					
-        // })
       })
       .catch(err => {
-        console.log(err.response)
+        console.log('크롤링 요청에 실패하였습니다.')
       })
-	}
-	
+  }
+
   render() {
-		return (
-			<div>
-				<CrawlingForm.CrawlingRegistration />
-			</div>
-		)
+    return (
+      <div>
+        <CrawlingForm.CrawlingRegistration handleSearch={this.handleSearch} />
+      </div>
+    )
   }
 }

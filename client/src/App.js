@@ -34,30 +34,33 @@ class App extends Component {
       <Router>
         <div id="App">
           <Navbar />
-            <Switch>
-              {this.state.isLoggedIn ? (
-                <Route exact path="/" component={People} />
-              ) : (
-                <Route
-                  path="/"
-                  render={() => (
-                    <Login
-                      isLoggedIn={this.state.isLoggedIn}
-                      login={this.login}
-                    />
-                  )}
-                />
-              )}
-
-              <Route path="/job" component={Job} />
+          <Switch>
+            {this.state.isLoggedIn ? (
+              <Route exact path="/" component={People} />
+            ) : (
               <Route
-                path="/people"
-                render={() => <People user_id={this.state.user_id} />}
+                path="/"
+                render={() => (
+                  <Login
+                    isLoggedIn={this.state.isLoggedIn}
+                    login={this.login}
+                  />
+                )}
               />
-              <Route path="/mail" component={Mail} />
-              <Route path="/sms" component={Sms} />
-              <Route path="/crawling" component={Crawling} />
-            </Switch>
+            )}
+
+            <Route path="/job" component={Job} />
+            <Route
+              path="/people"
+              render={() => <People user_id={this.state.user_id} />}
+            />
+            <Route path="/mail" component={Mail} />
+            <Route path="/sms" component={Sms} />
+            <Route
+              path="/crawling"
+              render={() => <Crawling user_id={this.state.user_id} />}
+            />
+          </Switch>
         </div>
       </Router>
     )

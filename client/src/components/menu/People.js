@@ -115,25 +115,133 @@ export default class People extends Component {
     ]
   }
 
-  sendMail = () => {
-    alert(`send Mail to [${this.state.selectedRowKeys}]`)
-    // empty after sending mail
+  sendMail = async () => {
+    await console.log('selected rows: ', this.state.selectedRowKeys)
+    await console.log('preparing to send')
+    if (this.state.selectedRowKeys.length === 1) {
+      try {
+        await Axios.post(API.sendMail, {
+          user_id: 'rmrm',
+          rm_id: this.state.selectedRowKeys[0],
+          sender: 'rmrm.help@gmail.com',
+          recipent: 'sunnykim367@gmail.com',
+          subject: 'single mail',
+          body: 'single mail'
+        })
+        await alert(`메일을 ${this.state.selectedRowKeys}에게 보냈습니다.`)
+        await this.resetSelections()
+      } catch (err) {
+        console.log('send one email error', err)
+      }
+    } else {
+      try {
+        for (let i = 0; i < this.state.selectedRowKeys.length; i++) {
+          await setTimeout(() => {
+            Axios.post(API.sendMail, {
+              user_id: 'rmrm',
+              rm_id: this.state.selectedRowKeys[i],
+              sender: 'rmrm.help@gmail.com',
+              recipent: 'sunnykim367@gmail.com',
+              subject: `multiple${i}`,
+              body: `multiple${i}`
+            })
+          }, 100)
+        }
+        await alert(`메일을 ${this.state.selectedRowKeys}에게 보냈습니다.`)
+        await this.resetSelections()
+      } catch (err) {
+        console.log('send multiple emails error', err)
+      }
+    }
+  }
+
+  sendSMS = async () => {
+    await console.log('selected rows: ', this.state.selectedRowKeys)
+    await console.log('preparing to send')
+    if (this.state.selectedRowKeys.length === 1) {
+      try {
+        await Axios.post(API.sendSMS, {
+          user_id: 'rmrm',
+          rm_id: this.state.selectedRowKeys[0],
+          recipent: '01072214890',
+          body: 'single text',
+          position: 'KT|자연어처리'
+        })
+        await alert(`문자를 ${this.state.selectedRowKeys}에게 보냈습니다.`)
+        await this.resetSelections()
+      } catch (err) {
+        console.log('send one SMS error', err)
+      }
+    } else {
+      try {
+        for (let i = 0; i < this.state.selectedRowKeys.length; i++) {
+          await setTimeout(() => {
+            Axios.post(API.sendSMS, {
+              user_id: 'rmrm',
+              rm_id: this.state.selectedRowKeys[i],
+              recipent: '01072214890',
+              body: `multiple texts${i}`,
+              position: 'KT|자연어처리'
+            })
+          }, 100)
+        }
+        await alert(`문자를 ${this.state.selectedRowKeys}에게 보냈습니다.`)
+        await this.resetSelections()
+      } catch (err) {
+        console.log('sending multiple SMS error', err)
+      }
+    }
+  }
+
+  resetSelections = () => {
     setTimeout(() => {
+      console.log('resetting row selection')
       this.setState({
         selectedRowKeys: []
       })
-    }, 1000)
+    }, 2000)
   }
 
   onSelectChange = selectedRowKeys => {
     console.log('selectedRowKeys changed: ', selectedRowKeys)
-    this.setState({ selectedRowKeys })
+    this.setState({ selectedRowKeys: selectedRowKeys })
   }
 
   handleDelete = key => {
     const dataSource = [...this.state.dataSource]
     this.setState({
       dataSource: dataSource.filter(item => item.key !== key)
+    })
+  }
+
+  handleClick = clickedData => {
+    this.showModal()
+    this.setState({ clickedData: clickedData })
+  }
+
+  handleDelete = key => {
+    const dataSource = [...this.state.dataSource]
+    this.setState({ dataSource: dataSource.filter(item => item.key !== key) })
+  }
+
+  handleAdd = () => {
+    const { count, dataSource, manualKey } = this.state
+    const newData = {
+      // uniq key 가 필요함 수정 필요!
+
+      // Warning: Each record in table should have a unique `key` prop,
+      // or set `rowKey` to an unique primary key.
+
+      rowKey: this.state.manualKey, // unique key 값을 안 준다
+      name: 'sunny',
+      age: '100',
+      school: 'uc berkeley',
+      company: 'codestates'
+    }
+    this.setState({
+      dataSource: [...dataSource, newData],
+      count: count + 1,
+      manualKey: manualKey + 1
     })
   }
 
@@ -177,7 +285,7 @@ export default class People extends Component {
       under_age: 0,
       upper_age: 90,
       top_school: false,
-      keyword: '인폼'
+      keyword: ''
     }).then(data => {
       const pagination = { ...this.state.pagination }
       // Read total count from server
