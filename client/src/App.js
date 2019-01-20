@@ -30,12 +30,10 @@ class App extends Component {
   }
 
   render() {
-    console.log('실행?')
     return (
       <Router>
         <div id="App">
           <Navbar />
-          <div className="site-content">
             <Switch>
               {this.state.isLoggedIn ? (
                 <Route exact path="/" component={People} />
@@ -60,7 +58,6 @@ class App extends Component {
               <Route path="/sms" component={Sms} />
               <Route path="/crawling" component={Crawling} />
             </Switch>
-          </div>
         </div>
       </Router>
     )

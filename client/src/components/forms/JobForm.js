@@ -55,7 +55,7 @@ class JobForm extends React.Component {
         >
           {getFieldDecorator('position', {
             rules: [{
-              type: 'position', message: 'Please fill in the position.',
+              type: 'string', message: 'Please fill in the position.',
             }, {
               required: true, message: 'Please fill in the position.',
             }],
@@ -99,8 +99,6 @@ class JobForm extends React.Component {
                 <Input placeholder='35'/>
             </Form.Item>
         </Form.Item>
-
-
 
         <Form.Item
           {...formItemLayout}

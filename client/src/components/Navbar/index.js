@@ -14,7 +14,6 @@ export default class Test extends React.Component {
   }
 
   render() {
-    console.log('state?!', this.state)
     return (
       <Menu
         onClick={this.handleClick}
