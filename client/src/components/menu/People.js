@@ -2,12 +2,13 @@ import React, { Component } from 'react'
 import EditableTable from './PeopleTable'
 import 'react-table/react-table.css'
 import './menu.css'
-import { Input, Select, Button, Checkbox, Spin } from 'antd'
+import { Input, Select, Button, Checkbox } from 'antd'
+
 export default class People extends Component {
   checkTopschool = e => {
     console.log(`isTopSchool === ${e.target.checked}`)
   }
-
+  
   render() {
     const InputGroup = Input.Group
     const Option = Select.Option
