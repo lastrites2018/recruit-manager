@@ -22,21 +22,13 @@ const columns = [{
   dataIndex: '수신확인'
 }]
 
-const rowSelection = {
-  onChange: (selectedRowKeys, selectedRows) => {
-    console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows)
-  },
-  getCheckboxProps: record => ({
-    disabled: record.name === 'Disabled User', // Column configuration not to be checked
-    name: record.name,
-  }),
-}
-
 export default class SMS extends Component {
   state = {
     loading: true,
     data: [],
-    pagination: {}
+    pagination: {},
+    selectedRowKeys: [],
+    selectedRows: []
   }
 
   componentDidMount() {
@@ -59,6 +51,11 @@ export default class SMS extends Component {
     })
   }
 
+  onSelectChange = (selectedRowKeys, selectedRows) => {
+    console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows)
+    this.setState({ selectedRowKeys: selectedRowKeys, selectedRows: selectedRows })
+  }
+
   handleTableChange = (pagination, filters, sorter) => {
     const pager = { ...this.state.pagination }
     pager.current = pagination.current
@@ -74,17 +71,63 @@ export default class SMS extends Component {
     })
   }
 
-  sendSMS = () => {
-    // API 안됌, 일단 mail api는 보류!
-    Axios.post(API.sendSMS, {
-      user_id: 'rmrm',
-      recipent: '01072214890',
-      subject:'test_subject',
-      'body':'test_body'
-    })
+  sendSMS = async () => {
+    await console.log('selected rows: ', this.state.selectedRowKeys)
+    await console.log('preparing to send')
+    if (this.state.selectedRowKeys.length === 1) {
+      try {
+        await Axios.post(API.sendSMS, {
+          user_id: 'rmrm',
+          rm_id: this.state.selectedRowKeys[0],
+          recipent: '01072214890',
+          body: 'single text',
+          position: 'KT|자연어처리'
+        })
+        await alert(`문자를 보냈습니다.`)
+        await this.resetSelections()
+      } catch(err) {
+        console.log('send one SMS error', err)
+      }
+    } else {
+      try {
+        for (let i = 0; i < this.state.selectedRowKeys.length; i++) {
+          await setTimeout(() => {
+            Axios.post(API.sendSMS, {
+              user_id: 'rmrm',
+              rm_id: this.state.selectedRowKeys[i],
+              recipent: '01072214890',
+              body: `multiple texts${i}`,
+              position: 'KT|자연어처리'
+            })
+          }, 100)
+        }
+        await alert(`문자를 보냈습니다.`)
+        await this.resetSelections()
+      } catch (err) {
+        console.log('sending multiple SMS error', err)
+      }
+    }
+  }
+
+  resetSelections = () => {
+    setTimeout(() => {
+      console.log('resetting row selection')
+      this.setState({
+        selectedRowKeys: [],
+        selectedRows: []
+      })
+    }, 2000)
   }
     
   render() {
+    const rowSelection = {
+      onChange: this.onSelectChange,
+      getCheckboxProps: record => ({
+        disabled: record.name === 'Disabled User', // Column configuration not to be checked
+        name: record.name,
+      }),
+    }
+
     return (
       <div>
         <Button
