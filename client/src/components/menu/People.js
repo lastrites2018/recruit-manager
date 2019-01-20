@@ -467,7 +467,7 @@ export default class People extends Component {
         <br />
         <Input
           style={{ marginLeft: '20px', width: '20%' }}
-          defaultValue="검색어 (And, Or)"
+          placeholder="검색어 (And, Or)"
         />
         <br />
         <Select
