@@ -18,6 +18,7 @@ class CrawlingForm extends React.Component {
     this.props.form.validateFieldsAndScroll((err, values) => {
       if (!err) {
         console.log('Received values of form: ', values)
+        values.user_id = this.props.user_id
         this.props.handleSearch(values)
       }
     })
