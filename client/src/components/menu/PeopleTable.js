@@ -3,6 +3,7 @@ import Axios from 'axios'
 import { Button, Divider, Modal, Popconfirm, Table } from 'antd'
 import { EditableFormRow, EditableCell } from '../../util/Table'
 import API from '../../util/api'
+import { timer } from 'rxjs';
 
 class EditableTable extends React.Component {
   constructor(props) {
@@ -75,10 +76,10 @@ class EditableTable extends React.Component {
         render: (text, record) =>
           this.state.dataSource.length >= 1 ? (
             <Popconfirm
-              title="삭제?"
+              title='삭제?'
               onConfirm={() => this.handleDelete(record.key)}
             >
-              <a href="javascript:">삭제</a>
+              <a href='javascript:'>삭제</a>
             </Popconfirm>
           ) : null
       }
@@ -160,8 +161,109 @@ class EditableTable extends React.Component {
     })
   }
 
-  async componentDidMount() {
-    await this.fetch()
+  sendMail = async () => {
+    await console.log('selected rows: ', this.state.selectedRowKeys)
+    await console.log('preparing to send')
+    if (this.state.selectedRowKeys.length === 1) {
+      try {
+        await Axios.post(API.sendMail, {
+          user_id: 'rmrm',
+          rm_id: this.state.selectedRowKeys[0],
+          sender: 'rmrm.help@gmail.com',
+          recipent: 'sunnykim367@gmail.com',
+          subject: 'single mail',
+          body: 'single mail'
+        })
+        await alert(`메일을 ${this.state.selectedRowKeys}에게 보냈습니다.`)
+        await this.resetSelections()
+      } catch(err) {
+        console.log('send one email error', err)
+      }
+    } else {
+      try {
+        for (let i = 0; i < this.state.selectedRowKeys.length; i++) {
+          await setTimeout(() => {
+            Axios.post(API.sendMail, {
+              user_id: 'rmrm',
+              rm_id: this.state.selectedRowKeys[i],
+              sender: 'rmrm.help@gmail.com',
+              recipent: 'sunnykim367@gmail.com',
+              subject: `multiple${i}`,
+              body: `multiple${i}`
+            })
+          }, 100)
+        }
+        await alert(`메일을 ${this.state.selectedRowKeys}에게 보냈습니다.`)
+        await this.resetSelections()
+      } catch (err) {
+        console.log('send multiple emails error', err)
+      }
+    }
+  }
+
+  sendSMS = async () => {
+    await console.log('selected rows: ', this.state.selectedRowKeys)
+    await console.log('preparing to send')
+    if (this.state.selectedRowKeys.length === 1) {
+      try {
+        await Axios.post(API.sendSMS, {
+          user_id: 'rmrm',
+          rm_id: this.state.selectedRowKeys[0],
+          recipent: '01072214890',
+          body: 'single text',
+          position: 'KT|자연어처리'
+        })
+        await alert(`문자를 ${this.state.selectedRowKeys}에게 보냈습니다.`)
+        await this.resetSelections()
+      } catch(err) {
+        console.log('send one SMS error', err)
+      }
+    } else {
+      try {
+        for (let i = 0; i < this.state.selectedRowKeys.length; i++) {
+          await setTimeout(() => {
+            Axios.post(API.sendSMS, {
+              user_id: 'rmrm',
+              rm_id: this.state.selectedRowKeys[i],
+              recipent: '01072214890',
+              body: `multiple texts${i}`,
+              position: 'KT|자연어처리'
+            })
+          }, 100)
+        }
+        await alert(`문자를 ${this.state.selectedRowKeys}에게 보냈습니다.`)
+        await this.resetSelections()
+      } catch (err) {
+        console.log('sending multiple SMS error', err)
+      }
+    }
+  }
+
+
+  resetSelections = () => {
+    setTimeout(() => {
+      console.log('resetting row selection')
+      this.setState({
+        selectedRowKeys: []
+      })
+    }, 2000)
+  }
+
+  onSelectChange = selectedRowKeys => {
+    console.log('selectedRowKeys changed: ', selectedRowKeys)
+    this.setState({ selectedRowKeys: selectedRowKeys })
+  }
+
+  handleDelete = key => {
+    const dataSource = [...this.state.dataSource]
+    this.setState({
+      dataSource: dataSource.filter(item => item.key !== key)
+    })
+  }
+
+  handleClick = clickedData => {
+    this.showModal()
+    this.setState({ clickedData: clickedData })
   }
 
   handleDelete = key => {
@@ -271,15 +373,21 @@ class EditableTable extends React.Component {
         <br />
         <Button
           onClick={this.handleAdd}
+<<<<<<< HEAD
           type="primary"
           icon="user-add"
           style={{ marginRight: 5, marginBottom: 16 }}
+=======
+          type='primary'
+          icon='user-add'
+          style={{ marginBottom: 16 }}
+>>>>>>> fedf3d00aa09e96b301c139278985a9ebf23ec19
         >
           등록
         </Button>
         <Button
-          type="primary"
-          icon="mail"
+          type='primary'
+          icon='mail'
           onClick={this.sendMail}
           style={{ marginRight: 5 }}
           disabled={!hasSelected}
@@ -287,11 +395,18 @@ class EditableTable extends React.Component {
           메일
         </Button>
         <Button
+<<<<<<< HEAD
           type="primary"
           icon="message"
           style={{ marginRight: 5 }}
           disabled={!hasSelected}
         >
+=======
+          type='primary'
+          icon='message'
+          onClick={this.sendSMS}
+          disabled={!hasSelected}>
+>>>>>>> fedf3d00aa09e96b301c139278985a9ebf23ec19
           SMS
         </Button>
         <p style={{ marginLeft: 8 }}>
@@ -299,7 +414,7 @@ class EditableTable extends React.Component {
         </p>
         <Table
           components={components}
-          rowKey="rm_code"
+          rowKey='rm_code'
           rowClassName={() => 'editable-row'}
           bordered
           dataSource={dataSource}

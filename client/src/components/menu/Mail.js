@@ -22,40 +22,17 @@ const columns = [{
   dataIndex: '수신확인'
 }]
 
-const rowSelection = {
-  onChange: (selectedRowKeys, selectedRows) => {
-    console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows)
-  },
-  getCheckboxProps: record => ({
-    disabled: record.name === 'Disabled User', // Column configuration not to be checked
-    name: record.name,
-  }),
-}
-
 export default class Mail extends Component {
   state = {
     loading: true,
     data: [],
-    pagination: {}
+    pagination: {},
+    selectedRowKeys: [],
+    selectedRows: []
   }
 
   componentDidMount() {
     this.fetch()
-  }
-
-  handleTableChange = (pagination, filters, sorter) => {
-    const pager = { ...this.state.pagination }
-    pager.current = pagination.current
-    this.setState({
-      pagination: pager,
-    })
-    this.fetch({
-      results: pagination.pageSize,
-      page: pagination.current,
-      sortField: sorter.field,
-      sortOrder: sorter.order,
-      ...filters,
-    })
   }
 
   fetch = () => {
@@ -74,19 +51,85 @@ export default class Mail extends Component {
     })
   }
 
-  sendMail = () => {
-    // API 안됌, 일단 mail api는 보류!
-    Axios.post(API.sendMail, {
-      user_id: 'rmrm',
-      rm_id: 'linkedin_1',
-      sender:'rmrm.help@gmail.com',
-      recipient:'sungunkim367@gmail.com',
-      subject:'test_subject',
-      body:'test_body'
+  onSelectChange = (selectedRowKeys, selectedRows) => {
+    console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows)
+    this.setState({ selectedRowKeys: selectedRowKeys, selectedRows: selectedRows })
+  }
+
+  handleTableChange = (pagination, filters, sorter) => {
+    const pager = { ...this.state.pagination }
+    pager.current = pagination.current
+    this.setState({
+      pagination: pager,
     })
+    this.fetch({
+      results: pagination.pageSize,
+      page: pagination.current,
+      sortField: sorter.field,
+      sortOrder: sorter.order,
+      ...filters,
+    })
+  }
+
+  sendMail = async () => {
+    await console.log('selected rows: ', this.state.selectedRows)
+    await console.log('preparing to send')
+    if (this.state.selectedRows.length === 1) {
+      try {
+        await Axios.post(API.sendMail, {
+          user_id: 'rmrm',
+          rm_id: this.state.selectedRows[0].rm_id,
+          sender: 'rmrm.help@gmail.com',
+          recipent: 'sunnykim367@gmail.com',
+          subject: 'single mail',
+          body: 'single mail'
+        })
+        await alert(`메일을 보냈습니다.`)
+        await this.resetSelections()
+      } catch(err) {
+        console.log('send one email error', err)
+      }
+    } else {
+      try {
+        for (let i = 0; i < this.state.selectedRows.length; i++) {
+          await setTimeout(() => {
+            Axios.post(API.sendMail, {
+              user_id: 'rmrm',
+              rm_id: this.state.selectedRows[i].rm_id,
+              sender: 'rmrm.help@gmail.com',
+              recipent: 'sunnykim367@gmail.com',
+              subject: `multiple${i}`,
+              body: `multiple${i}`
+            })
+          }, 100)
+        }
+        await alert(`메일을 보냈습니다.`)
+        await this.resetSelections()
+      } catch (err) {
+        console.log('send multiple emails error', err)
+      }
+    }
+  }
+
+  resetSelections = () => {
+    setTimeout(() => {
+      console.log('resetting row selection')
+      this.setState({
+        selectedRowKeys: [],
+        selectedRows: []
+      })
+    }, 2000)
   }
     
   render() {
+    const rowSelection = {
+      onChange: this.onSelectChange,
+
+      getCheckboxProps: record => ({
+        disabled: record.name === 'Disabled User', // Column configuration not to be checked
+        name: record.name,
+      }),
+    }
     return (
       <div>
         <Button

@@ -4,8 +4,6 @@ import API from '../../util/api'
 import JobForm from '../forms/JobForm'
 import { 
   Button,
-  Divider,
-  Form,
   message,
   Modal,
   Popconfirm,
@@ -44,7 +42,7 @@ const rowSelection = {
 	}),
 };
 
-export default class Jobb extends Component {
+export default class Job extends Component {
 	state = {
     loading: true,
     data: [],
@@ -101,6 +99,7 @@ export default class Jobb extends Component {
         visible={this.state.visible}
         onOk={this.handleModalOk}
         onCancel={this.handleModalCancel}
+        footer={null}
       >
       <JobForm.JobRegistration />
       
