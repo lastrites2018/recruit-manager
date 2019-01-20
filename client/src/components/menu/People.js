@@ -5,7 +5,18 @@ import API from '../../util/api'
 import { EditableFormRow, EditableCell } from '../../util/Table'
 import 'react-table/react-table.css'
 import './menu.css'
-import { Modal, Input, Select, Button, Checkbox, Divider, Table } from 'antd'
+import {
+  Modal,
+  Input,
+  Select,
+  Button,
+  Checkbox,
+  Divider,
+  Table,
+  Icon
+} from 'antd'
+import Highlighter from 'react-highlight-words'
+
 export default class People extends Component {
   constructor(props) {
     super(props)
@@ -23,7 +34,8 @@ export default class People extends Component {
       mailText: '',
       mailSubject: '',
       phoneNumber: '',
-      SMSText: ''
+      SMSText: '',
+      searchText: ''
     }
 
     this.columns = [
@@ -31,51 +43,59 @@ export default class People extends Component {
         key: 'name',
         title: '이름',
         dataIndex: 'name',
-        align: 'center'
+        align: 'center',
+        ...this.getColumnSearchProps('name')
       },
       {
         key: 'age',
         title: '나이',
         dataIndex: 'age',
         width: 70,
-        align: 'center'
+        align: 'center',
+        ...this.getColumnSearchProps('age')
       },
       {
         key: 'school',
         title: '최종학력',
         dataIndex: 'school',
-        align: 'center'
+        align: 'center',
+        ...this.getColumnSearchProps('school')
       },
       {
         key: 'company',
         title: '주요직장',
         dataIndex: 'company',
-        align: 'center'
+        align: 'center',
+        ...this.getColumnSearchProps('company')
       },
       {
         key: 'career',
         title: '총 경력',
         dataIndex: 'career',
-        align: 'center'
+        align: 'center',
+        ...this.getColumnSearchProps('career')
       },
       {
         key: 'keyword',
         title: '핵심 키워드',
         dataIndex: 'keyword',
-        align: 'center'
+        align: 'center',
+        ...this.getColumnSearchProps('keyword')
       },
       {
         key: 'resume_title',
         title: 'Resume Title',
         dataIndex: 'resume_title',
         align: 'center',
-        width: 130
+        width: 130,
+        ...this.getColumnSearchProps('resume_title')
       },
       {
         key: 'salary',
         title: '연봉',
         dataIndex: 'salary',
-        width: 120
+        width: 120,
+        ...this.getColumnSearchProps('salary')
       },
       {
         key: 'rate',
@@ -84,7 +104,8 @@ export default class People extends Component {
         sorter: (a, b) => a.rate - b.rate,
         sortOrder: 'descend',
         width: 70,
-        align: 'center'
+        align: 'center',
+        ...this.getColumnSearchProps('rate')
       }
       // {
       //   title: 'Action',
@@ -396,6 +417,77 @@ export default class People extends Component {
       </Modal>
     </div>
   )
+
+  getColumnSearchProps = dataIndex => ({
+    filterDropdown: ({
+      setSelectedKeys,
+      selectedKeys,
+      confirm,
+      clearFilters
+    }) => (
+      <div style={{ padding: 8 }}>
+        <Input
+          ref={node => {
+            this.searchInput = node
+          }}
+          placeholder={`Search ${dataIndex}`}
+          value={selectedKeys[0]}
+          onChange={e =>
+            setSelectedKeys(e.target.value ? [e.target.value] : [])
+          }
+          onPressEnter={() => this.handleSearch(selectedKeys, confirm)}
+          style={{ width: 188, marginBottom: 8, display: 'block' }}
+        />
+        <Button
+          type="primary"
+          onClick={() => this.handleSearch(selectedKeys, confirm)}
+          icon="search"
+          size="small"
+          style={{ width: 90, marginRight: 8 }}
+        >
+          Search
+        </Button>
+        <Button
+          onClick={() => this.handleReset(clearFilters)}
+          size="small"
+          style={{ width: 90 }}
+        >
+          Reset
+        </Button>
+      </div>
+    ),
+    filterIcon: filtered => (
+      <Icon type="search" style={{ color: filtered ? '#1890ff' : undefined }} />
+    ),
+    onFilter: (value, record) =>
+      record[dataIndex]
+        .toString()
+        .toLowerCase()
+        .includes(value.toLowerCase()),
+    onFilterDropdownVisibleChange: visible => {
+      if (visible) {
+        setTimeout(() => this.searchInput.select())
+      }
+    },
+    render: text => (
+      <Highlighter
+        highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+        searchWords={[this.state.searchText]}
+        autoEscape
+        textToHighlight={text && text.toString()}
+      />
+    )
+  })
+
+  handleSearch = (selectedKeys, confirm) => {
+    confirm()
+    this.setState({ searchText: selectedKeys[0] })
+  }
+
+  handleReset = clearFilters => {
+    clearFilters()
+    this.setState({ searchText: '' })
+  }
 
   async componentDidMount() {
     await this.fetch()
