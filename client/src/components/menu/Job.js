@@ -44,7 +44,7 @@ const rowSelection = {
 	}),
 };
 
-export default class Jobb extends Component {
+export default class Job extends Component {
 	state = {
     loading: true,
     data: [],
