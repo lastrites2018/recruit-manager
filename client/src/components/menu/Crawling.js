@@ -11,11 +11,20 @@ export default class Crawling extends Component {
     this.state = {}
   }
 
-  handleSearch({ min_age, max_age, keyword, area, websites }) {
-    {
-    }
+  handleSearch({
+    user_id,
+    min_age,
+    max_age,
+    keyword,
+    position,
+    area,
+    websites
+  }) {
     console.log('search button has been clicked!')
-    console.log('crawling-userid', this.props.user_id)
+
+    alert(
+      `keyword : ${keyword} area : ${area} age : ${min_age}|${max_age} ${websites}로 크롤링 요청을 하였습니다.`
+    )
     Axios.post(API.crawling, {
       user_id: this.props.user_id,
       keyword: keyword,
@@ -24,12 +33,6 @@ export default class Crawling extends Component {
       career: '',
       crawling_site: websites,
       page_threshold: ''
-      // keyword: keyword,
-      // area: '서울',
-      // age: '20|25',
-      // career: '삼성전자',
-      // crawling_site: 'incrute',
-      // page_threshold: ''
     })
       .then(res => {
         console.log('crawling?', res) // currently cooking api, need to wait
@@ -42,7 +45,10 @@ export default class Crawling extends Component {
   render() {
     return (
       <div>
-        <CrawlingForm.CrawlingRegistration handleSearch={this.handleSearch} />
+        <CrawlingForm.CrawlingRegistration
+          handleSearch={this.handleSearch}
+          user_id={this.props.user_id}
+        />
       </div>
     )
   }
