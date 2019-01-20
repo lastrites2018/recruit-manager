@@ -73,6 +73,12 @@ class CrawlingForm extends React.Component {
           </Form.Item>
         </Form.Item>
 
+        <Form.Item {...formItemLayout} label="Position">
+          {getFieldDecorator('position', {
+            rules: [{ required: true, message: 'Please fill in the position.' }]
+          })(<Input />)}
+        </Form.Item>
+
         <Form.Item {...formItemLayout} label="Keywords">
           {getFieldDecorator('keyword', {
             rules: [{ required: true, message: 'Please fill in the keyword.' }]
