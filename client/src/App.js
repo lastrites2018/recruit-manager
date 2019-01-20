@@ -49,7 +49,10 @@ class App extends Component {
               />
             )}
 
-            <Route path="/job" component={Job} />
+            <Route 
+              path="/job"
+              render={() => <Job user_id={this.state.user_id} />}
+            />
             <Route
               path="/people"
               render={() => <People user_id={this.state.user_id} />}

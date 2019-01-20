@@ -1,5 +1,7 @@
 import React from 'react'
+import Axios from 'axios'
 import { Button, Cascader, Form, Input } from 'antd'
+import API from '../../util/api'
 
 const residences = [{
   value: '서울',
@@ -12,14 +14,53 @@ const residences = [{
 }]
 
 class JobForm extends React.Component {
-  handleSubmit = (e) => {
-    e.preventDefault();
-    this.props.form.validateFieldsAndScroll((err, values) => {
-      if (!err) {
-        console.log('Received values of form: ', values);
-      }
-    });
+  state = {
+    newPosition: {}
   }
+
+
+  handleSubmit = (e) => {
+    e.preventDefault()
+    this.props.form.validateFieldsAndScroll((err, values) => {
+      if (!err) this.setState({ newPosition: values })
+    })
+    this.addPosition()
+  }
+
+  addPosition = async () => {
+    await console.log('adding position')
+    await console.log(this.state)
+    await Axios.post(API.insertPosition, {
+      user_id: this.props.user_id,
+      company: this.state.newPosition.company,
+      title: this.state.newPosition.position,
+      detail: this.state.newPosition.notes,
+      keyword: this.state.newPosition.keyword,
+      valid: 'alive',
+      age_from: this.state.newPosition.min_age,
+      age_to: this.state.newPosition.max_age
+    })
+    await console.log('position added')
+  }
+
+  // handleSubmit = (e) => {
+  //   e.preventDefault();
+  //   this.props.form.validateFieldsAndScroll((err, values) => {
+  //     if (!err) {
+  //       console.log('Received values of form: ', values)
+  //       Axios.post(API.insertPosition, {
+  //         user_id: this.props.user_id,
+  //         company: values.company,
+  //         title: values.position,
+  //         detail: values.notes,
+  //         keyword: values.keyword,
+  //         valid: 'alive',
+  //         age_from: values.min_age,
+  //         age_to: values.max_age
+  //       })
+  //     }
+  //   })
+  // }
 
   render() {
     const { getFieldDecorator } = this.props.form;
@@ -65,10 +106,10 @@ class JobForm extends React.Component {
         </Form.Item>
         <Form.Item
           {...formItemLayout}
-          label='Team'
+          label='Company'
         >
-          {getFieldDecorator('team', {
-            rules: [{ required: true, message: 'Please fill in the team.' }],
+          {getFieldDecorator('company', {
+            rules: [{ required: true, message: 'Please fill in the company.' }],
           })(
             <Input />
           )}
@@ -83,21 +124,23 @@ class JobForm extends React.Component {
         </Form.Item>
         
         <Form.Item
-            label='Age'
-            {...formItemLayout}
-            style={{ marginBottom: 0 }}
-            >
-            <Form.Item
-                style={{ display: 'inline-block', width: 'calc(50% - 12px)' }}
-            >
-                <Input placeholder='25'/>
-            </Form.Item>
-            <span style={{ display: 'inline-block', width: '24px', textAlign: 'center' }}>
-                -
-            </span>
-            <Form.Item style={{ display: 'inline-block', width: 'calc(50% - 12px)' }}>
-                <Input placeholder='35'/>
-            </Form.Item>
+          label='Age'
+          {...formItemLayout}
+          style={{ marginBottom: 0 }}
+          >
+          <Form.Item style={{ display: 'inline-block', width: 'calc(50% - 12px)' }}>
+            {getFieldDecorator('min_age')(
+            <Input placeholder='25'/>
+            )}
+          </Form.Item>
+          <span style={{ display: 'inline-block', width: '24px', textAlign: 'center' }}>
+              -
+          </span>
+          <Form.Item style={{ display: 'inline-block', width: 'calc(50% - 12px)' }}>
+          {getFieldDecorator('max_age')(
+            <Input placeholder='35'/>
+            )}
+          </Form.Item>
         </Form.Item>
 
         <Form.Item
