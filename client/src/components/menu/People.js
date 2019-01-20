@@ -517,6 +517,7 @@ export default class People extends Component {
           <Button
             type="primary"
             icon="message"
+            onClick={this.sendSMS}
             style={{ marginRight: 5 }}
             disabled={!hasSelected}
           >
