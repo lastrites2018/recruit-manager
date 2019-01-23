@@ -27,7 +27,7 @@ class JobForm extends React.Component {
     this.addPosition()
   }
 
-  addPosition = async () => {
+  addPosition = async () => { // use try and catch to avoid getting an unhandled promise error
     await console.log('adding position')
     await console.log(this.state)
     await Axios.post(API.insertPosition, {

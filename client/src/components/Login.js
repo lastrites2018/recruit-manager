@@ -44,7 +44,6 @@ export default class Login extends Component {
   }
 
   render() {
-    console.log('실행2sss?')
     if (!this.state.isAdminLoggedIn) {
       return (
         <div>
