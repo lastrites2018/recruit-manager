@@ -147,7 +147,7 @@ export default class Job extends Component {
         <a href="#" onClick={this.showModal}>
           등록
         </a>
-        <this.jobModal />
+        <this.jobModal user_id={this.props.user_id}/>
         <Table
           columns={columns}
           // rowKey={record => record.login.uuid}

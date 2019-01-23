@@ -38,7 +38,7 @@ export default class SMS extends Component {
   fetch = () => {
     Axios.post(API.getSMS, {
       user_id: 'rmrm',
-      rm_id: '*'
+      rm_code: '*'
     }).then((data) => {
       const pagination = { ...this.state.pagination }
       // Read total count from server
@@ -78,7 +78,7 @@ export default class SMS extends Component {
       try {
         await Axios.post(API.sendSMS, {
           user_id: 'rmrm',
-          rm_id: this.state.selectedRowKeys[0],
+          rm_code: this.state.selectedRowKeys[0],
           recipent: '01072214890',
           body: 'single text',
           position: 'KT|자연어처리'
@@ -94,7 +94,7 @@ export default class SMS extends Component {
           await setTimeout(() => {
             Axios.post(API.sendSMS, {
               user_id: 'rmrm',
-              rm_id: this.state.selectedRowKeys[i],
+              rm_code: this.state.selectedRowKeys[i],
               recipent: '01072214890',
               body: `multiple texts${i}`,
               position: 'KT|자연어처리'

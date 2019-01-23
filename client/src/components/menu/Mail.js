@@ -38,7 +38,7 @@ export default class Mail extends Component {
   fetch = () => {
     Axios.post(API.getMail, {
       user_id: 'rmrm',
-      rm_id: '*'
+      rm_code: '*'
     }).then((data) => {
       const pagination = { ...this.state.pagination }
       // Read total count from server
@@ -78,7 +78,7 @@ export default class Mail extends Component {
       try {
         await Axios.post(API.sendMail, {
           user_id: 'rmrm',
-          rm_id: this.state.selectedRows[0].rm_id,
+          rm_code: this.state.selectedRows[0].rm_code,
           sender: 'rmrm.help@gmail.com',
           recipent: 'sunnykim367@gmail.com',
           subject: 'single mail',
@@ -95,7 +95,7 @@ export default class Mail extends Component {
           await setTimeout(() => {
             Axios.post(API.sendMail, {
               user_id: 'rmrm',
-              rm_id: this.state.selectedRows[i].rm_id,
+              rm_code: this.state.selectedRows[i].rm_code,
               sender: 'rmrm.help@gmail.com',
               recipent: 'sunnykim367@gmail.com',
               subject: `multiple${i}`,

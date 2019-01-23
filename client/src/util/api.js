@@ -15,7 +15,7 @@ export default {
   updateMemo: `${BASE_URL}/resume/memo_update`,
   deleteMemo: `${BASE_URL}/resume/memo_delete`,
   getPosition: `${BASE_URL}/resume/view_position_table`,
-  insertPosition: `${BASE_URL}/resume/position_insert`,
+  insertPosition: `${BASE_URL}/resume/position_write`,
   updatePosition: `${BASE_URL}/resume/position_update`,
   deletePosition: `${BASE_URL}/resume/position_delete`
 }

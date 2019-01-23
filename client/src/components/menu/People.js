@@ -133,7 +133,7 @@ export default class People extends Component {
       try {
         await Axios.post(API.sendMail, {
           user_id: 'rmrm',
-          rm_id: this.state.selectedRowKeys[0],
+          rm_code: this.state.selectedRowKeys[0],
           sender: 'rmrm.help@gmail.com',
           recipent: 'sunnykim367@gmail.com',
           subject: 'single mail',
@@ -150,7 +150,7 @@ export default class People extends Component {
           await setTimeout(() => {
             Axios.post(API.sendMail, {
               user_id: 'rmrm',
-              rm_id: this.state.selectedRowKeys[i],
+              rm_code: this.state.selectedRowKeys[i],
               sender: 'rmrm.help@gmail.com',
               recipent: 'sunnykim367@gmail.com',
               subject: `multiple${i}`,
@@ -173,7 +173,7 @@ export default class People extends Component {
       try {
         await Axios.post(API.sendSMS, {
           user_id: 'rmrm',
-          rm_id: this.state.selectedRowKeys[0],
+          rm_code: this.state.selectedRowKeys[0],
           recipent: '01072214890',
           body: 'single text',
           position: 'KT|자연어처리'
@@ -189,7 +189,7 @@ export default class People extends Component {
           await setTimeout(() => {
             Axios.post(API.sendSMS, {
               user_id: 'rmrm',
-              rm_id: this.state.selectedRowKeys[i],
+              rm_code: this.state.selectedRowKeys[i],
               recipent: '01072214890',
               body: `multiple texts${i}`,
               position: 'KT|자연어처리'
@@ -267,7 +267,7 @@ export default class People extends Component {
         // user_id: this.props.user_id,
         // rm_id: rm_code
         user_id: 'rmrm',
-        rm_id: 'linkedin_1'
+        rm_code: 'linkedin_1'
       })
         .then(res => {
           console.log('getResumeDetail_res', res.data.result)
@@ -293,6 +293,7 @@ export default class People extends Component {
 
   fetch = () => {
     Axios.post(API.mainTable, {
+      user_id: this.state.user_id,
       under_age: 0,
       upper_age: 90,
       top_school: false,
@@ -312,8 +313,8 @@ export default class People extends Component {
   //send input data
   fetchAgain = () => {
     const { minAge, maxAge, isTopSchool, position } = this.state
-    console.log('this.state', this.state)
     Axios.post(API.viewMainTablePosition, {
+      user_id: this.state.user_id,
       under_age: Number(minAge) || 0,
       upper_age: Number(maxAge) || 90,
       top_school: isTopSchool,
