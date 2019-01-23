@@ -57,8 +57,8 @@ class App extends Component {
               path="/people"
               render={() => <People user_id={this.state.user_id} />}
             />
-            <Route path="/mail" component={Mail} />
-            <Route path="/sms" component={Sms} />
+            <Route path="/mail" component={Mail} user_id={this.state.user_id} />
+            <Route path="/sms" component={Sms} user_id={this.state.user_id} />
             <Route
               path="/crawling"
               render={() => <Crawling user_id={this.state.user_id} />}
