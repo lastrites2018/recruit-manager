@@ -539,6 +539,7 @@ export default class People extends Component {
               width: '5%'
             }}
             placeholder="min age"
+            maxLength={2}
             name="minAge"
             onChange={this.handleAgeChange}
           />
@@ -547,6 +548,7 @@ export default class People extends Component {
               width: '5%'
             }}
             placeholder="max age"
+            maxLength={2}
             name="maxAge"
             onChange={this.handleAgeChange}
           />
