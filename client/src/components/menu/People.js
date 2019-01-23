@@ -132,7 +132,7 @@ export default class People extends Component {
     if (this.state.selectedRowKeys.length === 1) {
       try {
         await Axios.post(API.sendMail, {
-          user_id: 'rmrm',
+          user_id: this.props.user_id,
           rm_code: this.state.selectedRowKeys[0],
           sender: 'rmrm.help@gmail.com',
           recipent: 'sunnykim367@gmail.com',
@@ -149,7 +149,7 @@ export default class People extends Component {
         for (let i = 0; i < this.state.selectedRowKeys.length; i++) {
           await setTimeout(() => {
             Axios.post(API.sendMail, {
-              user_id: 'rmrm',
+              user_id: this.props.user_id,
               rm_code: this.state.selectedRowKeys[i],
               sender: 'rmrm.help@gmail.com',
               recipent: 'sunnykim367@gmail.com',
@@ -172,7 +172,7 @@ export default class People extends Component {
     if (this.state.selectedRowKeys.length === 1) {
       try {
         await Axios.post(API.sendSMS, {
-          user_id: 'rmrm',
+          user_id: this.props.user_id,
           rm_code: this.state.selectedRowKeys[0],
           recipent: '01072214890',
           body: 'single text',
@@ -188,7 +188,7 @@ export default class People extends Component {
         for (let i = 0; i < this.state.selectedRowKeys.length; i++) {
           await setTimeout(() => {
             Axios.post(API.sendSMS, {
-              user_id: 'rmrm',
+              user_id: this.props.user_id,
               rm_code: this.state.selectedRowKeys[i],
               recipent: '01072214890',
               body: `multiple texts${i}`,
@@ -266,7 +266,7 @@ export default class People extends Component {
       await Axios.post(API.rmDetail, {
         // user_id: this.props.user_id,
         // rm_id: rm_code
-        user_id: 'rmrm',
+        user_id: this.props.user_id,
         rm_code: 'linkedin_1'
       })
         .then(res => {
@@ -293,7 +293,7 @@ export default class People extends Component {
 
   fetch = () => {
     Axios.post(API.mainTable, {
-      user_id: this.state.user_id,
+      user_id: this.props.user_id,
       under_age: 0,
       upper_age: 90,
       top_school: false,
