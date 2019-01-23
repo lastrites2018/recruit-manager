@@ -314,7 +314,7 @@ export default class People extends Component {
   fetchAgain = () => {
     const { minAge, maxAge, isTopSchool, position } = this.state
     Axios.post(API.viewMainTablePosition, {
-      user_id: this.state.user_id,
+      user_id: this.props.user_id,
       under_age: Number(minAge) || 0,
       upper_age: Number(maxAge) || 90,
       top_school: isTopSchool,

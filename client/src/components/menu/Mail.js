@@ -37,7 +37,7 @@ export default class Mail extends Component {
 
   fetch = () => {
     Axios.post(API.getMail, {
-      user_id: 'rmrm',
+      user_id: this.props.user_id,
       rm_code: '*'
     }).then((data) => {
       const pagination = { ...this.state.pagination }
@@ -77,7 +77,7 @@ export default class Mail extends Component {
     if (this.state.selectedRows.length === 1) {
       try {
         await Axios.post(API.sendMail, {
-          user_id: 'rmrm',
+          user_id: this.props.user_id,
           rm_code: this.state.selectedRows[0].rm_code,
           sender: 'rmrm.help@gmail.com',
           recipent: 'sunnykim367@gmail.com',
@@ -94,7 +94,7 @@ export default class Mail extends Component {
         for (let i = 0; i < this.state.selectedRows.length; i++) {
           await setTimeout(() => {
             Axios.post(API.sendMail, {
-              user_id: 'rmrm',
+              user_id: this.props.user_id,
               rm_code: this.state.selectedRows[i].rm_code,
               sender: 'rmrm.help@gmail.com',
               recipent: 'sunnykim367@gmail.com',
