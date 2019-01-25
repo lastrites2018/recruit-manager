@@ -27,40 +27,27 @@ class JobForm extends React.Component {
     this.addPosition()
   }
 
-  addPosition = async () => { // use try and catch to avoid getting an unhandled promise error
+  addPosition = async () => {
     await console.log('adding position')
-    await console.log(this.state)
-    await Axios.post(API.insertPosition, {
+    await console.log('user_id: ', this.props.user_id)
+    await console.log('newPosition: ', this.state.newPosition)
+    try {
+      await Axios.post(API.insertPosition, {
       user_id: this.props.user_id,
       company: this.state.newPosition.company,
       title: this.state.newPosition.position,
       detail: this.state.newPosition.notes,
       keyword: this.state.newPosition.keyword,
-      valid: 'alive',
+      valid: true,
       age_from: this.state.newPosition.min_age,
       age_to: this.state.newPosition.max_age
-    })
-    await console.log('position added')
+      })
+      await console.log('position added')
+      await this.props.close()
+    } catch (err) {
+      console.log(err)
+    }
   }
-
-  // handleSubmit = (e) => {
-  //   e.preventDefault();
-  //   this.props.form.validateFieldsAndScroll((err, values) => {
-  //     if (!err) {
-  //       console.log('Received values of form: ', values)
-  //       Axios.post(API.insertPosition, {
-  //         user_id: this.props.user_id,
-  //         company: values.company,
-  //         title: values.position,
-  //         detail: values.notes,
-  //         keyword: values.keyword,
-  //         valid: 'alive',
-  //         age_from: values.min_age,
-  //         age_to: values.max_age
-  //       })
-  //     }
-  //   })
-  // }
 
   render() {
     const { getFieldDecorator } = this.props.form;

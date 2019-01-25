@@ -114,7 +114,10 @@ export default class Job extends Component {
         onCancel={this.handleModalCancel}
         footer={null}
       >
-        <JobForm.JobRegistration />
+        <JobForm.JobRegistration 
+          user_id={this.props.user_id}
+          close={this.handleModalCancel}
+        />
       </Modal>
     </div>
   )
@@ -147,7 +150,7 @@ export default class Job extends Component {
         <a href="#" onClick={this.showModal}>
           등록
         </a>
-        <this.jobModal user_id={this.props.user_id}/>
+        <this.jobModal />
         <Table
           columns={columns}
           // rowKey={record => record.login.uuid}
