@@ -1,7 +1,9 @@
 import React, { Component } from 'react'
 import Axios from 'axios'
 import API from '../../util/api'
-import { Button, Table } from 'antd'
+import MailForm from '../forms/MailForm'
+
+import { Button, Modal, Table } from 'antd'
 
 const columns = [{
   title: '수신인',
@@ -26,9 +28,11 @@ export default class Mail extends Component {
   state = {
     loading: true,
     data: [],
+    mail: {},
     pagination: {},
     selectedRowKeys: [],
-    selectedRows: []
+    selectedRows: [],
+    visible: false
   }
 
   componentDidMount() {
@@ -71,6 +75,41 @@ export default class Mail extends Component {
     })
   }
 
+  showModal = () => {
+    console.log('show modal')
+    this.setState({ visible: true })
+  }
+
+  handleOk = () => {
+    this.setState({ visible: false })
+  }
+
+  handleCancel = () => {
+    this.setState({ visible: false })
+  }
+
+  writeMailContent = (form) => {
+    this.setState({ mail: form})
+    this.sendMail()
+  }
+
+  mailModal = () => (
+    <div>
+      <Modal
+        title="Mail"
+        visible={this.state.visible}
+        onOk={this.handleOk}
+        onCancel={this.handleCancel}
+        footer={null}
+      >
+        <MailForm.MailRegistration
+          selectedRows={this.state.selectedRows}
+          mail={this.writeMailContent}
+        />
+      </Modal>
+    </div>
+  )
+
   sendMail = async () => {
     await console.log('selected rows: ', this.state.selectedRows)
     await console.log('preparing to send')
@@ -80,9 +119,9 @@ export default class Mail extends Component {
           user_id: this.props.user_id,
           rm_code: this.state.selectedRows[0].rm_code,
           sender: 'rmrm.help@gmail.com',
-          recipent: 'sunnykim367@gmail.com',
-          subject: 'single mail',
-          body: 'single mail'
+          recipent: 'sungunkim367@gmail.com',
+          subject: this.state.mail.title,
+          body: this.state.mail.body
         })
         await alert(`메일을 보냈습니다.`)
         await this.resetSelections()
@@ -97,9 +136,9 @@ export default class Mail extends Component {
               user_id: this.props.user_id,
               rm_code: this.state.selectedRows[i].rm_code,
               sender: 'rmrm.help@gmail.com',
-              recipent: 'sunnykim367@gmail.com',
-              subject: `multiple${i}`,
-              body: `multiple${i}`
+              recipent: 'sungunkim367@gmail.com',
+              subject: this.state.mail.title,
+              body: this.state.mail.body
             })
           }, 100)
         }
@@ -130,12 +169,16 @@ export default class Mail extends Component {
         name: record.name,
       }),
     }
+
+    console.log(this.state)
+
     return (
       <div>
         <Button
             type='primary'
             icon='mail'
-            onClick={this.sendMail}
+            onClick={this.showModal}
+            // onClick={this.sendMail}
           >
             Follow up
           </Button>
@@ -149,6 +192,7 @@ export default class Mail extends Component {
           onChange={this.handleTableChange}
           rowSelection={rowSelection}
         />
+        <this.mailModal />
       </div>
     )
   }
