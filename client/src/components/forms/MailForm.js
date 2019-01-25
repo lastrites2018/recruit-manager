@@ -40,14 +40,6 @@ class MailForm extends React.Component {
       }
     }
 
-    // let defaultTitle = `${this.props.selectedRows[0].client} ${
-    //   this.props.selectedRows[0].position
-    // } 채용 제안`
-
-    // let defaultMailContent = `안녕하세요, 어제 제안드렸던 ${
-    //   this.props.selectedRows[0].position
-    // } 에 대해서 어떻게 생각해보셨는지 문의차 다시 메일 드립니다. 간략히 검토후 의향에 대해서 회신 주시면 감사하겠습니다.`
-
     return (
       <Form onSubmit={this.handleSubmit}>
         <Form.Item {...formItemLayout}>

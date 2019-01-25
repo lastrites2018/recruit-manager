@@ -104,6 +104,7 @@ export default class Mail extends Component {
   writeMailContent = form => {
     this.setState({ mail: form })
     this.sendMail()
+    this.handleCancel()
   }
 
   mailModal = () => (
@@ -132,7 +133,7 @@ export default class Mail extends Component {
           user_id: this.props.user_id,
           rm_code: this.state.selectedRows[0].rm_code,
           sender: 'rmrm.help@gmail.com',
-          recipent: 'jaewankim@codestates.com',
+          recipent: 'sungunkim367@gmail.com',
           // recipent: 'sungunkim367@gmail.com',
           subject: this.state.mail.title,
           body: this.state.mail.content,
