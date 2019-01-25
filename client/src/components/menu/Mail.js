@@ -163,7 +163,7 @@ export default class Mail extends Component {
               sender: 'rmrm.help@gmail.com',
               recipent: 'sungunkim367@gmail.com',
               subject: this.state.mail.title,
-              body: this.state.mail.body
+              body: this.state.mail.content
             })
           }, 100)
         }

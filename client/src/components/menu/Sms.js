@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
 import Axios from 'axios'
 import API from '../../util/api'
-import { Button, Table } from 'antd'
+import SmsForm from '../forms/SmsForm'
+import { Button, Modal, Table } from 'antd'
 
 const columns = [{
   title: '수신인',
@@ -28,7 +29,9 @@ export default class SMS extends Component {
     data: [],
     pagination: {},
     selectedRowKeys: [],
-    selectedRows: []
+    selectedRows: [],
+    sms: {},
+    visible: false
   }
 
   componentDidMount() {
@@ -71,7 +74,43 @@ export default class SMS extends Component {
     })
   }
 
+  showModal = () => {
+    this.setState({ visible: true })
+  }
+
+  handleOk = () => {
+    this.setState({ visible: false })
+  }
+
+  handleCancel = () => {
+    this.setState({ visible: false })
+  }
+
+  writeSmsContent = form => {
+    this.setState({ sms: form })
+    this.sendSMS()
+    this.handleCancel()
+  }
+
+  smsModal = () => (
+    <div>
+      <Modal
+        title="SMS"
+        visible={this.state.visible}
+        onOk={this.handleOk}
+        onCancel={this.handleCancel}
+        footer={null}
+      >
+        <SmsForm.SmsRegistration
+          selectedRows={this.state.selectedRows}
+          sms={this.writeSmsContent}
+        />
+      </Modal>
+    </div>
+  )
+
   sendSMS = async () => {
+    await console.log('state', this.state.sms)
     await console.log('selected rows: ', this.state.selectedRowKeys)
     await console.log('preparing to send')
     if (this.state.selectedRowKeys.length === 1) {
@@ -80,10 +119,10 @@ export default class SMS extends Component {
           user_id: this.props.user_id,
           rm_code: this.state.selectedRowKeys[0],
           recipent: '01072214890',
-          body: 'single text',
-          position: 'KT|자연어처리'
+          body: this.state.sms.content,
+          position: ''
         })
-        await alert(`문자를 보냈습니다.`)
+        await console.log(`문자를 보냈습니다.`)
         await this.resetSelections()
       } catch(err) {
         console.log('send one SMS error', err)
@@ -96,8 +135,8 @@ export default class SMS extends Component {
               user_id: this.props.user_id,
               rm_code: this.state.selectedRowKeys[i],
               recipent: '01072214890',
-              body: `multiple texts${i}`,
-              position: 'KT|자연어처리'
+              body: this.state.sms.content,
+              position: ''
             })
           }, 100)
         }
@@ -133,7 +172,8 @@ export default class SMS extends Component {
         <Button
           type='primary'
           icon='message'
-          onClick={this.sendSMS}
+          onClick={this.showModal}
+          // onClick={this.sendSMS}
         >
           Follow up
         </Button>
@@ -146,6 +186,7 @@ export default class SMS extends Component {
           onChange={this.handleTableChange}
           rowSelection={rowSelection}
         />
+        <this.smsModal />
       </div>
     )
   }
