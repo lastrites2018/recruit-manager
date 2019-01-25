@@ -36,7 +36,12 @@ class App extends Component {
           <Navbar />
           <Switch>
             {this.state.isLoggedIn ? (
-              <Route exact path="/" component={People} />
+              // <Route exact path="/" component={People} />
+              <Route
+                exact
+                path="/"
+                render={() => <People user_id={this.state.user_id} />}
+              />
             ) : (
               <Route
                 path="/"
@@ -49,7 +54,7 @@ class App extends Component {
               />
             )}
 
-            <Route 
+            <Route
               path="/job"
               render={() => <Job user_id={this.state.user_id} />}
             />
