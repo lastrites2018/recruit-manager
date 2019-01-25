@@ -50,7 +50,7 @@ export default class People extends Component {
         key: 'age',
         title: '나이',
         dataIndex: 'age',
-        width: 70,
+        width: 75,
         align: 'center',
         ...this.getColumnSearchProps('age')
       },
@@ -101,11 +101,24 @@ export default class People extends Component {
         key: 'rate',
         title: 'Rate',
         dataIndex: 'rate',
-        sorter: (a, b) => a.rate - b.rate,
-        sortOrder: 'descend',
-        width: 70,
+        // sorter: (a, b) => a.rate - b.rate,
+        // sortOrder: 'descend',
+        width: 60,
         align: 'center',
         ...this.getColumnSearchProps('rate')
+      },
+      {
+        key: 'url',
+        title: 'URL',
+        dataIndex: 'url',
+        width: 50,
+        render: (text, row, index) => {
+          return (
+            <a href={text} target="_blank" onClick={this.handleCancel}>
+              URL
+            </a>
+          )
+        }
       }
       // {
       //   title: 'Action',
@@ -267,7 +280,7 @@ export default class People extends Component {
         // user_id: this.props.user_id,
         // rm_id: rm_code
         user_id: this.props.user_id,
-        rm_code: 'linkedin_1'
+        rm_code: 'incrute_2018080595872'
       })
         .then(res => {
           console.log('getResumeDetail_res', res.data.result)
@@ -491,6 +504,7 @@ export default class People extends Component {
   }
 
   async componentDidMount() {
+    console.log('fetch!!')
     await this.fetch()
   }
 
