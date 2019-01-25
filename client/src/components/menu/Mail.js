@@ -5,24 +5,30 @@ import MailForm from '../forms/MailForm'
 
 import { Button, Modal, Table } from 'antd'
 
-const columns = [{
-  title: '수신인',
-  dataIndex: 'name',
-  render: text => <a href='javascript:'>{text}</a>,
-}, {
-  title: '발송시간',
-  dataIndex: 'send_date',
-  sorter: true
-}, {
-  title: 'Client',
-  dataIndex: 'client',
-}, {
-  title: 'Position',
-  dataIndex: 'position',
-}, {
-  title: '수신확인',
-  dataIndex: '수신확인'
-}]
+const columns = [
+  {
+    title: '수신인',
+    dataIndex: 'name',
+    render: text => <a href="javascript:">{text}</a>
+  },
+  {
+    title: '발송시간',
+    dataIndex: 'send_date',
+    sorter: true
+  },
+  {
+    title: 'Client',
+    dataIndex: 'client'
+  },
+  {
+    title: 'Position',
+    dataIndex: 'position'
+  },
+  {
+    title: '수신확인',
+    dataIndex: '수신확인'
+  }
+]
 
 export default class Mail extends Component {
   state = {
@@ -43,35 +49,42 @@ export default class Mail extends Component {
     Axios.post(API.getMail, {
       user_id: this.props.user_id,
       rm_code: '*'
-    }).then((data) => {
+    }).then(data => {
       const pagination = { ...this.state.pagination }
       // Read total count from server
       // pagination.total = data.totalCount
       this.setState({
         loading: false,
         data: data.data.result,
-        pagination,
+        pagination
       })
     })
   }
 
   onSelectChange = (selectedRowKeys, selectedRows) => {
-    console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows)
-    this.setState({ selectedRowKeys: selectedRowKeys, selectedRows: selectedRows })
+    console.log(
+      `selectedRowKeys: ${selectedRowKeys}`,
+      'selectedRows: ',
+      selectedRows
+    )
+    this.setState({
+      selectedRowKeys: selectedRowKeys,
+      selectedRows: selectedRows
+    })
   }
 
   handleTableChange = (pagination, filters, sorter) => {
     const pager = { ...this.state.pagination }
     pager.current = pagination.current
     this.setState({
-      pagination: pager,
+      pagination: pager
     })
     this.fetch({
       results: pagination.pageSize,
       page: pagination.current,
       sortField: sorter.field,
       sortOrder: sorter.order,
-      ...filters,
+      ...filters
     })
   }
 
@@ -88,8 +101,8 @@ export default class Mail extends Component {
     this.setState({ visible: false })
   }
 
-  writeMailContent = (form) => {
-    this.setState({ mail: form})
+  writeMailContent = form => {
+    this.setState({ mail: form })
     this.sendMail()
   }
 
@@ -119,13 +132,24 @@ export default class Mail extends Component {
           user_id: this.props.user_id,
           rm_code: this.state.selectedRows[0].rm_code,
           sender: 'rmrm.help@gmail.com',
-          recipent: 'sungunkim367@gmail.com',
+          recipent: 'jaewankim@codestates.com',
+          // recipent: 'sungunkim367@gmail.com',
           subject: this.state.mail.title,
-          body: this.state.mail.body
+          body: this.state.mail.content,
+          position: '' // 공백이라도 보내야 함.
         })
+          .then(data => {
+            console.log('data', data)
+          })
+          .catch(err => {
+            console.log(err.response)
+            this.setState({
+              // loading: false
+            })
+          })
         await alert(`메일을 보냈습니다.`)
-        await this.resetSelections()
-      } catch(err) {
+        // await this.resetSelections()
+      } catch (err) {
         console.log('send one email error', err)
       }
     } else {
@@ -159,29 +183,27 @@ export default class Mail extends Component {
       })
     }, 2000)
   }
-    
+
   render() {
     const rowSelection = {
       onChange: this.onSelectChange,
 
       getCheckboxProps: record => ({
         disabled: record.name === 'Disabled User', // Column configuration not to be checked
-        name: record.name,
-      }),
+        name: record.name
+      })
     }
-
-    console.log(this.state)
 
     return (
       <div>
         <Button
-            type='primary'
-            icon='mail'
-            onClick={this.showModal}
-            // onClick={this.sendMail}
-          >
-            Follow up
-          </Button>
+          type="primary"
+          icon="mail"
+          onClick={this.showModal}
+          // onClick={this.sendMail}
+        >
+          Follow up
+        </Button>
         <Table
           columns={columns}
           // rowKey={record => record.login.uuid}

@@ -2,8 +2,7 @@ import React from 'react'
 import { Button, Form, Input } from 'antd'
 
 class MailForm extends React.Component {
-  state = {
-  }
+  state = {}
 
   handleSubmit = e => {
     e.preventDefault()
@@ -41,34 +40,44 @@ class MailForm extends React.Component {
       }
     }
 
-    let defaultTitle = `${this.props.selectedRows[0].client} ${this.props.selectedRows[0].position} 채용 제안`
+    // let defaultTitle = `${this.props.selectedRows[0].client} ${
+    //   this.props.selectedRows[0].position
+    // } 채용 제안`
 
-    let defaultMailContent = `안녕하세요, 어제 제안드렸던 ${this.props.selectedRows[0].position} 에 대해서 어떻게 생각해보셨는지 문의차 다시 메일 드립니다. 간략히 검토후 의향에 대해서 회신 주시면 감사하겠습니다.`
+    // let defaultMailContent = `안녕하세요, 어제 제안드렸던 ${
+    //   this.props.selectedRows[0].position
+    // } 에 대해서 어떻게 생각해보셨는지 문의차 다시 메일 드립니다. 간략히 검토후 의향에 대해서 회신 주시면 감사하겠습니다.`
 
     return (
       <Form onSubmit={this.handleSubmit}>
         <Form.Item {...formItemLayout}>
           {getFieldDecorator('title', {
-            initialValue: defaultTitle,
+            initialValue: `${this.props.selectedRows[0].client} ${
+              this.props.selectedRows[0].position
+            } 채용 제안`,
+            // initialValue: defaultTitle,
             rules: [{ required: true, message: 'Please fill in the title.' }]
           })(<Input />)}
         </Form.Item>
 
-        <Form.Item {...formItemLayout} label='Content'>
+        <Form.Item {...formItemLayout} label="Content">
           {getFieldDecorator('content', {
-            initialValue: defaultMailContent,
+            initialValue: `안녕하세요, 어제 제안드렸던 ${
+              this.props.selectedRows[0].position
+            } 에 대해서 어떻게 생각해보셨는지 문의차 다시 메일 드립니다. 간략히 검토후 의향에 대해서 회신 주시면 감사하겠습니다.`,
+            // initialValue: defaultMailContent,
             rules: [{ required: true, message: 'Please fill in the content.' }]
           })(<Input.TextArea rows={4} />)}
         </Form.Item>
 
-        <Form.Item {...formItemLayout} label='Sign'>
+        <Form.Item {...formItemLayout} label="Sign">
           {getFieldDecorator('sign', {
             rules: [{ required: true, message: 'Please fill in the sign.' }]
           })(<Input />)}
         </Form.Item>
 
         <Form.Item {...tailFormItemLayout}>
-          <Button type='primary' htmlType='submit'>
+          <Button type="primary" htmlType="submit">
             SEND
           </Button>
         </Form.Item>
