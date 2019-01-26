@@ -42,13 +42,28 @@ class MailForm extends React.Component {
 
     return (
       <Form onSubmit={this.handleSubmit}>
-        <Form.Item {...formItemLayout}>
+        <Form.Item 
+          label='Title: '
+          {...formItemLayout}>
           {getFieldDecorator('title', {
-            initialValue: `${this.props.selectedRows[0].client} ${
-              this.props.selectedRows[0].position
-            } 채용 제안`,
-            // initialValue: defaultTitle,
+            initialValue: `채용 제안`,
             rules: [{ required: true, message: 'Please fill in the title.' }]
+          })(<Input />)}
+        </Form.Item>
+
+        <Form.Item 
+          label='Recipient: '
+          {...formItemLayout}>
+          {getFieldDecorator('receiver', {
+            initialValue: `${this.props.selectedRows[0].name}`
+          })(<Input />)}
+        </Form.Item>
+
+        <Form.Item 
+          label='Position: '
+          {...formItemLayout}>
+          {getFieldDecorator('position', {
+            initialValue: `포지션`
           })(<Input />)}
         </Form.Item>
 
