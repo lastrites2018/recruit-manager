@@ -26,7 +26,7 @@ class JobForm extends React.Component {
       title: this.state.newPosition.position,
       detail: this.state.newPosition.notes,
       keyword: this.state.newPosition.keyword,
-      valid: 'true',
+      valid: 'alive',
       age_from: this.state.newPosition.min_age,
       age_to: this.state.newPosition.max_age
       })

@@ -134,7 +134,6 @@ export default class Mail extends Component {
           rm_code: this.state.selectedRows[0].rm_code,
           sender: 'rmrm.help@gmail.com',
           recipient: 'sungunkim367@gmail.com',
-          // recipient: 'sungunkim367@gmail.com',
           subject: this.state.mail.title,
           body: this.state.mail.content,
           position: '' // 공백이라도 보내야 함.
@@ -144,9 +143,6 @@ export default class Mail extends Component {
           })
           .catch(err => {
             console.log(err.response)
-            this.setState({
-              // loading: false
-            })
           })
         await alert(`메일을 보냈습니다.`)
         // await this.resetSelections()
@@ -155,6 +151,7 @@ export default class Mail extends Component {
       }
     } else {
       try {
+        console.log(this.state.selectedRowKeys, this.state.selectedRows)
         for (let i = 0; i < this.state.selectedRows.length; i++) {
           await setTimeout(() => {
             Axios.post(API.sendMail, {
@@ -163,12 +160,13 @@ export default class Mail extends Component {
               sender: 'rmrm.help@gmail.com',
               recipient: 'sungunkim367@gmail.com',
               subject: this.state.mail.title,
-              body: this.state.mail.content
+              body: this.state.mail.content,
+              position: ''
             })
           }, 100)
         }
         await alert(`메일을 보냈습니다.`)
-        await this.resetSelections()
+        // await this.resetSelections()
       } catch (err) {
         console.log('send multiple emails error', err)
       }
