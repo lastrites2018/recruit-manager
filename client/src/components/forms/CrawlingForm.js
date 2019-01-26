@@ -52,11 +52,12 @@ class CrawlingForm extends React.Component {
 
     return (
       <Form onSubmit={this.handleSubmit}>
-        <Form.Item {...formItemLayout} label="Age" style={{ marginBottom: 0 }}>
+        <Form.Item {...formItemLayout} label="Experience" style={{ marginBottom: 0 }}>
+          
           <Form.Item
-            style={{ display: 'inline-block', width: 'calc(50% - 12px)' }}
+            style={{ display: 'inline-block', width: 'calc(25% - 12px)' }}
           >
-            {getFieldDecorator('min_age')(<Input placeholder="25" />)}
+            {getFieldDecorator('min_experience')(<Input placeholder="0" />)}
           </Form.Item>
           <span
             style={{
@@ -68,16 +69,36 @@ class CrawlingForm extends React.Component {
             -
           </span>
           <Form.Item
-            style={{ display: 'inline-block', width: 'calc(50% - 12px)' }}
+            style={{ display: 'inline-block', width: 'calc(25% - 12px)' }}
           >
-            {getFieldDecorator('max_age')(<Input placeholder="35" />)}
+            {getFieldDecorator('max_experience')(<Input placeholder="10" />)}
           </Form.Item>
         </Form.Item>
+      
+        <Form.Item {...formItemLayout} label="Age" style={{ marginBottom: 0 }}>
+          <Form.Item
+              style={{ display: 'inline-block', width: 'calc(25% - 12px)' }}
+            >
+              {getFieldDecorator('min_age')(<Input placeholder="25" />)}
+            </Form.Item>
+            <span
+              style={{
+                display: 'inline-block',
+                width: '24px',
+                textAlign: 'center'
+              }}
+            >
+              -
+            </span>
+            <Form.Item
+              style={{ display: 'inline-block', width: 'calc(25% - 12px)' }}
+            >
+              {getFieldDecorator('max_age')(<Input placeholder="35" />)}
+            </Form.Item>
+          </Form.Item>
 
         <Form.Item {...formItemLayout} label="Position">
-          {getFieldDecorator('position', {
-            rules: [{ required: true, message: 'Please fill in the position.' }]
-          })(<Input />)}
+          {getFieldDecorator('position')(<Input />)}
         </Form.Item>
 
         <Form.Item {...formItemLayout} label="Keywords">
@@ -87,9 +108,7 @@ class CrawlingForm extends React.Component {
         </Form.Item>
 
         <Form.Item {...formItemLayout} label="Area">
-          {getFieldDecorator('area', {
-            rules: [{ required: true, message: 'Please fill in the area.' }]
-          })(<Input placeholder="Seoul" />)}
+          {getFieldDecorator('area')(<Input placeholder="Seoul" />)}
         </Form.Item>
 
         <Form.Item {...formItemLayout} label="Website">
