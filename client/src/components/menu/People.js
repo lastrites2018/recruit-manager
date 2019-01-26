@@ -1,11 +1,14 @@
 import React, { Component } from 'react'
 import Axios from 'axios'
 import API from '../../util/api'
+import ResumeForm from '../forms/ResumeForm'
 import MailForm from '../forms/MailForm'
+import SmsForm from '../forms/SmsForm'
 import { EditableFormRow, EditableCell } from '../../util/Table'
 import 'react-table/react-table.css'
 import './menu.css'
 import {
+  message,
   Modal,
   Input,
   Select,
@@ -32,12 +35,15 @@ export default class People extends Component {
       manualKey: 0, // will need to change this later
       clickedData: [],
       visible: false,
+      visibleNewResume: false,
+      newResume: {},
       resumeDetailData: [],
       mailVisible: false,
       mailText: '',
       mailSubject: '',
       phoneNumber: '',
-      SMSText: '',
+      sms: {},
+      smsVisible: false,
       searchText: '',
       andOr: ''
     }
@@ -220,7 +226,43 @@ export default class People extends Component {
     }
   }
 
+  showSmsModal = () => {
+    this.setState({ smsVisible: true })
+  }
+
+  handleSmsOk = () => {
+    this.setState({ smsVisible: false })
+  }
+
+  handleSmsCancel = () => {
+    this.setState({ smsVisible: false })
+  }
+
+  writeSmsContent = form => {
+    this.setState({ sms: form })
+    this.sendSMS()
+    this.handleSmsCancel()
+  }
+
+  smsModal = () => (
+    <div>
+      <Modal
+        title="SMS"
+        visible={this.state.smsVisible}
+        onOk={this.handleSmsOk}
+        onCancel={this.handleSmsCancel}
+        footer={null}
+      >
+        <SmsForm.SmsRegistration
+          selectedRows={this.state.selectedRows}
+          sms={this.writeSmsContent}
+        />
+      </Modal>
+    </div>
+  )
+
   sendSMS = async () => {
+    await console.log('state', this.state.sms)
     await console.log('selected rows: ', this.state.selectedRowKeys)
     await console.log('preparing to send')
     if (this.state.selectedRowKeys.length === 1) {
@@ -229,12 +271,12 @@ export default class People extends Component {
           user_id: this.props.user_id,
           rm_code: this.state.selectedRowKeys[0],
           recipient: '01072214890',
-          body: 'single text',
-          position: 'KT|자연어처리'
+          body: this.state.sms.content,
+          position: ''
         })
-        await alert(`문자를 ${this.state.selectedRowKeys}에게 보냈습니다.`)
-        await this.resetSelections()
-      } catch (err) {
+        await console.log(`문자를 보냈습니다.`)
+        // await this.resetSelections()
+      } catch(err) {
         console.log('send one SMS error', err)
       }
     } else {
@@ -245,13 +287,13 @@ export default class People extends Component {
               user_id: this.props.user_id,
               rm_code: this.state.selectedRowKeys[i],
               recipient: '01072214890',
-              body: `multiple texts${i}`,
-              position: 'KT|자연어처리'
+              body: this.state.sms.content,
+              position: ''
             })
           }, 100)
         }
-        await alert(`문자를 ${this.state.selectedRowKeys}에게 보냈습니다.`)
-        await this.resetSelections()
+        await alert(`문자를 보냈습니다.`)
+        // await this.resetSelections()
       } catch (err) {
         console.log('sending multiple SMS error', err)
       }
@@ -563,11 +605,45 @@ export default class People extends Component {
   }
 
   filterAndOr = () => {
-
+    // api 기다리는 중
   }
 
+  // handleNewResume = (newResume) => {
+  //   this.setState({ newResume: newResume })
+  // }
+
+  showAddResumeModal = () => {
+    this.setState({ visibleNewResume: true })
+  }
+
+  handleAddResumeOk = () => {
+    this.setState({ visibleNewResume: false })
+  }
+
+  handleAddResumeCancel = () => {
+    this.setState({ visibleNewResume: false }, () => {
+      message.success('A resume has been added!')
+    })
+  }
+
+  addResumeModal = () => (
+    <div>
+      <Modal
+        title='레쥬메 등록'
+        visible={this.state.visibleNewResume}
+        onOk={this.handleAddResumeOk}
+        onCancel={this.handleAddResumeCancel}
+        footer={null}
+      >
+        <ResumeForm.ResumeRegistration
+          user_id={this.props.user_id}
+          close={this.handleAddResumeCancel}
+        />
+      </Modal>
+    </div>
+  )
+
   async componentDidMount() {
-    console.log('fetch!!')
     await this.fetch()
   }
 
@@ -670,9 +746,10 @@ export default class People extends Component {
         <div style={{ marginLeft: '20px' }}>
           <br />
           <Button
-            onClick={this.handleAdd}
+            // onClick={this.handleAdd}
             type="primary"
             icon="user-add"
+            onClick={this.showAddResumeModal}
             style={{ marginRight: 5, marginBottom: 16 }}
           >
             등록
@@ -689,7 +766,7 @@ export default class People extends Component {
           <Button
             type="primary"
             icon="message"
-            onClick={this.sendSMS}
+            onClick={this.showSmsModal}
             style={{ marginRight: 5 }}
             disabled={!hasSelected}
           >
@@ -713,6 +790,8 @@ export default class People extends Component {
           />
           {this.state.visible && <this.peopleModal />}
           <this.mailModal />
+          <this.smsModal />
+          <this.addResumeModal />
         </div>
       </div>
     )
