@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import Axios from 'axios'
 import API from '../../util/api'
-
+import MailForm from '../forms/MailForm'
 import { EditableFormRow, EditableCell } from '../../util/Table'
 import 'react-table/react-table.css'
 import './menu.css'
@@ -21,16 +21,19 @@ export default class People extends Component {
   constructor(props) {
     super(props)
     this.state = {
+      mail: {},
       minAge: '',
       maxAge: '',
       isTopSchool: false,
       position: '',
       dataSource: [],
       selectedRowKeys: [],
+      selectedRows: [],
       manualKey: 0, // will need to change this later
       clickedData: [],
       visible: false,
       resumeDetailData: [],
+      mailVisible: false,
       mailText: '',
       mailSubject: '',
       phoneNumber: '',
@@ -139,21 +142,57 @@ export default class People extends Component {
     ]
   }
 
+  showMailModal = () => {
+    this.setState({ mailVisible: true })
+  }
+
+  handleMailOk = () => {
+    this.setState({ mailVisible: false })
+  }
+
+  handleMailCancel = () => {
+    this.setState({ mailVisible: false })
+  }
+
+  writeMailContent = form => {
+    this.setState({ mail: form })
+    this.sendMail()
+    this.handleMailCancel()
+  }
+
+  mailModal = () => (
+    <div>
+      <Modal
+        title="Mail"
+        visible={this.state.mailVisible}
+        onOk={this.handleMailOk}
+        onCancel={this.handleMailCancel}
+        footer={null}
+      >
+        <MailForm.MailRegistration
+          selectedRows={this.state.selectedRows}
+          mail={this.writeMailContent}
+        />
+      </Modal>
+    </div>
+  )
+
   sendMail = async () => {
-    await console.log('selected rows: ', this.state.selectedRowKeys)
+    await console.log(this.state.selectedRowKey, this.state.selectedRows)
     await console.log('preparing to send')
     if (this.state.selectedRowKeys.length === 1) {
       try {
         await Axios.post(API.sendMail, {
           user_id: this.props.user_id,
-          rm_code: this.state.selectedRowKeys[0],
+          rm_code: this.state.selectedRows[0].rm_code,
           sender: 'rmrm.help@gmail.com',
-          recipient: 'sunnykim367@gmail.com',
+          recipient: 'sungunkim367@gmail.com',
           subject: 'single mail',
-          body: 'single mail'
+          body: 'single mail',
+          position: ''
         })
         await alert(`메일을 ${this.state.selectedRowKeys}에게 보냈습니다.`)
-        await this.resetSelections()
+        // await this.resetSelections()
       } catch (err) {
         console.log('send one email error', err)
       }
@@ -163,16 +202,17 @@ export default class People extends Component {
           await setTimeout(() => {
             Axios.post(API.sendMail, {
               user_id: this.props.user_id,
-              rm_code: this.state.selectedRowKeys[i],
+              rm_code: this.state.selectedRows[0].rm_code,
               sender: 'rmrm.help@gmail.com',
-              recipient: 'sunnykim367@gmail.com',
+              recipient: 'sungunkim367@gmail.com',
               subject: `multiple${i}`,
-              body: `multiple${i}`
+              body: `multiple${i}`,
+              position: ''
             })
           }, 100)
         }
         await alert(`메일을 ${this.state.selectedRowKeys}에게 보냈습니다.`)
-        await this.resetSelections()
+        // await this.resetSelections()
       } catch (err) {
         console.log('send multiple emails error', err)
       }
@@ -226,9 +266,16 @@ export default class People extends Component {
     }, 2000)
   }
 
-  onSelectChange = selectedRowKeys => {
-    console.log('selectedRowKeys changed: ', selectedRowKeys)
-    this.setState({ selectedRowKeys: selectedRowKeys })
+  onSelectChange = (selectedRowKeys, selectedRows) => {
+    console.log(
+      `selectedRowKeys: ${selectedRowKeys}`,
+      'selectedRows: ',
+      selectedRows
+    )
+    this.setState({
+      selectedRowKeys: selectedRowKeys,
+      selectedRows: selectedRows
+    })
   }
 
   async getResumeDetail(rm_code) {
@@ -372,13 +419,13 @@ export default class People extends Component {
         onCancel={this.handleCancel}
       >
         <div>
-          {/* [School]
+          [School]
           <p>{this.state.clickedData.school}</p>
         </div>
         <Divider />
         <div>
           [Company]
-          <p>{this.state.clickedData.company}</p> */}
+          <p>{this.state.clickedData.company}</p>
         </div>
         <Divider />
       </Modal>
@@ -464,8 +511,7 @@ export default class People extends Component {
   render() {
     const InputGroup = Input.Group
     const Option = Select.Option
-    // const { user_id } = this.props
-    // const { minAge, maxAge, isTopSchool, position } = this.state
+
     const { dataSource, selectedRowKeys } = this.state
     const rowSelection = {
       selectedRowKeys,
@@ -494,7 +540,7 @@ export default class People extends Component {
       }
     })
 
-    console.log('clicked data', this.state.clickedData)
+    // console.log('clicked data', this.state.clickedData)
 
     return (
       <div>
@@ -570,7 +616,8 @@ export default class People extends Component {
           <Button
             type="primary"
             icon="mail"
-            onClick={this.sendMail}
+            onClick={this.showMailModal}
+            // onClick={this.sendMail}
             style={{ marginRight: 5 }}
             disabled={!hasSelected}
           >
@@ -589,19 +636,20 @@ export default class People extends Component {
             {hasSelected ? `Selected ${selectedRowKeys.length} items` : ''}
           </p>
           <Table
+            columns={columns}
+            bordered
             style={{ width: '85%' }}
+            dataSource={dataSource}
             components={components}
             rowKey="rm_code"
             rowClassName={() => 'editable-row'}
-            bordered
-            dataSource={dataSource}
             rowSelection={rowSelection}
             onRow={record => ({
               onClick: () => this.handleClick(record)
             })}
-            columns={columns}
           />
           {this.state.visible && <this.peopleModal />}
+          <this.mailModal />
         </div>
       </div>
     )
