@@ -79,7 +79,7 @@ class MailForm extends React.Component {
           {getFieldDecorator('position', {
             rules: [{ required: true, message: 'Please select the position.' }]
           })(
-            <optionList />
+            {optionList}
           )}
         </Form.Item>
 
