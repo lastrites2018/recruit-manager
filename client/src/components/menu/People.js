@@ -40,7 +40,8 @@ export default class People extends Component {
       SMSText: '',
       searchText: '',
       selected: '',
-      andOr: ''
+      andOr: '',
+      positionData: []
     }
 
     this.columns = [
@@ -308,6 +309,7 @@ export default class People extends Component {
   }
 
   fetch = () => {
+    console.log('userid', this.props.user_id)
     Axios.post(API.mainTable, {
       user_id: this.props.user_id,
       under_age: 0,
@@ -326,15 +328,40 @@ export default class People extends Component {
     })
   }
 
+  fetchPosition = () => {
+    console.log('userid-fetch', this.props.user_id)
+    Axios.post(API.getPosition, {
+      user_id: this.props.user_id
+    }).then(data => {
+      this.setState({
+        positionData: data.data.result
+      })
+      console.log('position data', data.data.result)
+    })
+  }
+
   //send input data
   fetchAgain = () => {
+    console.log('userid-fetchagain', this.props.user_id)
     const { minAge, maxAge, isTopSchool, position, andOr } = this.state
+    let unitedSearch = ''
+    if (position && andOr) {
+      unitedSearch = `${position}||${andOr}`
+    } else if (position) {
+      unitedSearch = position
+    } else if (andOr) {
+      unitedSearch = andOr
+    }
+
+    console.log('unitedSearch', unitedSearch)
     Axios.post(API.viewMainTablePosition, {
       user_id: this.props.user_id,
       under_age: Number(minAge) || 0,
       upper_age: Number(maxAge) || 90,
       top_school: isTopSchool,
-      keyword: andOr
+      keyword: unitedSearch
+      // position: position
+      // keyword: andOr
     }).then(data => {
       const pagination = { ...this.state.pagination }
       pagination.total = 200
@@ -571,8 +598,16 @@ export default class People extends Component {
     this.setState({ searchText: '' })
   }
 
-  handleAndOR = searchWords => {
-    this.setState({ andOr: searchWords })
+  handleAndOR = e => {
+    let words
+    const searchWords = e.target.value
+    if (searchWords && searchWords.includes(' ')) {
+      words = searchWords.split(' ').join('||')
+    } else {
+      words = searchWords
+    }
+
+    this.setState({ andOr: words })
   }
 
   filterAndOr = () => {}
@@ -580,6 +615,7 @@ export default class People extends Component {
   async componentDidMount() {
     console.log('fetch!!')
     await this.fetch()
+    await this.fetchPosition()
   }
 
   render() {
@@ -614,7 +650,12 @@ export default class People extends Component {
       }
     })
 
-    // console.log('clicked data', this.state.clickedData)
+    const optionList = this.state.positionData.map((position, index) => (
+      <Option value={position.keyword} key={index}>
+        {`${position.title}    키워드 : ${position.keyword}`}
+        {/* {position.title} */}
+      </Option>
+    ))
 
     return (
       <div>
@@ -649,7 +690,7 @@ export default class People extends Component {
         <br />
         <Input
           style={{ marginLeft: '20px', width: '20%' }}
-          placeholder="검색어 (And, Or)"
+          placeholder="검색어 (or)"
           onChange={this.handleAndOR}
         />
         <br />
@@ -664,10 +705,11 @@ export default class People extends Component {
             0
           }
         >
-          <Option value="개발자">개발자</Option>
+          {optionList}
+          {/* <Option value="개발자">개발자</Option>
           <Option value="매니저">매니저</Option>
           <Option value="프론트엔드">프론트엔드</Option>
-          <Option value="백엔드">백엔드</Option>
+          <Option value="백엔드">백엔드</Option> */}
         </Select>
         <Button
           style={{ marginLeft: '10px' }}
