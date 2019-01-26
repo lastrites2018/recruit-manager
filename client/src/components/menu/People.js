@@ -45,11 +45,12 @@ export default class People extends Component {
       sms: {},
       smsVisible: false,
       searchText: '',
+      selected: '',
       andOr: ''
     }
 
     this.columns = [
-      {
+     
         key: 'name',
         title: '이름',
         dataIndex: 'name',
@@ -111,8 +112,8 @@ export default class People extends Component {
         key: 'rate',
         title: 'Rate',
         dataIndex: 'rate',
-        // sorter: (a, b) => a.rate - b.rate,
-        // sortOrder: 'descend',
+        sorter: (a, b) => a.rate - b.rate,
+        sortOrder: 'descend',
         width: 60,
         align: 'center',
         ...this.getColumnSearchProps('rate')
@@ -392,7 +393,6 @@ export default class People extends Component {
   }
 
   handlePositionChange = value => {
-    // console.log('event', value)
     this.setState({ position: value })
   }
 
@@ -451,6 +451,19 @@ export default class People extends Component {
 
   handleCancel = () => {
     this.setState({ visible: false })
+  }
+
+  handleSearchReset = () => {
+    this.handleClearSelected()
+    this.fetch()
+  }
+
+  // handleSelectChange = value => {
+  //   this.setState({ selected: value })
+  // }
+
+  handleClearSelected = () => {
+    this.setState({ position: null })
   }
 
   peopleModal = () => (
@@ -600,7 +613,7 @@ export default class People extends Component {
     this.setState({ searchText: '' })
   }
 
-  handleAndOR = (searchWords) => {
+  handleAndOR = searchWords => {
     this.setState({ andOr: searchWords })
   }
 
@@ -625,6 +638,7 @@ export default class People extends Component {
       message.success('A resume has been added!')
     })
   }
+
 
   addResumeModal = () => (
     <div>
@@ -719,9 +733,9 @@ export default class People extends Component {
         />
         <br />
         <Select
+          value={this.state.position}
           showSearch
           style={{ marginTop: '1px', marginLeft: '20px', width: '30%' }}
-          placeholder="Choose a position"
           optionFilterProp="children"
           onChange={this.handlePositionChange}
           filterOption={(input, option) =>
@@ -742,6 +756,14 @@ export default class People extends Component {
         >
           Search
         </Button>
+        <Button
+          style={{ marginLeft: '10px' }}
+          type="primary"
+          onClick={this.handleSearchReset}
+        >
+          Reset
+        </Button>
+
         <br />
         <div style={{ marginLeft: '20px' }}>
           <br />
