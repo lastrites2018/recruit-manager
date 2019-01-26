@@ -23,17 +23,17 @@ class ResumeForm extends React.Component {
       await Axios.post(API.insertResume, {
       user_id: this.props.user_id,
       name: this.state.newResume.name,
-      birth: '',
-      age: '',
-      gender: '',
-      mobile: '',
-      email: '',
-      job_keyword: '',
-      job_title: '',
-      educational_history: '',
-      career_history: '',
-      salary_requirement: '',
-      working_area: ''
+      birth: this.state.newResume.birth_year,
+      gender: this.state.newResume.gender,
+      mobile: this.state.newResume.mobile,
+      address: this.state.newResume.address || '',
+      email: this.state.newResume.email || '',
+      job_keyword: this.state.newResume.keywords || '',
+      job_title: this.state.newResume.job_title || '',
+      educational_history: this.state.newResume.educational_history || '',
+      career_history: this.state.newResume.career_history || '',
+      salary_requirement: this.state.newResume.salary_requirement || '',
+      working_area: this.state.newResume.working_area || '',
     })
       await console.log('resume added')
       await this.props.close()
@@ -89,9 +89,7 @@ class ResumeForm extends React.Component {
             style={{ display: 'inline-block', width: 'calc(25% - 12px)' }}>
             {getFieldDecorator('birth_year', {
               placeholder: 1993,
-              rules: [
-                { type: 'number', message: 'Birth year must be a number.'},
-                { required: true, message: 'Please fill in the birth year.' }]
+              rules: [{ required: true, message: 'Please fill in the birth year.' }]
             })(
             <Input />
             )}
