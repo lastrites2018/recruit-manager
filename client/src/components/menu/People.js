@@ -39,7 +39,8 @@ export default class People extends Component {
       phoneNumber: '',
       SMSText: '',
       searchText: '',
-      selected: ''
+      selected: '',
+      andOr: ''
     }
 
     this.columns = [
@@ -327,13 +328,13 @@ export default class People extends Component {
 
   //send input data
   fetchAgain = () => {
-    const { minAge, maxAge, isTopSchool, position } = this.state
+    const { minAge, maxAge, isTopSchool, position, andOr } = this.state
     Axios.post(API.viewMainTablePosition, {
       user_id: this.props.user_id,
       under_age: Number(minAge) || 0,
       upper_age: Number(maxAge) || 90,
       top_school: isTopSchool,
-      keyword: position || '인폼'
+      keyword: andOr
     }).then(data => {
       const pagination = { ...this.state.pagination }
       pagination.total = 200
@@ -570,6 +571,12 @@ export default class People extends Component {
     this.setState({ searchText: '' })
   }
 
+  handleAndOR = searchWords => {
+    this.setState({ andOr: searchWords })
+  }
+
+  filterAndOr = () => {}
+
   async componentDidMount() {
     console.log('fetch!!')
     await this.fetch()
@@ -643,6 +650,7 @@ export default class People extends Component {
         <Input
           style={{ marginLeft: '20px', width: '20%' }}
           placeholder="검색어 (And, Or)"
+          onChange={this.handleAndOR}
         />
         <br />
         <Select
@@ -692,7 +700,6 @@ export default class People extends Component {
             type="primary"
             icon="mail"
             onClick={this.showMailModal}
-            // onClick={this.sendMail}
             style={{ marginRight: 5 }}
             disabled={!hasSelected}
           >
