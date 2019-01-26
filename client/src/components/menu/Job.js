@@ -86,8 +86,15 @@ export default class Job extends Component {
   }
 
   onSelectChange = (selectedRowKeys, selectedRows) => {
-    console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows)
-    this.setState({ selectedRowKeys: selectedRowKeys, selectedRows: selectedRows })
+    console.log(
+      `selectedRowKeys: ${selectedRowKeys}`,
+      'selectedRows: ',
+      selectedRows
+    )
+    this.setState({
+      selectedRowKeys: selectedRowKeys,
+      selectedRows: selectedRows
+    })
   }
 
   resetSelections = () => {
@@ -122,9 +129,10 @@ export default class Job extends Component {
         onCancel={this.handleModalCancel}
         footer={null}
       >
-        <JobForm.JobRegistration 
+        <JobForm.JobRegistration
           user_id={this.props.user_id}
           close={this.handleModalCancel}
+          jobFetch={this.fetch}
         />
       </Modal>
     </div>
@@ -147,8 +155,8 @@ export default class Job extends Component {
       onChange: this.onSelectChange,
       getCheckboxProps: record => ({
         disabled: record.name === 'Disabled User', // Column configuration not to be checked
-        name: record.name,
-      }),
+        name: record.name
+      })
     }
 
     return (
