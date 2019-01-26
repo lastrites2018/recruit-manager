@@ -51,6 +51,14 @@ class SmsForm extends React.Component {
           })(<Input />)}
         </Form.Item>
 
+        <Form.Item {...formItemLayout}>
+          {getFieldDecorator('receiver', {
+            initialValue: `${this.props.selectedRows[0].name} ${
+              this.props.selectedRows[0].position
+            } 채용 제안`,
+          })(<Input />)}
+        </Form.Item>
+
         <Form.Item {...formItemLayout} label="Content">
           {getFieldDecorator('content', {
             initialValue: `안녕하세요, 어제 제안드렸던 ${
