@@ -50,7 +50,7 @@ export default class People extends Component {
     }
 
     this.columns = [
-     
+      {
         key: 'name',
         title: '이름',
         dataIndex: 'name',
