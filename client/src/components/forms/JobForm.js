@@ -7,8 +7,7 @@ class JobForm extends React.Component {
   state = {
     newPosition: {}
   }
-
-
+  
   handleSubmit = (e) => {
     e.preventDefault()
     this.props.form.validateFieldsAndScroll((err, values) => {
