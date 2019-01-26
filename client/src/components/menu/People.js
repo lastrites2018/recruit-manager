@@ -284,13 +284,13 @@ export default class People extends Component {
       await console.log('rm_code', rm_code)
       await Axios.post(API.rmDetail, {
         user_id: this.props.user_id,
-        rm_code: 'incrute_2018080595872'
+        rm_code
+        // rm_code: 'incrute_2018080595872'
       })
         .then(res => {
           console.log('getResumeDetail_res', res.data.result)
           this.setState({
             resumeDetailData: res.data.result
-            // loading: false
           })
         })
         .catch(err => {
@@ -299,10 +299,10 @@ export default class People extends Component {
     }
   }
 
-  handleClick = clickedData => {
-    this.showModal()
-    this.setState({ clickedData: clickedData })
-    this.getResumeDetail(clickedData.rm_code)
+  handleClick = async clickedData => {
+    await this.getResumeDetail(clickedData.rm_code)
+    await this.showModal()
+    await this.setState({ clickedData: clickedData })
   }
 
   fetch = () => {
@@ -420,17 +420,71 @@ export default class People extends Component {
       >
         <div>
           [School]
-          <p>{this.state.clickedData.school}</p>
+          <p>{this.state.resumeDetailData[0].school}</p>
+          {/* <p>{this.state.clickedData.school}</p> */}
         </div>
         <Divider />
         <div>
           [Company]
-          <p>{this.state.clickedData.company}</p>
+          <p>{this.state.resumeDetailData[0].company}</p>
         </div>
+        {/* <this.memoTable /> */}
         <Divider />
       </Modal>
     </div>
   )
+
+  // memoTable = () => {
+  //   //temp
+
+  //   const columns = [
+  //     {
+  //       title: 'Client',
+  //       dataIndex: 'client'
+  //     },
+  //     {
+  //       title: 'Date',
+  //       dataIndex: 'date'
+  //     },
+  //     {
+  //       title: 'Text',
+  //       dataIndex: 'text'
+  //     },
+  //     {
+  //       title: 'Username',
+  //       dataIndex: 'username'
+  //     }
+  //   ]
+
+  //   console.log('tp', this.state.resumeDetailData[0])
+
+  //   // if (!this.state.resumeDetailData[0].memo) {
+  //   //   return
+  //   // }
+
+  //   // const datas = this.state.resumeDetailData[0].map(data => {
+  //   //   return {
+  //   //     client: data.memo.client,
+  //   //     date: data.memo.date,
+  //   //     position: data.memo.position,
+  //   //     text: data.memo.text,
+  //   //     username: data.memo.username
+  //   //     // memo_client: "강남상사"
+  //   //     // memo_date: "2019-01-24"
+  //   //     // memo_position: "추천을 하려고 했었음 확인"
+  //   //     // memo_text: "경리"
+  //   //     // memo_username: "username"
+  //   //   }
+  //   // })
+  //   return (
+  //     <div>
+  //       <h4>Middle size table</h4>
+  //       {/* <Table columns={columns} dataSource={datas} size="middle" />
+  //       <h4>Small size table</h4>
+  //       <Table columns={columns} dataSource={datas} size="small" /> */}
+  //     </div>
+  //   )
+  // }
 
   getColumnSearchProps = dataIndex => ({
     filterDropdown: ({
