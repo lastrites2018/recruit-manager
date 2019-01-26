@@ -71,36 +71,33 @@ class ResumeForm extends React.Component {
     return (
       <Form onSubmit={this.handleSubmit}>
         <Form.Item
-          label='이름 | 출생년도 | Gender'
+          label='* Candidate Info'
           {...formItemLayout}
           style={{ marginBottom: 0 }}
           >
-          <Form.Item style={{ display: 'inline-block', width: 'calc(50% - 12px)' }}>
+          <Form.Item style={{ display: 'inline-block', width: 'calc(40% - 12px)' }}>
             {getFieldDecorator('name', {
-              placeholder: '이름',
               rules: [
                 { type: 'string', message: 'Name must be a string.'},
                 { required: true, message: 'Please fill in the name.' }]
             })(
-            <Input />
+            <Input placeholder='이름' />
             )}
           </Form.Item>
           <Form.Item
             style={{ display: 'inline-block', width: 'calc(25% - 12px)' }}>
             {getFieldDecorator('birth_year', {
-              placeholder: 1993,
               rules: [{ required: true, message: 'Please fill in the birth year.' }]
             })(
-            <Input />
+            <Input placeholder='1993' />
             )}
           </Form.Item>
           <Form.Item
             style={{ display: 'inline-block', width: 'calc(25% - 12px)' }}>
           {getFieldDecorator('gender', {
-            placeholder: '남 | 여',
             rules: [{ type: 'string', message: 'Gender must be a number.'}]
           })(
-            <Input />
+            <Input placeholder='남/여' />
             )}
           </Form.Item>
         </Form.Item>
