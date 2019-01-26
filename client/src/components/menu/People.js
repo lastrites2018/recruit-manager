@@ -148,7 +148,7 @@ export default class People extends Component {
           user_id: this.props.user_id,
           rm_code: this.state.selectedRowKeys[0],
           sender: 'rmrm.help@gmail.com',
-          recipent: 'sunnykim367@gmail.com',
+          recipient: 'sunnykim367@gmail.com',
           subject: 'single mail',
           body: 'single mail'
         })
@@ -165,7 +165,7 @@ export default class People extends Component {
               user_id: this.props.user_id,
               rm_code: this.state.selectedRowKeys[i],
               sender: 'rmrm.help@gmail.com',
-              recipent: 'sunnykim367@gmail.com',
+              recipient: 'sunnykim367@gmail.com',
               subject: `multiple${i}`,
               body: `multiple${i}`
             })
@@ -187,7 +187,7 @@ export default class People extends Component {
         await Axios.post(API.sendSMS, {
           user_id: this.props.user_id,
           rm_code: this.state.selectedRowKeys[0],
-          recipent: '01072214890',
+          recipient: '01072214890',
           body: 'single text',
           position: 'KT|자연어처리'
         })
@@ -203,7 +203,7 @@ export default class People extends Component {
             Axios.post(API.sendSMS, {
               user_id: this.props.user_id,
               rm_code: this.state.selectedRowKeys[i],
-              recipent: '01072214890',
+              recipient: '01072214890',
               body: `multiple texts${i}`,
               position: 'KT|자연어처리'
             })
@@ -231,54 +231,11 @@ export default class People extends Component {
     this.setState({ selectedRowKeys: selectedRowKeys })
   }
 
-  handleDelete = key => {
-    const dataSource = [...this.state.dataSource]
-    this.setState({
-      dataSource: dataSource.filter(item => item.key !== key)
-    })
-  }
-
-  handleClick = clickedData => {
-    this.showModal()
-    this.setState({ clickedData: clickedData })
-  }
-
-  handleDelete = key => {
-    const dataSource = [...this.state.dataSource]
-    this.setState({ dataSource: dataSource.filter(item => item.key !== key) })
-  }
-
-  handleAdd = () => {
-    const { count, dataSource, manualKey } = this.state
-    const newData = {
-      // uniq key 가 필요함 수정 필요!
-
-      // Warning: Each record in table should have a unique `key` prop,
-      // or set `rowKey` to an unique primary key.
-
-      rowKey: this.state.manualKey, // unique key 값을 안 준다
-      name: 'sunny',
-      age: '100',
-      school: 'uc berkeley',
-      company: 'codestates'
-    }
-    this.setState({
-      dataSource: [...dataSource, newData],
-      count: count + 1,
-      manualKey: manualKey + 1
-    })
-  }
-
   async getResumeDetail(rm_code) {
     if (rm_code) {
-      // this.setState({
-      //   loading: true
-      // })
       await console.log('userid', this.props.user_id)
       await console.log('rm_code', rm_code)
       await Axios.post(API.rmDetail, {
-        // user_id: this.props.user_id,
-        // rm_id: rm_code
         user_id: this.props.user_id,
         rm_code: 'incrute_2018080595872'
       })
@@ -291,9 +248,6 @@ export default class People extends Component {
         })
         .catch(err => {
           console.log(err.response)
-          this.setState({
-            // loading: false
-          })
         })
     }
   }
@@ -333,7 +287,6 @@ export default class People extends Component {
       top_school: isTopSchool,
       keyword: position || '인폼'
     }).then(data => {
-      console.log('data', data.data.result)
       const pagination = { ...this.state.pagination }
       pagination.total = 200
       this.setState({
@@ -419,13 +372,13 @@ export default class People extends Component {
         onCancel={this.handleCancel}
       >
         <div>
-          [School]
+          {/* [School]
           <p>{this.state.clickedData.school}</p>
         </div>
         <Divider />
         <div>
           [Company]
-          <p>{this.state.clickedData.company}</p>
+          <p>{this.state.clickedData.company}</p> */}
         </div>
         <Divider />
       </Modal>
@@ -649,7 +602,6 @@ export default class People extends Component {
             columns={columns}
           />
           {this.state.visible && <this.peopleModal />}
-          {/* <this.peopleModal /> */}
         </div>
       </div>
     )

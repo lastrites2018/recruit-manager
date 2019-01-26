@@ -118,7 +118,7 @@ export default class SMS extends Component {
         await Axios.post(API.sendSMS, {
           user_id: this.props.user_id,
           rm_code: this.state.selectedRowKeys[0],
-          recipent: '01072214890',
+          recipient: '01072214890',
           body: this.state.sms.content,
           position: ''
         })
@@ -134,7 +134,7 @@ export default class SMS extends Component {
             Axios.post(API.sendSMS, {
               user_id: this.props.user_id,
               rm_code: this.state.selectedRowKeys[i],
-              recipent: '01072214890',
+              recipient: '01072214890',
               body: this.state.sms.content,
               position: ''
             })
