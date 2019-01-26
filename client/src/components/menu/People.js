@@ -38,7 +38,8 @@ export default class People extends Component {
       mailSubject: '',
       phoneNumber: '',
       SMSText: '',
-      searchText: ''
+      searchText: '',
+      selected: ''
     }
 
     this.columns = [
@@ -104,8 +105,8 @@ export default class People extends Component {
         key: 'rate',
         title: 'Rate',
         dataIndex: 'rate',
-        // sorter: (a, b) => a.rate - b.rate,
-        // sortOrder: 'descend',
+        sorter: (a, b) => a.rate - b.rate,
+        sortOrder: 'descend',
         width: 60,
         align: 'center',
         ...this.getColumnSearchProps('rate')
@@ -349,7 +350,6 @@ export default class People extends Component {
   }
 
   handlePositionChange = value => {
-    // console.log('event', value)
     this.setState({ position: value })
   }
 
@@ -408,6 +408,19 @@ export default class People extends Component {
 
   handleCancel = () => {
     this.setState({ visible: false })
+  }
+
+  handleSearchReset = () => {
+    this.handleClearSelected()
+    this.fetch()
+  }
+
+  // handleSelectChange = value => {
+  //   this.setState({ selected: value })
+  // }
+
+  handleClearSelected = () => {
+    this.setState({ position: null })
   }
 
   peopleModal = () => (
@@ -633,9 +646,9 @@ export default class People extends Component {
         />
         <br />
         <Select
+          value={this.state.position}
           showSearch
           style={{ marginTop: '1px', marginLeft: '20px', width: '30%' }}
-          placeholder="Choose a position"
           optionFilterProp="children"
           onChange={this.handlePositionChange}
           filterOption={(input, option) =>
@@ -656,6 +669,14 @@ export default class People extends Component {
         >
           Search
         </Button>
+        <Button
+          style={{ marginLeft: '10px' }}
+          type="primary"
+          onClick={this.handleSearchReset}
+        >
+          Reset
+        </Button>
+
         <br />
         <div style={{ marginLeft: '20px' }}>
           <br />
