@@ -36,7 +36,6 @@ class App extends Component {
           <Navbar />
           <Switch>
             {this.state.isLoggedIn ? (
-              // <Route exact path="/" component={People} />
               <Route
                 exact
                 path="/"

@@ -3,16 +3,6 @@ import Axios from 'axios'
 import { Button, Cascader, Form, Input } from 'antd'
 import API from '../../util/api'
 
-const residences = [{
-  value: '서울',
-  label: '서울',
-  children: [
-      {value: '강남구', label: '강남구'},
-      {value: '강동구', label: '강동구', 
-      children: [{value: '강일동', label: '강일동'}]}
-    ],
-}]
-
 class JobForm extends React.Component {
   state = {
     newPosition: {}
@@ -28,8 +18,6 @@ class JobForm extends React.Component {
   }
 
   addPosition = async () => {
-    await console.log('adding position')
-    await console.log('user_id: ', this.props.user_id)
     await console.log('newPosition: ', this.state.newPosition)
     try {
       await Axios.post(API.insertPosition, {
@@ -38,7 +26,7 @@ class JobForm extends React.Component {
       title: this.state.newPosition.position,
       detail: this.state.newPosition.notes,
       keyword: this.state.newPosition.keyword,
-      valid: true,
+      valid: 'true',
       age_from: this.state.newPosition.min_age,
       age_to: this.state.newPosition.max_age
       })
@@ -75,6 +63,38 @@ class JobForm extends React.Component {
       },
     }
 
+    const residences = [
+      {
+        value: '서울',
+        label: '서울',
+        children: [
+          {value: '강남구', label: '강남구'},
+          {value: '강동구', label: '강동구'},
+          {value: '강북구', label: '강북구'}, 
+          {value: '강서구', label: '강서구'}, 
+          {value: '관악구', label: '관악구'}, 
+          {value: '구로구', label: '구로구'}, 
+          {value: '금천구', label: '금천구'},
+          {value: '노원구', label: '노원구'},
+          {value: '도봉구', label: '도봉구'},
+          {value: '동대문구', label: '동대문구'},
+          {value: '동작구', label: '동작구'},
+          {value: '마포구', label: '마포구'},
+          {value: '서대문구', label: '서대문구'},
+          {value: '서초구', label: '서초구'},
+          {value: '성동구', label: '성동구'},
+          {value: '성북구', label: '성북구'},
+          {value: '송파구', label: '송파구'},
+          {value: '양천구', label: '양천구'},
+          {value: '영등포구', label: '영등포구'},
+          {value: '용산구', label: '용산구'},
+          {value: '은평구', label: '은평구'},
+          {value: '종로구', label: '종로구'},
+          {value: '중구', label: '중구'},
+          {value: '중랑구', label: '중랑구'}],
+        },
+        { value: '서울 외', label: '서울 외' }]
+
     return (
       <Form onSubmit={this.handleSubmit}>
         <Form.Item
@@ -82,11 +102,7 @@ class JobForm extends React.Component {
           label='Position'
         >
           {getFieldDecorator('position', {
-            rules: [{
-              type: 'string', message: 'Please fill in the position.',
-            }, {
-              required: true, message: 'Please fill in the position.',
-            }],
+            rules: [{ required: true, message: 'Please fill in the position.' }],
           })(
             <Input />
           )}
@@ -105,7 +121,9 @@ class JobForm extends React.Component {
           {...formItemLayout}
           label='Notes'
         >
-          {getFieldDecorator('notes')(
+          {getFieldDecorator('notes', {
+            initialValue: ''
+          })(
             <Input.TextArea rows={4} />
           )}
         </Form.Item>
@@ -116,16 +134,26 @@ class JobForm extends React.Component {
           style={{ marginBottom: 0 }}
           >
           <Form.Item style={{ display: 'inline-block', width: 'calc(50% - 12px)' }}>
-            {getFieldDecorator('min_age')(
-            <Input placeholder='25'/>
+            {getFieldDecorator('min_age', {
+              initialValue: 25,
+              rules: [
+                { type: 'number', message: 'Min age must be a number.'},
+                { required: true, message: 'Please fill in the min age.' }]
+            })(
+            <Input />
             )}
           </Form.Item>
           <span style={{ display: 'inline-block', width: '24px', textAlign: 'center' }}>
               -
           </span>
           <Form.Item style={{ display: 'inline-block', width: 'calc(50% - 12px)' }}>
-          {getFieldDecorator('max_age')(
-            <Input placeholder='35'/>
+          {getFieldDecorator('max_age', {
+            initialValue: 35,
+            rules: [
+              { type: 'number', message: 'Max age must be a number.'},
+              { required: true, message: 'Please fill in the max age.' }]
+          })(
+            <Input />
             )}
           </Form.Item>
         </Form.Item>
@@ -135,8 +163,7 @@ class JobForm extends React.Component {
           label='Location'
         >
           {getFieldDecorator('residence', {
-            initialValue: ['서울', '강동구', '강일동'],
-            rules: [{ type: 'array', required: true, message: 'Please select a location.' }],
+            initialValue: ['서울', '강남구'],
           })(
             <Cascader options={residences} />
           )}
@@ -146,7 +173,7 @@ class JobForm extends React.Component {
           label='Keywords'
         >
           {getFieldDecorator('keyword', {
-            rules: [{ required: true, message: 'Please fill in the keyword.' }],
+            initialValue: '',
           })(
               <Input />
           )}

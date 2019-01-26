@@ -41,25 +41,13 @@ const columns = [
   }
 ]
 
-const rowSelection = {
-  onChange: (selectedRowKeys, selectedRows) => {
-    console.log(
-      `selectedRowKeys: ${selectedRowKeys}`,
-      'selectedRows: ',
-      selectedRows
-    )
-  },
-  getCheckboxProps: record => ({
-    disabled: record.name === 'Disabled User', // Column configuration not to be checked
-    name: record.name
-  })
-}
-
 export default class Job extends Component {
   state = {
     loading: true,
     data: [],
     pagination: {},
+    selectedRowKeys: [],
+    selectedRows: [],
     visible: false
   }
 
@@ -69,7 +57,7 @@ export default class Job extends Component {
 
   fetch = () => {
     Axios.post(API.getPosition, {
-      user_id: 'rmrm'
+      user_id: this.props.user_id
     }).then(data => {
       const pagination = { ...this.state.pagination }
       // Read total count from server
@@ -97,8 +85,28 @@ export default class Job extends Component {
     })
   }
 
-  handleDeleteConfirm = e => {
-    message.success('Deleted!')
+  onSelectChange = (selectedRowKeys, selectedRows) => {
+    console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows)
+    this.setState({ selectedRowKeys: selectedRowKeys, selectedRows: selectedRows })
+  }
+
+  resetSelections = () => {
+    setTimeout(() => {
+      console.log('resetting row selection')
+      this.setState({
+        selectedRowKeys: []
+      })
+    }, 2000)
+  }
+
+  handleDeleteConfirm = async e => {
+    await Axios.post(API.deletePosition, {
+      user_id: this.props.user_id,
+      position_id: this.state.selectedRows[0].position_id,
+      valid: 'false'
+    })
+    await message.success('Deleted!')
+    await this.resetSelections()
   }
 
   handleDeleteCancel = e => {
@@ -135,6 +143,14 @@ export default class Job extends Component {
   }
 
   render() {
+    const rowSelection = {
+      onChange: this.onSelectChange,
+      getCheckboxProps: record => ({
+        disabled: record.name === 'Disabled User', // Column configuration not to be checked
+        name: record.name,
+      }),
+    }
+
     return (
       <div>
         <Popconfirm

@@ -133,8 +133,8 @@ export default class Mail extends Component {
           user_id: this.props.user_id,
           rm_code: this.state.selectedRows[0].rm_code,
           sender: 'rmrm.help@gmail.com',
-          recipent: 'sungunkim367@gmail.com',
-          // recipent: 'sungunkim367@gmail.com',
+          recipient: 'sungunkim367@gmail.com',
+          // recipient: 'sungunkim367@gmail.com',
           subject: this.state.mail.title,
           body: this.state.mail.content,
           position: '' // 공백이라도 보내야 함.
@@ -161,7 +161,7 @@ export default class Mail extends Component {
               user_id: this.props.user_id,
               rm_code: this.state.selectedRows[i].rm_code,
               sender: 'rmrm.help@gmail.com',
-              recipent: 'sungunkim367@gmail.com',
+              recipient: 'sungunkim367@gmail.com',
               subject: this.state.mail.title,
               body: this.state.mail.content
             })
