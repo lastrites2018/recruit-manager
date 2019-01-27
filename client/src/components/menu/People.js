@@ -388,10 +388,18 @@ export default class People extends Component {
     console.log('userid-fetchagain', this.props.user_id)
     const { minAge, maxAge, isTopSchool, position, andOr } = this.state
     let unitedSearch = ''
-    if (position && andOr) {
-      unitedSearch = `${position}||${andOr}`
-    } else if (position) {
-      unitedSearch = position
+    let positionSplit = ''
+
+    if (position && position.includes(' ')) {
+      positionSplit = position.split(' ').join('||')
+    } else {
+      positionSplit = position
+    }
+
+    if (positionSplit && andOr) {
+      unitedSearch = `${positionSplit}||${andOr}`
+    } else if (positionSplit) {
+      unitedSearch = positionSplit
     } else if (andOr) {
       unitedSearch = andOr
     }
