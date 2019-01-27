@@ -39,8 +39,6 @@ export default class People extends Component {
       newResume: {},
       resumeDetailData: [],
       mailVisible: false,
-      mailText: '',
-      mailSubject: '',
       phoneNumber: '',
       sms: {},
       smsVisible: false,
@@ -197,8 +195,8 @@ export default class People extends Component {
           rm_code: this.state.selectedRows[0].rm_code,
           sender: 'rmrm.help@gmail.com',
           recipient: this.state.selectedRows[0].email,
-          subject: 'single mail',
-          body: 'single mail',
+          subject: this.state.mail.title,
+          body: this.state.mail.content,
           position: ''
         })
         await alert(`메일을 ${this.state.selectedRowKeys}에게 보냈습니다.`)
@@ -215,8 +213,8 @@ export default class People extends Component {
               rm_code: this.state.selectedRows[i].rm_code,
               sender: 'rmrm.help@gmail.com',
               recipient: this.state.selectedRows[i].email,
-              subject: `multiple${i}`,
-              body: `multiple${i}`,
+              subject: this.state.mail.title,
+              body: this.state.mail.content,
               position: ''
             })
           }, 100)

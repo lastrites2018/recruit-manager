@@ -106,11 +106,11 @@ class MailForm extends React.Component {
             </Select>
           )}
         </Form.Item>
-
+s
         <Form.Item {...formItemLayout} label="Content">
           {getFieldDecorator('content', {
             initialValue: `안녕하세요, 어제 제안드렸던 ${
-              this.props.selectedRows[0].position
+              this.state.position
             } 에 대해서 어떻게 생각해보셨는지 문의차 다시 메일 드립니다. 간략히 검토후 의향에 대해서 회신 주시면 감사하겠습니다.`,
             // initialValue: defaultMailContent,
             rules: [{ required: true, message: 'Please fill in the content.' }]
