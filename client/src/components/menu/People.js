@@ -181,6 +181,7 @@ export default class People extends Component {
         <MailForm.MailRegistration
           selectedRows={this.state.selectedRows}
           mail={this.writeMailContent}
+          positionData={this.state.positionData}
         />
       </Modal>
     </div>

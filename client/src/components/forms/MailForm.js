@@ -1,8 +1,10 @@
 import React from 'react'
-import { Button, Form, Input } from 'antd'
+import { Button, Form, Input, Select } from 'antd'
 
 class MailForm extends React.Component {
-  state = {}
+  state = {
+    positon: ''
+  }
 
   handleSubmit = e => {
     e.preventDefault()
@@ -12,6 +14,10 @@ class MailForm extends React.Component {
         console.log('Received values of form: ', values)
       }
     })
+  }
+
+  handlePositionChange = value => {
+    this.setState({ position: value })
   }
 
   render() {
@@ -40,6 +46,12 @@ class MailForm extends React.Component {
       }
     }
 
+    const optionList = this.props.positionData.map((position, index) => (
+      <Select.Option value={position.keyword} key={index}>
+        {`${position.title}    키워드 : ${position.keyword}`}
+      </Select.Option>
+    ))
+
     return (
       <Form onSubmit={this.handleSubmit}>
         <Form.Item 
@@ -52,19 +64,23 @@ class MailForm extends React.Component {
         </Form.Item>
 
         <Form.Item 
-          label='Recipient: '
+          label='Recipient: ' 
           {...formItemLayout}>
           {getFieldDecorator('receiver', {
             initialValue: `${this.props.selectedRows[0].name}`
           })(<Input />)}
         </Form.Item>
 
-        <Form.Item 
-          label='Position: '
-          {...formItemLayout}>
+        <Form.Item // 여기 수정 필요해요~ //
+          label='Positions: '
+          {...formItemLayout}
+          hasFeedback
+        >
           {getFieldDecorator('position', {
-            initialValue: `포지션`
-          })(<Input />)}
+            rules: [{ required: true, message: 'Please select the position.' }]
+          })(
+            {optionList}
+          )}
         </Form.Item>
 
         <Form.Item {...formItemLayout} label="Content">
