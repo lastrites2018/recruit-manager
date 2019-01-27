@@ -56,7 +56,7 @@ export default class Mail extends Component {
       // pagination.total = data.totalCount
       this.setState({
         loading: false,
-        data: data.data.result,
+        data: data.data.result.reverse(),
         pagination
       })
     })
