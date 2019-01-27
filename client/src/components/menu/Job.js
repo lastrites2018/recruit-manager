@@ -8,47 +8,137 @@ import {
   Modal,
   Popconfirm,
   Table,
-  Tag
+  Tag,
+  Input,
+  Button,
+  Icon
 } from 'antd'
-
-const columns = [
-  {
-    title: '포지션 제목',
-    dataIndex: 'title'
-  },
-  {
-    title: '포지션 회사',
-    dataIndex: 'company'
-  },
-  {
-    title: '키워드',
-    dataIndex: 'keyword',
-    render: e => (
-      <span>
-        {e.split(', ').map(tag => (
-          <Tag color="blue">{tag}</Tag>
-        ))}
-      </span>
-    )
-  },
-  {
-    title: '등록일시',
-    dataIndex: 'modified_date'
-  },
-  {
-    title: 'Status',
-    dataIndex: 'valid'
-  }
-]
+import Highlighter from 'react-highlight-words'
 
 export default class Job extends Component {
-  state = {
-    loading: true,
-    data: [],
-    pagination: {},
-    selectedRowKeys: [],
-    selectedRows: [],
-    visible: false
+  constructor(props) {
+    super(props)
+    this.state = {
+      loading: true,
+      data: [],
+      pagination: {},
+      selectedRowKeys: [],
+      selectedRows: [],
+      visible: false
+    }
+
+    this.columns = [
+      {
+        title: '포지션 제목',
+        dataIndex: 'title',
+        width: '15%',
+        ...this.getColumnSearchProps('title')
+      },
+      {
+        title: '포지션 회사',
+        dataIndex: 'company',
+        width: '15%',
+        ...this.getColumnSearchProps('company')
+      },
+      {
+        title: '포지션 상세',
+        dataIndex: 'detail',
+        width: '100',
+        ...this.getColumnSearchProps('detail')
+      },
+      {
+        title: '키워드',
+        dataIndex: 'keyword',
+        ...this.getColumnSearchProps('keyword'),
+        render: e => (
+          <span>
+            {e.split(', ').map(tag => (
+              <Tag color="blue">{tag}</Tag>
+            ))}
+          </span>
+        )
+      },
+      {
+        title: '등록일시',
+        dataIndex: 'modified_date',
+        width: '100',
+        ...this.getColumnSearchProps('modified_date')
+      },
+      {
+        title: 'Status',
+        dataIndex: 'valid'
+      }
+    ]
+  }
+  getColumnSearchProps = dataIndex => ({
+    filterDropdown: ({
+      setSelectedKeys,
+      selectedKeys,
+      confirm,
+      clearFilters
+    }) => (
+      <div style={{ padding: 8 }}>
+        <Input
+          ref={node => {
+            this.searchInput = node
+          }}
+          placeholder={`Search ${dataIndex}`}
+          value={selectedKeys[0]}
+          onChange={e =>
+            setSelectedKeys(e.target.value ? [e.target.value] : [])
+          }
+          onPressEnter={() => this.handleSearch(selectedKeys, confirm)}
+          style={{ width: 188, marginBottom: 8, display: 'block' }}
+        />
+        <Button
+          type="primary"
+          onClick={() => this.handleSearch(selectedKeys, confirm)}
+          icon="search"
+          size="small"
+          style={{ width: 90, marginRight: 8 }}
+        >
+          Search
+        </Button>
+        <Button
+          onClick={() => this.handleReset(clearFilters)}
+          size="small"
+          style={{ width: 90 }}
+        >
+          Reset
+        </Button>
+      </div>
+    ),
+    filterIcon: filtered => (
+      <Icon type="search" style={{ color: filtered ? '#1890ff' : undefined }} />
+    ),
+    onFilter: (value, record) =>
+      record[dataIndex]
+        .toString()
+        .toLowerCase()
+        .includes(value.toLowerCase()),
+    onFilterDropdownVisibleChange: visible => {
+      if (visible) {
+        setTimeout(() => this.searchInput.select())
+      }
+    },
+    render: text => (
+      <Highlighter
+        highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+        searchWords={[this.state.searchText]}
+        autoEscape
+        textToHighlight={text.toString()}
+      />
+    )
+  })
+
+  handleSearch = (selectedKeys, confirm) => {
+    confirm()
+    this.setState({ searchText: selectedKeys[0] })
+  }
+
+  handleReset = clearFilters => {
+    clearFilters()
+    this.setState({ searchText: '' })
   }
 
   componentDidMount() {
@@ -62,9 +152,10 @@ export default class Job extends Component {
       const pagination = { ...this.state.pagination }
       // Read total count from server
       // pagination.total = data.totalCount
+      console.log('job', data.data.result)
       this.setState({
         loading: false,
-        data: data.data.result,
+        data: data.data.result.reverse(),
         pagination
       })
     })
@@ -99,7 +190,7 @@ export default class Job extends Component {
 
   resetSelections = () => {
     setTimeout(() => {
-      console.log('resetting row selection')
+      console.log('job-resetting row selection')
       this.setState({
         selectedRowKeys: []
       })
@@ -160,7 +251,7 @@ export default class Job extends Component {
     }
 
     return (
-      <div>
+      <div style={{ marginLeft: '20px' }}>
         <Popconfirm
           title="Are you sure you want to delete this?"
           onConfirm={this.handleDeleteConfirm}
@@ -176,9 +267,10 @@ export default class Job extends Component {
         </a>
         <this.jobModal />
         <Table
-          columns={columns}
+          columns={this.columns}
           // rowKey={record => record.login.uuid}
           size="small"
+          style={{ marginTop: '16px', width: '95%' }}
           bordered
           dataSource={this.state.data}
           pagination={this.state.pagination}

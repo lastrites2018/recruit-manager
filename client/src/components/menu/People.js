@@ -45,7 +45,8 @@ export default class People extends Component {
       searchText: '',
       selected: '',
       andOr: '',
-      positionData: []
+      positionData: [],
+      searchCount: 0
     }
 
     this.columns = [
@@ -129,6 +130,13 @@ export default class People extends Component {
             </a>
           )
         }
+      },
+      {
+        key: 'modified_date', //날짜에 맞게 데이터 맞게 들어왔는지 확인용
+        title: '등록 날짜(테스트용)',
+        dataIndex: 'modified_date',
+        width: 120,
+        ...this.getColumnSearchProps('modified_date')
       }
       // {
       //   title: 'Action',
@@ -324,7 +332,6 @@ export default class People extends Component {
 
   async getResumeDetail(rm_code) {
     if (rm_code) {
-      await console.log('userid', this.props.user_id)
       await console.log('rm_code', rm_code)
       await Axios.post(API.rmDetail, {
         user_id: this.props.user_id,
@@ -350,7 +357,6 @@ export default class People extends Component {
   }
 
   fetch = () => {
-    console.log('userid', this.props.user_id)
     Axios.post(API.mainTable, {
       user_id: this.props.user_id,
       under_age: 0,
@@ -362,15 +368,16 @@ export default class People extends Component {
       // Read total count from server
       // pagination.total = data.totalCount
       pagination.total = 200
+      console.log('people-fetch', data.data.result)
+
       this.setState({
-        dataSource: data.data.result,
+        dataSource: data.data.result.reverse(),
         pagination
       })
     })
   }
 
   fetchPosition = () => {
-    console.log('userid-fetch', this.props.user_id)
     Axios.post(API.getPosition, {
       user_id: this.props.user_id
     }).then(data => {
@@ -383,7 +390,6 @@ export default class People extends Component {
 
   //send input data
   fetchAgain = () => {
-    console.log('userid-fetchagain', this.props.user_id)
     const { minAge, maxAge, isTopSchool, position, andOr } = this.state
     let unitedSearch = ''
     let positionSplit = ''
@@ -415,8 +421,9 @@ export default class People extends Component {
       const pagination = { ...this.state.pagination }
       pagination.total = 200
       this.setState({
-        dataSource: data.data.result,
-        pagination
+        dataSource: data.data.result.reverse(),
+        pagination,
+        searchCount: data.data.result.length
       })
     })
   }
@@ -672,13 +679,13 @@ export default class People extends Component {
   }
 
   handleAddResumeOk = () => {
-    this.setState({ visibleNewResume: false })
-  }
-
-  handleAddResumeCancel = () => {
     this.setState({ visibleNewResume: false }, () => {
       message.success('A resume has been added!')
     })
+  }
+
+  handleAddResumeCancel = () => {
+    this.setState({ visibleNewResume: false })
   }
 
   addResumeModal = () => (
@@ -693,6 +700,8 @@ export default class People extends Component {
         <ResumeForm.ResumeRegistration
           user_id={this.props.user_id}
           close={this.handleAddResumeCancel}
+          addSuccess={this.handleAddResumeOk}
+          peopleFetch={this.fetch}
         />
       </Modal>
     </div>
@@ -845,10 +854,13 @@ export default class People extends Component {
           <p style={{ marginLeft: 8 }}>
             {hasSelected ? `Selected ${selectedRowKeys.length} items` : ''}
           </p>
+          {this.state.searchCount > 0 ? (
+            <span>{this.state.searchCount} 개의 검색 결과가 있습니다.</span>
+          ) : null}
           <Table
             columns={columns}
             bordered
-            style={{ width: '85%' }}
+            style={{ width: '95%' }}
             dataSource={dataSource}
             components={components}
             rowKey="rm_code"

@@ -4,24 +4,30 @@ import API from '../../util/api'
 import SmsForm from '../forms/SmsForm'
 import { Button, Modal, Table } from 'antd'
 
-const columns = [{
-  title: '수신인',
-  dataIndex: 'name',
-  render: e => <a href='javascript:'>{e}</a>
-}, {
-  title: '발송시간',
-  dataIndex: 'send_date',
-  sorter: true
-}, {
-  title: 'Client',
-  dataIndex: 'client',
-}, {
-  title: 'Position',
-  dataIndex: 'position',
-}, {
-  title: '수신확인',
-  dataIndex: '수신확인'
-}]
+const columns = [
+  {
+    title: '수신인',
+    dataIndex: 'name',
+    render: e => <a href="javascript:">{e}</a>
+  },
+  {
+    title: '발송시간',
+    dataIndex: 'send_date',
+    sorter: true
+  },
+  {
+    title: 'Client',
+    dataIndex: 'client'
+  },
+  {
+    title: 'Position',
+    dataIndex: 'position'
+  },
+  {
+    title: '수신확인',
+    dataIndex: '수신확인'
+  }
+]
 
 export default class SMS extends Component {
   state = {
@@ -42,35 +48,42 @@ export default class SMS extends Component {
     Axios.post(API.getSMS, {
       user_id: this.props.user_id,
       rm_code: '*'
-    }).then((data) => {
+    }).then(data => {
       const pagination = { ...this.state.pagination }
       // Read total count from server
       // pagination.total = data.totalCount
       this.setState({
         loading: false,
-        data: data.data.result,
-        pagination,
+        data: data.data.result.reverse(),
+        pagination
       })
     })
   }
 
   onSelectChange = (selectedRowKeys, selectedRows) => {
-    console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows)
-    this.setState({ selectedRowKeys: selectedRowKeys, selectedRows: selectedRows })
+    console.log(
+      `selectedRowKeys: ${selectedRowKeys}`,
+      'selectedRows: ',
+      selectedRows
+    )
+    this.setState({
+      selectedRowKeys: selectedRowKeys,
+      selectedRows: selectedRows
+    })
   }
 
   handleTableChange = (pagination, filters, sorter) => {
     const pager = { ...this.state.pagination }
     pager.current = pagination.current
     this.setState({
-      pagination: pager,
+      pagination: pager
     })
     this.fetch({
       results: pagination.pageSize,
       page: pagination.current,
       sortField: sorter.field,
       sortOrder: sorter.order,
-      ...filters,
+      ...filters
     })
   }
 
@@ -124,7 +137,7 @@ export default class SMS extends Component {
         })
         await console.log(`문자를 보냈습니다.`)
         await this.resetSelections()
-      } catch(err) {
+      } catch (err) {
         console.log('send one SMS error', err)
       }
     } else {
@@ -157,21 +170,21 @@ export default class SMS extends Component {
       })
     }, 2000)
   }
-    
+
   render() {
     const rowSelection = {
       onChange: this.onSelectChange,
       getCheckboxProps: record => ({
         disabled: record.name === 'Disabled User', // Column configuration not to be checked
-        name: record.name,
-      }),
+        name: record.name
+      })
     }
 
     return (
       <div>
         <Button
-          type='primary'
-          icon='message'
+          type="primary"
+          icon="message"
           onClick={this.showModal}
           // onClick={this.sendSMS}
         >

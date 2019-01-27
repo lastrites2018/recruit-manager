@@ -19,8 +19,10 @@ class ResumeForm extends React.Component {
   }
 
   uploadResume = async () => {
+    console.log('uploadResume!!!!! 접근')
+    // FIXME: 피플 내림차순으로 바바꾸기
     try {
-      await console.log(this.state.newResume)
+      await console.log('newResume', this.state.newResume)
       await Axios.post(API.insertResume, {
         user_id: this.props.user_id,
         name: this.state.newResume.name,
@@ -37,7 +39,8 @@ class ResumeForm extends React.Component {
         working_area: this.state.newResume.working_area || ''
       })
       await console.log('resume added')
-      await this.props.close()
+      await this.props.peopleFetch()
+      await this.props.addSuccess()
     } catch (err) {
       console.log(err)
     }
