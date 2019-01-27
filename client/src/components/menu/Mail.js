@@ -13,7 +13,8 @@ const columns = [
   },
   {
     title: '발송시간',
-    dataIndex: 'send_date',
+    dataIndex: 'modified_date',
+    // dataIndex: 'send_date',
     sorter: true
   },
   {
@@ -194,11 +195,13 @@ export default class Mail extends Component {
     }
 
     return (
-      <div>
+      <div style={{ marginLeft: '20px' }}>
         <Button
           type="primary"
           icon="mail"
           onClick={this.showModal}
+          disabled={!this.state.selectedRows.length}
+          style={{ marginTop: '10px' }}
           // onClick={this.sendMail}
         >
           Follow up
@@ -207,6 +210,7 @@ export default class Mail extends Component {
           columns={columns}
           // rowKey={record => record.login.uuid}
           bordered
+          style={{ marginTop: '16px', width: '85%' }}
           dataSource={this.state.data}
           pagination={this.state.pagination}
           loading={this.state.loading}

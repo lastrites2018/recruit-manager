@@ -1,9 +1,11 @@
 import React from 'react'
+import Axios from 'axios'
 import { Button, Form, Input, Select } from 'antd'
-
+import API from '../../util/api'
 class MailForm extends React.Component {
   state = {
-    positon: ''
+    positon: '',
+    positionData: []
   }
 
   handleSubmit = e => {
@@ -18,6 +20,23 @@ class MailForm extends React.Component {
 
   handlePositionChange = value => {
     this.setState({ position: value })
+  }
+
+  fetchPosition = () => {
+    console.log('userid-fetch', this.props.user_id)
+    Axios.post(API.getPosition, {
+      user_id: this.props.user_id
+    }).then(data => {
+      this.setState({
+        positionData: data.data.result
+      })
+      console.log('position data', data.data.result)
+    })
+  }
+
+  componentDidMount() {
+    console.log('mailform 요청확인')
+    this.fetchPosition()
   }
 
   render() {
@@ -46,7 +65,7 @@ class MailForm extends React.Component {
       }
     }
 
-    const optionList = this.props.positionData.map((position, index) => (
+    const optionList = this.state.positionData.map((position, index) => (
       <Select.Option value={position.keyword} key={index}>
         {`${position.title}    키워드 : ${position.keyword}`}
       </Select.Option>
@@ -54,32 +73,37 @@ class MailForm extends React.Component {
 
     return (
       <Form onSubmit={this.handleSubmit}>
-        <Form.Item 
-          label='Title: '
-          {...formItemLayout}>
+        <Form.Item label="Title: " {...formItemLayout}>
           {getFieldDecorator('title', {
             initialValue: `채용 제안`,
             rules: [{ required: true, message: 'Please fill in the title.' }]
           })(<Input />)}
         </Form.Item>
 
-        <Form.Item 
-          label='Recipient: ' 
-          {...formItemLayout}>
+        <Form.Item label="Recipient: " {...formItemLayout}>
           {getFieldDecorator('receiver', {
             initialValue: `${this.props.selectedRows[0].name}`
           })(<Input />)}
         </Form.Item>
 
-        <Form.Item // 여기 수정 필요해요~ //
-          label='Positions: '
-          {...formItemLayout}
-          hasFeedback
-        >
-          {getFieldDecorator('position', {
+        <Form.Item label="Positions: " {...formItemLayout} hasFeedback>
+          {getFieldDecorator('select', {
             rules: [{ required: true, message: 'Please select the position.' }]
           })(
-            {optionList}
+            <Select
+              value={this.state.position}
+              showSearch
+              style={{ width: '90 %' }}
+              optionFilterProp="children"
+              onChange={this.handlePositionChange}
+              filterOption={(input, option) =>
+                option.props.children
+                  .toLowerCase()
+                  .indexOf(input.toLowerCase()) >= 0
+              }
+            >
+              {optionList}
+            </Select>
           )}
         </Form.Item>
 
