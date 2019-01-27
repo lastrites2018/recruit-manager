@@ -196,7 +196,7 @@ export default class People extends Component {
           user_id: this.props.user_id,
           rm_code: this.state.selectedRows[0].rm_code,
           sender: 'rmrm.help@gmail.com',
-          recipient: 'sungunkim367@gmail.com',
+          recipient: this.state.selectedRows[0].email,
           subject: 'single mail',
           body: 'single mail',
           position: ''
@@ -212,9 +212,9 @@ export default class People extends Component {
           await setTimeout(() => {
             Axios.post(API.sendMail, {
               user_id: this.props.user_id,
-              rm_code: this.state.selectedRows[0].rm_code,
+              rm_code: this.state.selectedRows[i].rm_code,
               sender: 'rmrm.help@gmail.com',
-              recipient: 'sungunkim367@gmail.com',
+              recipient: this.state.selectedRows[i].email,
               subject: `multiple${i}`,
               body: `multiple${i}`,
               position: ''
@@ -273,7 +273,7 @@ export default class People extends Component {
         await Axios.post(API.sendSMS, {
           user_id: this.props.user_id,
           rm_code: this.state.selectedRowKeys[0],
-          recipient: '01072214890',
+          recipient: this.state.selectedRows[0].mobile,
           body: this.state.sms.content,
           position: ''
         })
@@ -289,7 +289,7 @@ export default class People extends Component {
             Axios.post(API.sendSMS, {
               user_id: this.props.user_id,
               rm_code: this.state.selectedRowKeys[i],
-              recipient: '01072214890',
+              recipient: this.state.selectedRows[i].mobile,
               body: this.state.sms.content,
               position: ''
             })
