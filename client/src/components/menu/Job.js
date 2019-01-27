@@ -33,11 +33,11 @@ const columns = [
   },
   {
     title: '등록일시',
-    dataIndex: ''
+    dataIndex: 'modified_date'
   },
   {
     title: 'Status',
-    dataIndex: ''
+    dataIndex: 'valid'
   }
 ]
 
