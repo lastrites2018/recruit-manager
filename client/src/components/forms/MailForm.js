@@ -65,7 +65,7 @@ class MailForm extends React.Component {
     }
 
     const optionList = this.state.positionData.map((position, index) => (
-      <Select.Option value={position.keyword} key={index}>
+      <Select.Option value={position.title} key={index}>
         {`${position.title}    키워드 : ${position.keyword}`}
       </Select.Option>
     ))
