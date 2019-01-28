@@ -67,7 +67,7 @@ class MailForm extends React.Component {
 
     const optionList = this.state.positionData.map((position, index) => (
       <Select.Option value={position.title} key={index}>
-        {`${position.title}    키워드 : ${position.keyword}`}
+        {`${position.title}: ${position.keyword}`}
       </Select.Option>
     ))
 
@@ -82,7 +82,7 @@ class MailForm extends React.Component {
 
         <Form.Item label="Recipient: " {...formItemLayout}>
           {getFieldDecorator('receiver', {
-            initialValue: `${this.props.selectedRows[0].name}`
+            initialValue: this.props.allRecipients.join(', ')
           })(<Input />)}
         </Form.Item>
 
@@ -109,9 +109,9 @@ class MailForm extends React.Component {
 
         <Form.Item {...formItemLayout} label="Content">
           {getFieldDecorator('content', {
-            initialValue: `안녕하세요, 어제 제안드렸던 ${
+            initialValue: `안녕하세요, \n\n어제 제안드렸던 [${
               this.state.position
-            } 에 대해서 어떻게 생각해보셨는지 문의차 다시 메일 드립니다. 간략히 검토후 의향에 대해서 회신 주시면 감사하겠습니다.`,
+            }] 에 대해서 어떻게 생각해보셨는지 문의차 다시 메일 드립니다. \n\n간략히 검토후 의향에 대해서 회신 주시면 감사하겠습니다.`,
             // initialValue: defaultMailContent,
             rules: [{ required: true, message: 'Please fill in the content.' }]
           })(<Input.TextArea rows={4} />)}
@@ -119,6 +119,7 @@ class MailForm extends React.Component {
 
         <Form.Item {...formItemLayout} label="Sign">
           {getFieldDecorator('sign', {
+            initialValue: '강상모 드림', 
             rules: [{ required: true, message: 'Please fill in the sign.' }]
           })(<Input />)}
         </Form.Item>
