@@ -8,15 +8,17 @@ import { EditableFormRow, EditableCell } from '../../util/Table'
 import 'react-table/react-table.css'
 import './menu.css'
 import {
-  message,
-  Modal,
-  Input,
-  Select,
   Button,
   Checkbox,
+  Col,
   Divider,
+  Icon,
+  Input,
+  message,
+  Modal,
+  Row,
+  Select,
   Table,
-  Icon
 } from 'antd'
 import Highlighter from 'react-highlight-words'
 
@@ -24,12 +26,14 @@ export default class People extends Component {
   constructor(props) {
     super(props)
     this.state = {
+      allRecipients: [],
       mail: {},
       minAge: '',
       maxAge: '',
       isTopSchool: false,
       position: '',
       dataSource: [],
+      nextSource: {},
       selectedRowKeys: [],
       selectedRows: [],
       manualKey: 0, // will need to change this later
@@ -38,6 +42,7 @@ export default class People extends Component {
       visibleNewResume: false,
       newResume: {},
       resumeDetailData: [],
+      resumeDetailTitle: '',
       mailVisible: false,
       phoneNumber: '',
       sms: {},
@@ -46,7 +51,8 @@ export default class People extends Component {
       selected: '',
       andOr: '',
       positionData: [],
-      searchCount: 0
+      searchCount: 0,
+      currentKey: null
     }
 
     this.columns = [
@@ -188,10 +194,23 @@ export default class People extends Component {
           selectedRows={this.state.selectedRows}
           mail={this.writeMailContent}
           positionData={this.state.positionData}
+          allRecipients={this.state.allRecipients}
         />
       </Modal>
     </div>
   )
+
+  success = (msg) => {
+    message.success(msg)
+  }
+
+  getAllRecipients = () => {
+    let allRecipients = []
+    for (let i = 0; i < this.state.selectedRows.length; i++) {
+      allRecipients.push(this.state.selectedRows[i].name)
+    }
+    this.setState({ allRecipients })
+  }
 
   sendMail = async () => {
     await console.log(this.state.selectedRowKey, this.state.selectedRows)
@@ -204,16 +223,17 @@ export default class People extends Component {
           sender: 'rmrm.help@gmail.com',
           recipient: this.state.selectedRows[0].email,
           subject: this.state.mail.title,
-          body: this.state.mail.content,
+          body: this.state.mail.content + '\n\n' + this.state.mail.sign,
           position: ''
         })
-        await alert(`메일을 ${this.state.selectedRowKeys}에게 보냈습니다.`)
+        await this.success(`메일을 ${this.state.selectedRows[0].name} 님에게 보냈습니다.`)
         // await this.resetSelections()
       } catch (err) {
         console.log('send one email error', err)
       }
     } else {
       try {
+        let listOfRecipients = []
         for (let i = 0; i < this.state.selectedRowKeys.length; i++) {
           await setTimeout(() => {
             Axios.post(API.sendMail, {
@@ -227,7 +247,10 @@ export default class People extends Component {
             })
           }, 100)
         }
-        await alert(`메일을 ${this.state.selectedRowKeys}에게 보냈습니다.`)
+        for (let j = 0; j < this.state.selectedRows.length; j++) {
+          await listOfRecipients.push(this.state.selectedRows[j].name)
+        }
+        await alert(`메일을 ${listOfRecipients.join(' 님, ')} 님에게 보냈습니다.`)
         // await this.resetSelections()
       } catch (err) {
         console.log('send multiple emails error', err)
@@ -318,25 +341,24 @@ export default class People extends Component {
     }, 2000)
   }
 
-  onSelectChange = (selectedRowKeys, selectedRows) => {
-    console.log(
+  onSelectChange = async (selectedRowKeys, selectedRows) => {
+    await console.log(
       `selectedRowKeys: ${selectedRowKeys}`,
       'selectedRows: ',
       selectedRows
     )
-    this.setState({
+    await this.setState({
       selectedRowKeys: selectedRowKeys,
-      selectedRows: selectedRows
+      selectedRows: selectedRows,
     })
+    await this.getAllRecipients()
   }
 
   async getResumeDetail(rm_code) {
     if (rm_code) {
-      await console.log('rm_code', rm_code)
       await Axios.post(API.rmDetail, {
         user_id: this.props.user_id,
-        rm_code
-        // rm_code: 'incrute_2018080595872'
+        rm_code: this.state.clickedData.rm_code
       })
         .then(res => {
           console.log('getResumeDetail_res', res.data.result)
@@ -351,9 +373,11 @@ export default class People extends Component {
   }
 
   handleClick = async clickedData => {
+    await this.setState({ clickedData })
+    await this.setState({ resumeDetailTitle: `${this.state.clickedData.name} | ${this.state.clickedData.age} | ${this.state.clickedData.gender} | ${this.state.clickedData.mobile} | ${this.state.clickedData.email}` })
+
     await this.getResumeDetail(clickedData.rm_code)
     await this.showModal()
-    await this.setState({ clickedData: clickedData })
   }
 
   fetch = () => {
@@ -368,10 +392,14 @@ export default class People extends Component {
       // Read total count from server
       // pagination.total = data.totalCount
       pagination.total = 200
-      console.log('people-fetch', data.data.result)
 
+      const result = data.data.result.reverse().map((row, i) => {
+        const each = Object.assign({}, row)
+        each.key = i
+        return each
+      })
       this.setState({
-        dataSource: data.data.result.reverse(),
+        dataSource: result,
         pagination
       })
     })
@@ -384,7 +412,6 @@ export default class People extends Component {
       this.setState({
         positionData: data.data.result
       })
-      console.log('position data', data.data.result)
     })
   }
 
@@ -420,10 +447,16 @@ export default class People extends Component {
     }).then(data => {
       const pagination = { ...this.state.pagination }
       pagination.total = 200
+
+      const result = data.data.result.reverse().map((row, i) => {
+        const each = Object.assign({}, row)
+        each.key = i
+        return each
+      })
       this.setState({
-        dataSource: data.data.result.reverse(),
+        dataSource: result,
         pagination,
-        searchCount: data.data.result.length
+        searchCount: result.length
       })
     })
   }
@@ -507,26 +540,65 @@ export default class People extends Component {
     this.setState({ position: null })
   }
 
+  onLeftClick = async () => {
+    await this.setState({ currentKey: this.state.clickedData.key - 1 })
+    for (let i = 0; i < this.state.dataSource.length; i++) {
+      if (this.state.dataSource[i].key === this.state.currentKey) {
+        await this.setState({ clickedData: this.state.dataSource[i] })
+      }
+    }
+    await this.setState({ resumeDetailTitle: `${this.state.clickedData.name} ${this.state.clickedData.age} | ${this.state.clickedData.gender} | ${this.state.clickedData.mobile} | ${this.state.clickedData.email}` })
+    await this.getResumeDetail(this.state.clickedData.rm_code)
+  }
+
+  onRightClick = async () => {
+    await this.setState({ currentKey: this.state.clickedData.key + 1 })
+    for (let i = 0; i < this.state.dataSource.length; i++) {
+      if (this.state.dataSource[i].key === this.state.currentKey) {
+        await this.setState({ clickedData: this.state.dataSource[i] })
+      }
+    }
+    await this.setState({ resumeDetailTitle: `${this.state.clickedData.name} ${this.state.clickedData.age} | ${this.state.clickedData.gender} | ${this.state.clickedData.mobile} | ${this.state.clickedData.email}` })
+    await this.getResumeDetail(this.state.clickedData.rm_code)
+  }
+
   peopleModal = () => (
     <div>
       <Modal
-        title={this.state.clickedData.name}
+        title={this.state.resumeDetailTitle}
         visible={this.state.visible}
         onOk={this.handleOk}
         onCancel={this.handleCancel}
+        footer={null}
       >
-        <div>
-          [School]
-          <p>{this.state.resumeDetailData[0].school}</p>
-          {/* <p>{this.state.clickedData.school}</p> */}
-        </div>
-        <Divider />
-        <div>
-          [Company]
-          <p>{this.state.resumeDetailData[0].company}</p>
-        </div>
-        {/* <this.memoTable /> */}
-        <Divider />
+      <Row type='flex' justify='center' align='middle'>
+        <Col span={14}><h3>[ School ]</h3></Col>
+      </Row>
+      <Row type='flex' justify='center' align='middle'>
+        <Col span={14}><p>{this.state.resumeDetailData[0].school}</p></Col>
+      </Row>
+      <Divider />
+      <Row type='flex' justify='center' align='middle'>
+        <Col span={14}><h3>[ Company ]</h3></Col>
+      </Row>
+      <Row type='flex' justify='center' align='middle'>
+        <Col span={14}><p>{this.state.resumeDetailData[0].company}</p></Col>
+      </Row>
+      <Divider />
+      <Row type='flex' justify='center' align='middle'>
+        <Col span={14}><h3>[ Others ]</h3></Col>
+      </Row>
+      <Row type='flex' justify='center' align='middle'>
+        <Col span={14}><p>{this.state.resumeDetailData[0].others}</p></Col>
+      </Row>
+      <Divider />
+      <Row type='flex' align='middle'>
+        <Col span={6}>
+          <Button type='primary' icon='left' value='large' onClick={this.onLeftClick}></Button>
+        </Col>
+        <Col span={6} offset={12}><Button type='primary' icon='right' value='large' onClick={this.onRightClick}></Button></Col>
+      </Row>
+        
       </Modal>
     </div>
   )
@@ -751,6 +823,9 @@ export default class People extends Component {
       </Option>
     ))
 
+    console.log('clickedData: ', this.state.clickedData)
+    console.log('currentKey', this.state.currentKey)
+
     return (
       <div>
         <br />
@@ -867,7 +942,10 @@ export default class People extends Component {
             rowClassName={() => 'editable-row'}
             rowSelection={rowSelection}
             onRow={record => ({
-              onClick: () => this.handleClick(record)
+              onClick: () => {
+                console.log('record', record)
+                this.handleClick(record)
+              }
             })}
           />
           {this.state.visible && <this.peopleModal />}
