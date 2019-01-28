@@ -9,6 +9,7 @@ export default class Mail extends Component {
   constructor(props) {
     super(props)
     this.state = {
+      allRecipients: [],
       loading: true,
       data: [],
       mail: {},
@@ -142,16 +143,25 @@ export default class Mail extends Component {
     })
   }
 
-  onSelectChange = (selectedRowKeys, selectedRows) => {
-    console.log(
+  onSelectChange = async (selectedRowKeys, selectedRows) => {
+    await console.log(
       `selectedRowKeys: ${selectedRowKeys}`,
       'selectedRows: ',
       selectedRows
     )
-    this.setState({
+    await this.setState({
       selectedRowKeys: selectedRowKeys,
       selectedRows: selectedRows
     })
+    await this.getAllRecipients()
+  }
+
+  getAllRecipients = () => {
+    let allRecipients = []
+    for (let i = 0; i < this.state.selectedRows.length; i++) {
+      allRecipients.push(this.state.selectedRows[i].name)
+    }
+    this.setState({ allRecipients })
   }
 
   handleTableChange = (pagination, filters, sorter) => {
@@ -200,6 +210,7 @@ export default class Mail extends Component {
         <MailForm.MailRegistration
           selectedRows={this.state.selectedRows}
           mail={this.writeMailContent}
+          allRecipients={this.state.allRecipients}
         />
       </Modal>
     </div>
