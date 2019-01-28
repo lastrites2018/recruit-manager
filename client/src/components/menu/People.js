@@ -259,7 +259,11 @@ export default class People extends Component {
   }
 
   showSmsModal = () => {
-    this.setState({ smsVisible: true })
+    console.log('showSmsModal', this.state.selectedRows[0].mobile)
+    this.state.selectedRows[0].mobile &&
+    this.state.selectedRows[0].mobile !== 'null'
+      ? this.setState({ smsVisible: true })
+      : message.error('폰 번호가 등록되지 않은 이력서입니다.')
   }
 
   handleSmsOk = () => {
@@ -276,22 +280,34 @@ export default class People extends Component {
     this.handleSmsCancel()
   }
 
-  smsModal = () => (
-    <div>
-      <Modal
-        title="SMS"
-        visible={this.state.smsVisible}
-        onOk={this.handleSmsOk}
-        onCancel={this.handleSmsCancel}
-        footer={null}
-      >
-        <SmsForm.SmsRegistration
-          selectedRows={this.state.selectedRows}
-          sms={this.writeSmsContent}
-        />
-      </Modal>
-    </div>
-  )
+  smsModal = () => {
+    // let receiversMobileNumber =
+    //   this.state.selectedRows.length > 1
+    //     ? this.state.selectedRows.map((row, index) => row.mobile).join(',')
+    //     : null
+
+    return (
+      <div>
+        <Modal
+          title={
+            this.state.selectedRows.length > 1
+              ? `SMS ${this.state.selectedRows[0].mobile} 외`
+              : `SMS ${this.state.selectedRows[0].mobile}`
+          }
+          // title="SMS"
+          visible={this.state.smsVisible}
+          onOk={this.handleSmsOk}
+          onCancel={this.handleSmsCancel}
+          footer={null}
+        >
+          <SmsForm.SmsRegistration
+            selectedRows={this.state.selectedRows}
+            sms={this.writeSmsContent}
+          />
+        </Modal>
+      </div>
+    )
+  }
 
   sendSMS = async () => {
     await console.log('state', this.state.sms)
@@ -528,7 +544,31 @@ export default class People extends Component {
   }
 
   handleSearchReset = () => {
-    this.handleClearSelected()
+    this.setState({
+      mail: {},
+      minAge: '',
+      maxAge: '',
+      isTopSchool: false,
+      position: '',
+      dataSource: [],
+      selectedRowKeys: [],
+      selectedRows: [],
+      manualKey: 0, // will need to change this later
+      clickedData: [],
+      visible: false,
+      visibleNewResume: false,
+      newResume: {},
+      resumeDetailData: [],
+      mailVisible: false,
+      phoneNumber: '',
+      sms: {},
+      smsVisible: false,
+      searchText: '',
+      selected: '',
+      andOr: '',
+      positionData: [],
+      searchCount: 0
+    })
     this.fetch()
   }
 
@@ -706,14 +746,15 @@ export default class People extends Component {
         setTimeout(() => this.searchInput.select())
       }
     },
-    render: text => (
-      <Highlighter
-        highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
-        searchWords={[this.state.searchText]}
-        autoEscape
-        textToHighlight={text && text.toString()}
-      />
-    )
+    render: text =>
+      text ? (
+        <Highlighter
+          highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+          searchWords={[this.state.searchText]}
+          autoEscape
+          textToHighlight={text.toString()}
+        />
+      ) : null
   })
 
   handleSearch = (selectedKeys, confirm) => {
@@ -950,7 +991,8 @@ export default class People extends Component {
           />
           {this.state.visible && <this.peopleModal />}
           <this.mailModal />
-          <this.smsModal />
+          {this.state.smsVisible && <this.smsModal />}
+          {/* <this.smsModal /> */}
           <this.addResumeModal />
         </div>
       </div>

@@ -3,7 +3,6 @@ import Axios from 'axios'
 import API from '../../util/api'
 import JobForm from '../forms/JobForm'
 import {
-  // Button,
   message,
   Modal,
   Popconfirm,
@@ -121,14 +120,15 @@ export default class Job extends Component {
         setTimeout(() => this.searchInput.select())
       }
     },
-    render: text => (
-      <Highlighter
-        highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
-        searchWords={[this.state.searchText]}
-        autoEscape
-        textToHighlight={text.toString()}
-      />
-    )
+    render: text =>
+      text ? (
+        <Highlighter
+          highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+          searchWords={[this.state.searchText]}
+          autoEscape
+          textToHighlight={text && text.toString()}
+        />
+      ) : null
   })
 
   handleSearch = (selectedKeys, confirm) => {
@@ -268,7 +268,7 @@ export default class Job extends Component {
         <this.jobModal />
         <Table
           columns={this.columns}
-          // rowKey={record => record.login.uuid}
+          rowKey="position_id"
           size="small"
           style={{ marginTop: '16px', width: '95%' }}
           bordered
