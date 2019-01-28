@@ -2,42 +2,124 @@ import React, { Component } from 'react'
 import Axios from 'axios'
 import API from '../../util/api'
 import SmsForm from '../forms/SmsForm'
-import { Button, Modal, Table } from 'antd'
-
-const columns = [
-  {
-    title: '수신인',
-    dataIndex: 'name',
-    render: e => <a href="javascript:">{e}</a>
-  },
-  {
-    title: '발송시간',
-    dataIndex: 'send_date',
-    sorter: true
-  },
-  {
-    title: 'Client',
-    dataIndex: 'client'
-  },
-  {
-    title: 'Position',
-    dataIndex: 'position'
-  },
-  {
-    title: '수신확인',
-    dataIndex: '수신확인'
-  }
-]
+import { Modal, Table, Input, Button, Icon } from 'antd'
+import Highlighter from 'react-highlight-words'
 
 export default class SMS extends Component {
-  state = {
-    loading: true,
-    data: [],
-    pagination: {},
-    selectedRowKeys: [],
-    selectedRows: [],
-    sms: {},
-    visible: false
+  constructor(props) {
+    super(props)
+    this.state = {
+      loading: true,
+      data: [],
+      pagination: {},
+      selectedRowKeys: [],
+      selectedRows: [],
+      sms: {},
+      visible: false,
+      searchText: ''
+    }
+
+    this.columns = [
+      {
+        title: '수신인',
+        dataIndex: 'name',
+        render: e => <a href="javascript:">{e}</a>,
+        ...this.getColumnSearchProps('name')
+      },
+      {
+        title: '발송시간',
+        dataIndex: 'modified_date',
+        // dataIndex: 'send_date',
+        sorter: true,
+        ...this.getColumnSearchProps('modified_date')
+      },
+      {
+        title: 'Client',
+        dataIndex: 'client',
+        ...this.getColumnSearchProps('client')
+      },
+      {
+        title: 'Position',
+        dataIndex: 'position',
+        ...this.getColumnSearchProps('position')
+      },
+      {
+        title: '수신확인',
+        dataIndex: '수신확인',
+        ...this.getColumnSearchProps('수신확인')
+      }
+    ]
+  }
+  getColumnSearchProps = dataIndex => ({
+    filterDropdown: ({
+      setSelectedKeys,
+      selectedKeys,
+      confirm,
+      clearFilters
+    }) => (
+      <div style={{ padding: 8 }}>
+        <Input
+          ref={node => {
+            this.searchInput = node
+          }}
+          placeholder={`Search ${dataIndex}`}
+          value={selectedKeys[0]}
+          onChange={e =>
+            setSelectedKeys(e.target.value ? [e.target.value] : [])
+          }
+          onPressEnter={() => this.handleSearch(selectedKeys, confirm)}
+          style={{ width: 188, marginBottom: 8, display: 'block' }}
+        />
+        <Button
+          type="primary"
+          onClick={() => this.handleSearch(selectedKeys, confirm)}
+          icon="search"
+          size="small"
+          style={{ width: 90, marginRight: 8 }}
+        >
+          Search
+        </Button>
+        <Button
+          onClick={() => this.handleReset(clearFilters)}
+          size="small"
+          style={{ width: 90 }}
+        >
+          Reset
+        </Button>
+      </div>
+    ),
+    filterIcon: filtered => (
+      <Icon type="search" style={{ color: filtered ? '#1890ff' : undefined }} />
+    ),
+    onFilter: (value, record) =>
+      record[dataIndex]
+        .toString()
+        .toLowerCase()
+        .includes(value.toLowerCase()),
+    onFilterDropdownVisibleChange: visible => {
+      if (visible) {
+        setTimeout(() => this.searchInput.select())
+      }
+    },
+    render: text =>
+      text ? (
+        <Highlighter
+          highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+          searchWords={[this.state.searchText]}
+          autoEscape
+          textToHighlight={text.toString()}
+        />
+      ) : null
+  })
+
+  handleSearch = (selectedKeys, confirm) => {
+    confirm()
+    this.setState({ searchText: selectedKeys[0] })
+  }
+
+  handleReset = clearFilters => {
+    clearFilters()
+    this.setState({ searchText: '' })
   }
 
   componentDidMount() {
@@ -191,7 +273,7 @@ export default class SMS extends Component {
           Follow up
         </Button>
         <Table
-          columns={columns}
+          columns={this.columns}
           // rowKey={record => record.login.uuid}
           dataSource={this.state.data}
           pagination={this.state.pagination}

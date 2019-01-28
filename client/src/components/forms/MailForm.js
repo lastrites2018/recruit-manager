@@ -23,7 +23,6 @@ class MailForm extends React.Component {
   }
 
   fetchPosition = () => {
-    console.log('userid-fetch', this.props.user_id)
     Axios.post(API.getPosition, {
       user_id: this.props.user_id
     }).then(data => {
@@ -106,7 +105,7 @@ class MailForm extends React.Component {
             </Select>
           )}
         </Form.Item>
-s
+
         <Form.Item {...formItemLayout} label="Content">
           {getFieldDecorator('content', {
             initialValue: `안녕하세요, 어제 제안드렸던 ${
