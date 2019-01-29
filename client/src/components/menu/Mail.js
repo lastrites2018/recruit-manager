@@ -227,7 +227,13 @@ export default class Mail extends Component {
           sender: 'rmrm.help@gmail.com',
           recipient: this.state.selectedRows[0].recipient,
           subject: this.state.mail.title,
-          body: this.state.mail.content,
+          body:
+            this.state.mail.content +
+            '\n\n' +
+            '[Position Detail]: ' +
+            this.state.mail.position_detail +
+            '\n\n' +
+            this.state.mail.sign,
           position: '' // 공백이라도 보내야 함.
         })
           .then(data => {

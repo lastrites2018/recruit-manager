@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import Axios from 'axios'
 import API from '../../util/api'
 import ResumeForm from '../forms/ResumeForm'
+import UpdateResumeForm from '../forms/UpdateResumeForm'
 import MailForm from '../forms/MailForm'
 import SmsForm from '../forms/SmsForm'
 import { EditableFormRow, EditableCell } from '../../util/Table'
@@ -18,7 +19,7 @@ import {
   Modal,
   Row,
   Select,
-  Table,
+  Table
 } from 'antd'
 import Highlighter from 'react-highlight-words'
 
@@ -41,6 +42,7 @@ export default class People extends Component {
       visible: false,
       visibleNewResume: false,
       newResume: {},
+      visibleUpdateResume: false,
       resumeDetailData: [],
       resumeDetailTitle: '',
       mailVisible: false,
@@ -193,14 +195,14 @@ export default class People extends Component {
         <MailForm.MailRegistration
           selectedRows={this.state.selectedRows}
           mail={this.writeMailContent}
-          positionData={this.state.positionData}
+          // positionData={this.state.positionData} 중복
           allRecipients={this.state.allRecipients}
         />
       </Modal>
     </div>
   )
 
-  success = (msg) => {
+  success = msg => {
     message.success(msg)
   }
 
@@ -223,10 +225,18 @@ export default class People extends Component {
           sender: 'rmrm.help@gmail.com',
           recipient: this.state.selectedRows[0].email,
           subject: this.state.mail.title,
-          body: this.state.mail.content + '\n\n' + this.state.mail.sign,
+          body:
+            this.state.mail.content +
+            '\n\n' +
+            '[Position Detail]: ' +
+            this.state.mail.position_detail +
+            '\n\n' +
+            this.state.mail.sign,
           position: ''
         })
-        await this.success(`메일을 ${this.state.selectedRows[0].name} 님에게 보냈습니다.`)
+        await this.success(
+          `메일을 ${this.state.selectedRows[0].name} 님에게 보냈습니다.`
+        )
         // await this.resetSelections()
       } catch (err) {
         console.log('send one email error', err)
@@ -250,7 +260,9 @@ export default class People extends Component {
         for (let j = 0; j < this.state.selectedRows.length; j++) {
           await listOfRecipients.push(this.state.selectedRows[j].name)
         }
-        await alert(`메일을 ${listOfRecipients.join(' 님, ')} 님에게 보냈습니다.`)
+        await alert(
+          `메일을 ${listOfRecipients.join(' 님, ')} 님에게 보냈습니다.`
+        )
         // await this.resetSelections()
       } catch (err) {
         console.log('send multiple emails error', err)
@@ -365,7 +377,7 @@ export default class People extends Component {
     )
     await this.setState({
       selectedRowKeys: selectedRowKeys,
-      selectedRows: selectedRows,
+      selectedRows: selectedRows
     })
     await this.getAllRecipients()
   }
@@ -390,7 +402,13 @@ export default class People extends Component {
 
   handleClick = async clickedData => {
     await this.setState({ clickedData })
-    await this.setState({ resumeDetailTitle: `${this.state.clickedData.name} | ${this.state.clickedData.age} | ${this.state.clickedData.gender} | ${this.state.clickedData.mobile} | ${this.state.clickedData.email}` })
+    await this.setState({
+      resumeDetailTitle: `${this.state.clickedData.name} | ${
+        this.state.clickedData.age
+      } | ${this.state.clickedData.gender} | ${
+        this.state.clickedData.mobile
+      } | ${this.state.clickedData.email}`
+    })
 
     await this.getResumeDetail(clickedData.rm_code)
     await this.showModal()
@@ -587,7 +605,13 @@ export default class People extends Component {
         await this.setState({ clickedData: this.state.dataSource[i] })
       }
     }
-    await this.setState({ resumeDetailTitle: `${this.state.clickedData.name} ${this.state.clickedData.age} | ${this.state.clickedData.gender} | ${this.state.clickedData.mobile} | ${this.state.clickedData.email}` })
+    await this.setState({
+      resumeDetailTitle: `${this.state.clickedData.name} ${
+        this.state.clickedData.age
+      } | ${this.state.clickedData.gender} | ${
+        this.state.clickedData.mobile
+      } | ${this.state.clickedData.email}`
+    })
     await this.getResumeDetail(this.state.clickedData.rm_code)
   }
 
@@ -598,7 +622,13 @@ export default class People extends Component {
         await this.setState({ clickedData: this.state.dataSource[i] })
       }
     }
-    await this.setState({ resumeDetailTitle: `${this.state.clickedData.name} ${this.state.clickedData.age} | ${this.state.clickedData.gender} | ${this.state.clickedData.mobile} | ${this.state.clickedData.email}` })
+    await this.setState({
+      resumeDetailTitle: `${this.state.clickedData.name} ${
+        this.state.clickedData.age
+      } | ${this.state.clickedData.gender} | ${
+        this.state.clickedData.mobile
+      } | ${this.state.clickedData.email}`
+    })
     await this.getResumeDetail(this.state.clickedData.rm_code)
   }
 
@@ -611,34 +641,57 @@ export default class People extends Component {
         onCancel={this.handleCancel}
         footer={null}
       >
-      <Row type='flex' justify='center' align='middle'>
-        <Col span={14}><h3>[ School ]</h3></Col>
-      </Row>
-      <Row type='flex' justify='center' align='middle'>
-        <Col span={14}><p>{this.state.resumeDetailData[0].school}</p></Col>
-      </Row>
-      <Divider />
-      <Row type='flex' justify='center' align='middle'>
-        <Col span={14}><h3>[ Company ]</h3></Col>
-      </Row>
-      <Row type='flex' justify='center' align='middle'>
-        <Col span={14}><p>{this.state.resumeDetailData[0].company}</p></Col>
-      </Row>
-      <Divider />
-      <Row type='flex' justify='center' align='middle'>
-        <Col span={14}><h3>[ Others ]</h3></Col>
-      </Row>
-      <Row type='flex' justify='center' align='middle'>
-        <Col span={14}><p>{this.state.resumeDetailData[0].others}</p></Col>
-      </Row>
-      <Divider />
-      <Row type='flex' align='middle'>
-        <Col span={6}>
-          <Button type='primary' icon='left' value='large' onClick={this.onLeftClick}></Button>
-        </Col>
-        <Col span={6} offset={12}><Button type='primary' icon='right' value='large' onClick={this.onRightClick}></Button></Col>
-      </Row>
-        
+        <Row type="flex" justify="center" align="middle">
+          <Col span={14}>
+            <h3>[ School ]</h3>
+          </Col>
+        </Row>
+        <Row type="flex" justify="center" align="middle">
+          <Col span={14}>
+            <p>{this.state.resumeDetailData[0].school}</p>
+          </Col>
+        </Row>
+        <Divider />
+        <Row type="flex" justify="center" align="middle">
+          <Col span={14}>
+            <h3>[ Company ]</h3>
+          </Col>
+        </Row>
+        <Row type="flex" justify="center" align="middle">
+          <Col span={14}>
+            <p>{this.state.resumeDetailData[0].company}</p>
+          </Col>
+        </Row>
+        <Divider />
+        <Row type="flex" justify="center" align="middle">
+          <Col span={14}>
+            <h3>[ Others ]</h3>
+          </Col>
+        </Row>
+        <Row type="flex" justify="center" align="middle">
+          <Col span={14}>
+            <p>{this.state.resumeDetailData[0].others}</p>
+          </Col>
+        </Row>
+        <Divider />
+        <Row type="flex" align="middle">
+          <Col span={6}>
+            <Button
+              type="primary"
+              icon="left"
+              value="large"
+              onClick={this.onLeftClick}
+            />
+          </Col>
+          <Col span={6} offset={12}>
+            <Button
+              type="primary"
+              icon="right"
+              value="large"
+              onClick={this.onRightClick}
+            />
+          </Col>
+        </Row>
       </Modal>
     </div>
   )
@@ -820,6 +873,79 @@ export default class People extends Component {
     </div>
   )
 
+  deleteResume = async () => {
+    let deletedRecipients = []
+    if (this.state.selectedRowKeys.length === 1) {
+      try {
+        await Axios.post(API.deleteResume, {
+          user_id: this.props.user_id,
+          rm_code: this.state.selectedRowKeys[0]
+        })
+        await this.success(
+          `${this.state.selectedRows[0].name} 님의 레쥬메를 삭제했습니다.`
+        )
+        await this.fetch()
+        await this.setState({ selectedRowKeys: [], selectedRows: [] })
+      } catch (err) {
+        console.log('failed to delete to a resume', err)
+      }
+    } else {
+      // 여기는 안되네 또 흠!!
+      try {
+        for (let i = 0; i < this.state.selectedRowKeys.length; i++) {
+          await deletedRecipients.push(this.state.selectedRows[i].name)
+          await setTimeout(() => {
+            Axios.post(API.deleteResume, {
+              user_id: this.props.user_id,
+              rm_code: this.state.selectedRowKeys[i]
+            })
+          }, 500)
+        }
+        await this.success(
+          `${deletedRecipients.join('님, ')} 님의 레쥬메를 삭제했습니다.`
+        )
+        await this.fetch()
+        await this.setState({ selectedRowKeys: [], selectedRows: [] })
+      } catch (err) {
+        console.log('failed to delete resumes', err)
+      }
+    }
+  }
+
+  showUpdateResumeModal = () => {
+    this.setState({ visibleUpdateResume: true })
+  }
+
+  handleUpdateResumeOk = () => {
+    this.setState({ visibleUpdateResume: false }, () => {
+      message.success('A resume has been updated!')
+    })
+  }
+
+  handleUpdateResumeCancel = () => {
+    this.setState({ visibleUpdateResume: false })
+  }
+
+  updateResumeModal = () => (
+    <div>
+      <Modal
+        title="레쥬메 편집"
+        visible={this.state.visibleUpdateResume}
+        onOk={this.handleUpdateResumeOk}
+        onCancel={this.handleUpdateResumeCancel}
+        footer={null}
+      >
+        <UpdateResumeForm.UpdateResumeRegistration
+          user_id={this.props.user_id}
+          selected={this.state.selectedRows}
+          close={this.handleUpdateResumeCancel}
+          addSuccess={this.handleUpdateResumeOk}
+          peopleFetch={this.fetch}
+        />
+      </Modal>
+    </div>
+  )
+
   async componentDidMount() {
     await this.fetch()
     await this.fetchPosition()
@@ -860,12 +986,8 @@ export default class People extends Component {
     const optionList = this.state.positionData.map((position, index) => (
       <Option value={position.keyword} key={index}>
         {`${position.title}    키워드 : ${position.keyword}`}
-        {/* {position.title} */}
       </Option>
     ))
-
-    console.log('clickedData: ', this.state.clickedData)
-    console.log('currentKey', this.state.currentKey)
 
     return (
       <div>
@@ -916,10 +1038,6 @@ export default class People extends Component {
           }
         >
           {optionList}
-          {/* <Option value="개발자">개발자</Option>
-          <Option value="매니저">매니저</Option>
-          <Option value="프론트엔드">프론트엔드</Option>
-          <Option value="백엔드">백엔드</Option> */}
         </Select>
         <Button
           style={{ marginLeft: '10px' }}
@@ -941,15 +1059,6 @@ export default class People extends Component {
         <div style={{ marginLeft: '20px' }}>
           <br />
           <Button
-            // onClick={this.handleAdd}
-            type="primary"
-            icon="user-add"
-            onClick={this.showAddResumeModal}
-            style={{ marginRight: 5, marginBottom: 16 }}
-          >
-            등록
-          </Button>
-          <Button
             type="primary"
             icon="mail"
             onClick={this.showMailModal}
@@ -966,6 +1075,32 @@ export default class People extends Component {
             disabled={!hasSelected}
           >
             SMS
+          </Button>
+          <Button
+            type="primary"
+            icon="edit"
+            onClick={this.showUpdateResumeModal}
+            style={{ float: 'right', marginRight: 5, marginBottom: 16 }}
+            disabled={!hasSelected}
+          >
+            편집
+          </Button>
+          <Button
+            type="primary"
+            icon="delete"
+            onClick={this.deleteResume}
+            style={{ float: 'right', marginRight: 5, marginBottom: 16 }}
+            disabled={!hasSelected}
+          >
+            삭제
+          </Button>
+          <Button
+            type="primary"
+            icon="user-add"
+            onClick={this.showAddResumeModal}
+            style={{ float: 'right', marginRight: 5, marginBottom: 16 }}
+          >
+            등록
           </Button>
           <p style={{ marginLeft: 8 }}>
             {hasSelected ? `Selected ${selectedRowKeys.length} items` : ''}
@@ -994,6 +1129,7 @@ export default class People extends Component {
           {this.state.smsVisible && <this.smsModal />}
           {/* <this.smsModal /> */}
           <this.addResumeModal />
+          <this.updateResumeModal />
         </div>
       </div>
     )
