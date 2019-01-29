@@ -10,6 +10,7 @@ export default class Mail extends Component {
     super(props)
     this.state = {
       allRecipients: [],
+      allEmails: [],
       loading: true,
       data: [],
       mail: {},
@@ -157,11 +158,13 @@ export default class Mail extends Component {
   }
 
   getAllRecipients = () => {
-    let allRecipients = []
+    let allRecipients = [],
+      allEmails = []
     for (let i = 0; i < this.state.selectedRows.length; i++) {
       allRecipients.push(this.state.selectedRows[i].name)
+      allEmails.push(this.state.selectedRows[i].recipient)
     }
-    this.setState({ allRecipients })
+    this.setState({ allRecipients, allEmails })
   }
 
   handleTableChange = (pagination, filters, sorter) => {
@@ -211,6 +214,7 @@ export default class Mail extends Component {
           selectedRows={this.state.selectedRows}
           mail={this.writeMailContent}
           allRecipients={this.state.allRecipients}
+          allEmails={this.state.allEmails}
         />
       </Modal>
     </div>

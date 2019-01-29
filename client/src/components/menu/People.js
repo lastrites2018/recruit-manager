@@ -28,6 +28,7 @@ export default class People extends Component {
     super(props)
     this.state = {
       allRecipients: [],
+      allEmails: [],
       mail: {},
       minAge: '',
       maxAge: '',
@@ -197,6 +198,7 @@ export default class People extends Component {
           mail={this.writeMailContent}
           // positionData={this.state.positionData} 중복
           allRecipients={this.state.allRecipients}
+          allEmails={this.state.allEmails}
         />
       </Modal>
     </div>
@@ -207,11 +209,13 @@ export default class People extends Component {
   }
 
   getAllRecipients = () => {
-    let allRecipients = []
+    let allRecipients = [],
+      allEmails = []
     for (let i = 0; i < this.state.selectedRows.length; i++) {
       allRecipients.push(this.state.selectedRows[i].name)
+      allEmails.push(this.state.selectedRows[i].email)
     }
-    this.setState({ allRecipients })
+    this.setState({ allRecipients, allEmails })
   }
 
   sendMail = async () => {
