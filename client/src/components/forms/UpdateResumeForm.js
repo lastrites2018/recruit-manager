@@ -20,11 +20,7 @@ class UpdateResumeForm extends React.Component {
 
   updateResume = async () => {
     console.log('updateResume!!!!! 접근')
-    // FIXME: 피플 내림차순으로 바바꾸기
-    // 입력한 values를 들고 오는데, update가 안된다 ;;
     try {
-      await console.log('update user_id: ', this.props.user_id)
-      await console.log('update rm_code: ', this.props.selected[0].rm_code)
       await console.log('update resume to this: ', this.state.newResume)
       await console.log('error', this.state.newResume.birth_year)
       await Axios.post(API.updateResume, {

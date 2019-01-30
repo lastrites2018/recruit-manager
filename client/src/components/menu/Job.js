@@ -198,13 +198,46 @@ export default class Job extends Component {
   }
 
   handleDeleteConfirm = async e => {
-    await Axios.post(API.deletePosition, {
-      user_id: this.props.user_id,
-      position_id: this.state.selectedRows[0].position_id,
-      valid: 'false'
-    })
-    await message.success('Deleted!')
-    await this.resetSelections()
+    await e.preventDefault()
+    if (this.state.selectedRows.length === 1) {
+      try {
+        await Axios.post(API.deletePosition, {
+          user_id: this.props.user_id,
+          position_id: this.state.selectedRows[0].position_id,
+          valid: 'expired'
+        })
+        await message.success(
+          `${this.state.selectedRows[0].company} | ${
+            this.state.selectedRows[0].title
+          } 포지션이 삭제되었습니다.`
+        )
+        await this.fetch()
+      } catch (err) {
+        await message.error('failed to delete a position', err)
+      }
+    } else {
+      try {
+        let deletedPositions = []
+        for (let i = 0; i < this.state.selectedRows.length; i++) {
+          await deletedPositions.push(
+            `${this.state.selectedRows[i].company} | ${
+              this.state.selectedRows[i].title
+            }`
+          )
+          await Axios.post(API.deletePosition, {
+            user_id: this.props.user_id,
+            position_id: this.state.selectedRows[i].position_id,
+            valid: 'expired'
+          })
+        }
+        await message.success(
+          `${deletedPositions.join(', ')} 포지션이 삭제되었습니다.`
+        )
+        await this.fetch()
+      } catch (err) {
+        await message.error('failed to delete positions', err)
+      }
+    }
   }
 
   handleDeleteCancel = e => {
