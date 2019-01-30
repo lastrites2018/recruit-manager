@@ -5,6 +5,8 @@ import API from '../../util/api'
 class MailForm extends React.Component {
   state = {
     positon: '',
+    positionCompany: '',
+    positionDetail: '',
     positionData: []
   }
 
@@ -18,8 +20,16 @@ class MailForm extends React.Component {
     })
   }
 
-  handlePositionChange = value => {
-    this.setState({ position: value })
+  handlePositionChange = async value => {
+    await this.setState({ position: value })
+    for (let i = 0; i < this.state.positionData.length; i++) {
+      if (this.state.positionData[i].title === this.state.position) {
+        await this.setState({
+          positionDetail: this.state.positionData[i].detail,
+          positionCompany: this.state.positionData[i].company
+        })
+      }
+    }
   }
 
   fetchPosition = () => {
@@ -70,11 +80,17 @@ class MailForm extends React.Component {
       </Select.Option>
     ))
 
+    console.log('positions', this.state.positionData)
+    console.log('position', this.state.position, typeof this.state.position)
+    console.log('position detail', this.state.positionDetail)
+
     return (
       <Form onSubmit={this.handleSubmit}>
         <Form.Item label="Title: " {...formItemLayout}>
           {getFieldDecorator('title', {
-            initialValue: `채용 제안`,
+            initialValue: `${this.state.positionCompany} ${
+              this.state.position
+            } 채용 제안`,
             rules: [{ required: true, message: 'Please fill in the title.' }]
           })(<Input />)}
         </Form.Item>
@@ -83,6 +99,13 @@ class MailForm extends React.Component {
           {getFieldDecorator('receiver', {
             initialValue: this.props.allRecipients.join(', ')
           })(<Input />)}
+        </Form.Item>
+
+        <Form.Item label="Emails: " {...formItemLayout}>
+          {/* Input에 readOnly 하고 싶은데 안됨! */}
+          {getFieldDecorator('email', {
+            initialValue: this.props.allEmails.join(', ')
+          })(<Input.TextArea rows={2} />)}
         </Form.Item>
 
         <Form.Item label="Positions: " {...formItemLayout} hasFeedback>
@@ -106,6 +129,12 @@ class MailForm extends React.Component {
           )}
         </Form.Item>
 
+        <Form.Item label="Position Detail: " {...formItemLayout}>
+          {getFieldDecorator('position_detail', {
+            initialValue: this.state.positionDetail
+          })(<Input.TextArea rows={4} />)}
+        </Form.Item>
+
         <Form.Item {...formItemLayout} label="Content">
           {getFieldDecorator('content', {
             initialValue: `안녕하세요, \n\n어제 제안드렸던 [${
@@ -118,7 +147,7 @@ class MailForm extends React.Component {
 
         <Form.Item {...formItemLayout} label="Sign">
           {getFieldDecorator('sign', {
-            initialValue: '강상모 드림', 
+            initialValue: '강상모 드림',
             rules: [{ required: true, message: 'Please fill in the sign.' }]
           })(<Input />)}
         </Form.Item>

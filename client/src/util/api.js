@@ -6,6 +6,8 @@ export default {
   mainTable: `${BASE_URL}/resume/view_main_table`,
   viewMainTablePosition: `${BASE_URL}/resume/view_main_table_position`,
   insertResume: `${BASE_URL}/resume/resume_write`,
+  updateResume: `${BASE_URL}/resume/resume_update`,
+  deleteResume: `${BASE_URL}/resume/resume_delete`,
   rmDetail: `${BASE_URL}/resume/rm_detail`,
   getMail: `${BASE_URL}/resume/view_mail_table`,
   sendMail: `${BASE_URL}/resume/mail_send`,
