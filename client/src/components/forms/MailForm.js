@@ -108,6 +108,16 @@ class MailForm extends React.Component {
           })(<Input.TextArea rows={2} />)}
         </Form.Item>
 
+        <Form.Item {...formItemLayout} label="Content">
+          {getFieldDecorator('content', {
+            initialValue: `안녕하세요, \n\n어제 제안드렸던 [${
+              this.state.position
+            }] 에 대해서 어떻게 생각해보셨는지 문의차 다시 메일 드립니다. \n\n간략히 검토후 의향에 대해서 회신 주시면 감사하겠습니다.`,
+            // initialValue: defaultMailContent,
+            rules: [{ required: true, message: 'Please fill in the content.' }]
+          })(<Input.TextArea rows={4} />)}
+        </Form.Item>
+
         <Form.Item label="Positions: " {...formItemLayout} hasFeedback>
           {getFieldDecorator('select', {
             rules: [{ required: true, message: 'Please select the position.' }]
@@ -135,16 +145,6 @@ class MailForm extends React.Component {
           })(<Input.TextArea rows={4} />)}
         </Form.Item>
 
-        <Form.Item {...formItemLayout} label="Content">
-          {getFieldDecorator('content', {
-            initialValue: `안녕하세요, \n\n어제 제안드렸던 [${
-              this.state.position
-            }] 에 대해서 어떻게 생각해보셨는지 문의차 다시 메일 드립니다. \n\n간략히 검토후 의향에 대해서 회신 주시면 감사하겠습니다.`,
-            // initialValue: defaultMailContent,
-            rules: [{ required: true, message: 'Please fill in the content.' }]
-          })(<Input.TextArea rows={4} />)}
-        </Form.Item>
-
         <Form.Item {...formItemLayout} label="Sign">
           {getFieldDecorator('sign', {
             initialValue: '강상모 드림',
@@ -153,7 +153,11 @@ class MailForm extends React.Component {
         </Form.Item>
 
         <Form.Item {...tailFormItemLayout}>
-          <Button type="primary" htmlType="submit">
+          <Button
+            type="primary"
+            htmlType="submit"
+            onKeyPress={() => this.handleSubmit}
+          >
             SEND
           </Button>
         </Form.Item>

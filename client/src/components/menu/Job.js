@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import Axios from 'axios'
 import API from '../../util/api'
 import JobForm from '../forms/JobForm'
+import UpdateJobForm from '../forms/UpdateJobForm'
 import {
   message,
   Modal,
@@ -262,16 +263,47 @@ export default class Job extends Component {
     </div>
   )
 
+  updateJobModal = () => (
+    <div>
+      <Modal
+        title=""
+        visible={this.state.updateVisible}
+        onOk={this.handleUpdateModalOk}
+        onCancel={this.handleUpdateModalCancel}
+        footer={null}
+      >
+        <UpdateJobForm.UpdateJobRegistration
+          user_id={this.props.user_id}
+          close={this.handleUpdateModalCancel}
+          selected={this.state.selectedRows[0]}
+          jobFetch={this.fetch}
+        />
+      </Modal>
+    </div>
+  )
+
   showModal = () => {
-    this.setState({ visible: true })
+    this.setState({ updateVisible: true })
   }
 
   handleModalOk = () => {
-    this.setState({ visible: false })
+    this.setState({ updateVisible: false })
   }
 
   handleModalCancel = () => {
-    this.setState({ visible: false })
+    this.setState({ updateVisible: false })
+  }
+
+  showUpdateModal = () => {
+    this.setState({ updateVisible: true })
+  }
+
+  handleUpdateModalOk = () => {
+    this.setState({ updateVisible: false })
+  }
+
+  handleUpdateModalCancel = () => {
+    this.setState({ updateVisible: false })
   }
 
   render() {
@@ -285,6 +317,10 @@ export default class Job extends Component {
 
     return (
       <div style={{ marginLeft: '20px' }}>
+        <Button type="primary" icon="user-add" onClick={this.showModal}>
+          등록
+        </Button>
+
         <Popconfirm
           title="Are you sure you want to delete this?"
           onConfirm={this.handleDeleteConfirm}
@@ -292,13 +328,17 @@ export default class Job extends Component {
           okText="OK"
           cancelText="Cancel"
         >
-          <a href="#">삭제</a>
+          <Button type="primary" icon="delete">
+            삭제
+          </Button>
         </Popconfirm>
-        <a> | </a>
-        <a href="#" onClick={this.showModal}>
-          등록
-        </a>
+
+        <Button type="primary" icon="edit" onClick={this.showUpdateModal}>
+          편집
+        </Button>
+
         <this.jobModal />
+        <this.updateJobModal />
         <Table
           columns={this.columns}
           rowKey="position_id"
