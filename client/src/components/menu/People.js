@@ -413,13 +413,13 @@ export default class People extends Component {
         this.state.clickedData.mobile
       } | ${this.state.clickedData.email}`
     })
-    await this.setState({
-      resumeDetailTitle: `${this.state.clickedData.name} | ${
-        this.state.clickedData.age
-      } | ${this.state.clickedData.gender} | ${
-        this.state.clickedData.mobile
-      }} | ${this.state.clickedData.email}`
-    })
+    // await this.setState({
+    //   resumeDetailTitle: `${this.state.clickedData.name} | ${
+    //     this.state.clickedData.age
+    //   } | ${this.state.clickedData.gender} | ${
+    //     this.state.clickedData.mobile
+    //   }} | ${this.state.clickedData.email}`
+    // })
 
     await this.getResumeDetail(clickedData.rm_code)
     await this.showModal()
