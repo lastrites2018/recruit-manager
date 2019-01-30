@@ -30,8 +30,8 @@ export default class People extends Component {
       allRecipients: [],
       allEmails: [],
       mail: {},
-      minAge: '',
-      maxAge: '',
+      under_birth: '',
+      upper_birth: '',
       isTopSchool: false,
       position: '',
       dataSource: [],
@@ -434,7 +434,7 @@ export default class People extends Component {
           : '등록된 이름 없음'
     }
     await this.setState({
-      resumeDetailTitle: `${resumeTitle.name} | ${resumeTitle.age} | ${
+      resumeDetailTitle: `${resumeTitle.name} | ${resumeTitle.birth} | ${
         resumeTitle.gender
       } | ${resumeTitle.mobile} | ${resumeTitle.email}`
     })
@@ -482,7 +482,13 @@ export default class People extends Component {
 
   //send input data
   fetchAgain = () => {
-    const { minAge, maxAge, isTopSchool, position, andOr } = this.state
+    const {
+      under_birth,
+      upper_birth,
+      isTopSchool,
+      position,
+      andOr
+    } = this.state
     let unitedSearch = ''
     let positionSplit = ''
 
@@ -503,8 +509,8 @@ export default class People extends Component {
     console.log('unitedSearch', unitedSearch)
     Axios.post(API.viewMainTablePosition, {
       user_id: this.props.user_id,
-      under_age: Number(minAge) || 0,
-      upper_age: Number(maxAge) || 90,
+      under_birth: Number(under_birth) || 0,
+      upper_birth: Number(upper_birth) || 90,
       top_school: isTopSchool,
       keyword: unitedSearch
       // position: position
@@ -595,8 +601,8 @@ export default class People extends Component {
   handleSearchReset = () => {
     this.setState({
       mail: {},
-      minAge: '',
-      maxAge: '',
+      under_birth: '',
+      upper_birth: '',
       isTopSchool: false,
       position: '',
       dataSource: [],
@@ -1057,18 +1063,16 @@ export default class People extends Component {
               marginLeft: '20px',
               width: '5%'
             }}
-            placeholder="min age"
-            maxLength={2}
-            name="minAge"
+            placeholder="min_age"
+            name="under_birth"
             onChange={this.handleAgeChange}
           />
           <Input
             style={{
               width: '5%'
             }}
-            placeholder="max age"
-            maxLength={2}
-            name="maxAge"
+            placeholder="max_age"
+            name="upper_birth"
             onChange={this.handleAgeChange}
           />
           <Checkbox
@@ -1081,7 +1085,7 @@ export default class People extends Component {
         <br />
         <Input
           style={{ marginLeft: '20px', width: '20%' }}
-          placeholder="검색어 (or 검색을 원하시면 한 칸 띄고 입력해주세요!)"
+          placeholder="검색어 (한 칸 띄고 입력해주세요!)"
           onChange={this.handleAndOR}
         />
         <br />
