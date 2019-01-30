@@ -255,6 +255,7 @@ export default class Job extends Component {
         footer={null}
       >
         <JobForm.JobRegistration
+          selected={this.state.selectedRows}
           user_id={this.props.user_id}
           close={this.handleModalCancel}
           jobFetch={this.fetch}
@@ -291,7 +292,7 @@ export default class Job extends Component {
   }
 
   handleModalCancel = () => {
-    this.setState({ updateVisible: false })
+    this.setState({ updateVisible: false, selectedRowKeys: [] })
   }
 
   showUpdateModal = () => {
@@ -303,7 +304,7 @@ export default class Job extends Component {
   }
 
   handleUpdateModalCancel = () => {
-    this.setState({ updateVisible: false })
+    this.setState({ updateVisible: false, selectedRowKeys: [] })
   }
 
   render() {

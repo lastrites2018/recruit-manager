@@ -18,6 +18,7 @@ class MailForm extends React.Component {
         console.log('Received values of form: ', values)
       }
     })
+    this.setState({ position: '', positionCompany: '', positionDetail: '' })
   }
 
   handlePositionChange = async value => {
@@ -80,47 +81,48 @@ class MailForm extends React.Component {
       </Select.Option>
     ))
 
-    console.log('positions', this.state.positionData)
-    console.log('position', this.state.position, typeof this.state.position)
+    console.log('position', this.state.position)
+    console.log('company', this.state.positionCompany)
     console.log('position detail', this.state.positionDetail)
 
     return (
       <Form onSubmit={this.handleSubmit}>
-        <Form.Item label="Title: " {...formItemLayout}>
+        <Form.Item label="Title" {...formItemLayout}>
           {getFieldDecorator('title', {
             initialValue: `${this.state.positionCompany} ${
               this.state.position
             } 채용 제안`,
-            rules: [{ required: true, message: 'Please fill in the title.' }]
+            rules: [{ required: true }]
           })(<Input />)}
         </Form.Item>
 
-        <Form.Item label="Recipient: " {...formItemLayout}>
+        <Form.Item label="Recipient" {...formItemLayout}>
           {getFieldDecorator('receiver', {
-            initialValue: this.props.allRecipients.join(', ')
+            initialValue: this.props.allRecipients.join(', '),
+            rules: [{ required: true }]
           })(<Input />)}
         </Form.Item>
 
-        <Form.Item label="Emails: " {...formItemLayout}>
+        <Form.Item label="Emails" {...formItemLayout}>
           {/* Input에 readOnly 하고 싶은데 안됨! */}
           {getFieldDecorator('email', {
-            initialValue: this.props.allEmails.join(', ')
+            initialValue: this.props.allEmails.join(', '),
+            rules: [{ required: true }]
           })(<Input.TextArea rows={2} />)}
         </Form.Item>
 
-        <Form.Item {...formItemLayout} label="Content">
+        <Form.Item label="Content" {...formItemLayout}>
           {getFieldDecorator('content', {
             initialValue: `안녕하세요, \n\n어제 제안드렸던 [${
               this.state.position
             }] 에 대해서 어떻게 생각해보셨는지 문의차 다시 메일 드립니다. \n\n간략히 검토후 의향에 대해서 회신 주시면 감사하겠습니다.`,
-            // initialValue: defaultMailContent,
-            rules: [{ required: true, message: 'Please fill in the content.' }]
+            rules: [{ required: true }]
           })(<Input.TextArea rows={4} />)}
         </Form.Item>
 
-        <Form.Item label="Positions: " {...formItemLayout} hasFeedback>
-          {getFieldDecorator('select', {
-            rules: [{ required: true, message: 'Please select the position.' }]
+        <Form.Item label="Positions" {...formItemLayout} hasFeedback>
+          {getFieldDecorator('position', {
+            rules: [{ required: true }]
           })(
             <Select
               value={this.state.position}
@@ -139,7 +141,7 @@ class MailForm extends React.Component {
           )}
         </Form.Item>
 
-        <Form.Item label="Position Detail: " {...formItemLayout}>
+        <Form.Item label="Position Detail" {...formItemLayout}>
           {getFieldDecorator('position_detail', {
             initialValue: this.state.positionDetail
           })(<Input.TextArea rows={4} />)}
@@ -148,7 +150,7 @@ class MailForm extends React.Component {
         <Form.Item {...formItemLayout} label="Sign">
           {getFieldDecorator('sign', {
             initialValue: `커리어셀파 헤드헌터 강상모 \n+82 010 3929 7682 \nwww.careersherpa.co.kr`,
-            rules: [{ required: true, message: 'Please fill in the sign.' }]
+            rules: [{ required: true }]
           })(<Input.TextArea rows={4} />)}
         </Form.Item>
 

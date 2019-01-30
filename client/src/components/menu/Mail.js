@@ -211,7 +211,6 @@ export default class Mail extends Component {
         footer={null}
       >
         <MailForm.MailRegistration
-          selectedRows={this.state.selectedRows}
           mail={this.writeMailContent}
           allRecipients={this.state.allRecipients}
           allEmails={this.state.allEmails}

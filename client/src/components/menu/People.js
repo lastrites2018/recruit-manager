@@ -194,9 +194,7 @@ export default class People extends Component {
         footer={null}
       >
         <MailForm.MailRegistration
-          selectedRows={this.state.selectedRows}
           mail={this.writeMailContent}
-          // positionData={this.state.positionData} 중복
           allRecipients={this.state.allRecipients}
           allEmails={this.state.allEmails}
         />
