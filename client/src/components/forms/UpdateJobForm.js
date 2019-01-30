@@ -29,7 +29,9 @@ class UpdateJobForm extends React.Component {
         title: this.state.newPosition.position,
         detail: this.state.newPosition.notes,
         keyword: this.state.newPosition.keyword,
-        valid: true
+        under_birth: this.state.newPosition.under_birth,
+        upper_birth: this.state.newPosition.upper_birth,
+        valid: this.state.newPosition.status
       })
       await console.log('position added')
       await this.props.close()
@@ -126,6 +128,37 @@ class UpdateJobForm extends React.Component {
             <Input placeholder="키워드가 여러 개인 경우 한 칸 띄고 입력해주세요." />
             // tag 기능 제대로 쓸려면 키워드도 array로 받거나 기호를 사이에 넣어서 저장하고 가져오면 분할하던가 해줘야할듯.
           )}
+        </Form.Item>
+        <Form.Item
+          label="Birth Year"
+          {...formItemLayout}
+          style={{ marginBottom: 0 }}
+        >
+          <Form.Item
+            style={{ display: 'inline-block', width: 'calc(50% - 12px)' }}
+          >
+            {getFieldDecorator('under_birth', {
+              initialValue: 1900,
+              rules: [{ type: 'number' }, { required: true }]
+            })(<Input />)}
+          </Form.Item>
+          <span
+            style={{
+              display: 'inline-block',
+              width: '24px',
+              textAlign: 'center'
+            }}
+          >
+            -
+          </span>
+          <Form.Item
+            style={{ display: 'inline-block', width: 'calc(50% - 12px)' }}
+          >
+            {getFieldDecorator('upper_birth', {
+              initialValue: 2100,
+              rules: [{ type: 'number' }, { required: true }]
+            })(<Input />)}
+          </Form.Item>
         </Form.Item>
         <Form.Item {...formItemLayout} label="Status">
           {getFieldDecorator('status', {
