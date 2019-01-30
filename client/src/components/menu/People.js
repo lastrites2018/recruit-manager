@@ -534,8 +534,8 @@ export default class People extends Component {
     console.log('unitedSearch', unitedSearch)
     Axios.post(API.viewMainTablePosition, {
       user_id: this.props.user_id,
-      under_birth: Number(under_birth) || 0,
-      upper_birth: Number(upper_birth) || 90,
+      under_birth: Number(under_birth) || 1900,
+      upper_birth: Number(upper_birth) || 2400,
       top_school: isTopSchool,
       keyword: unitedSearch
       // position: position
