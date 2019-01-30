@@ -279,11 +279,13 @@ export default class People extends Component {
   }
 
   showSmsModal = () => {
-    console.log('showSmsModal', this.state.selectedRows[0].mobile)
-    this.state.selectedRows[0].mobile &&
-    this.state.selectedRows[0].mobile !== 'null'
-      ? this.setState({ smsVisible: true })
-      : message.error('폰 번호가 등록되지 않은 이력서입니다.')
+    // console.log('showSmsModal', this.state.selectedRows[0].mobile)
+    // this.state.selectedRows[0].mobile &&
+    // this.state.selectedRows[0].mobile !== 'null'
+    //   ? this.setState({ smsVisible: true })
+    //   : message.error('폰 번호가 등록되지 않은 이력서입니다.')
+
+    this.setState({ smsVisible: true })
   }
 
   handleSmsOk = () => {
@@ -295,6 +297,7 @@ export default class People extends Component {
   }
 
   writeSmsContent = form => {
+    console.log('people-sms-form', form)
     this.setState({ sms: form })
     this.sendSMS()
     this.handleSmsCancel()
@@ -306,14 +309,19 @@ export default class People extends Component {
     //     ? this.state.selectedRows.map((row, index) => row.mobile).join(',')
     //     : null
 
+    let title
+    if (this.state.selectedRows.length === 0) {
+      title = 'SMS'
+    } else {
+      this.state.selectedRows.length > 1
+        ? (title = `SMS ${this.state.selectedRows[0].mobile} 외`)
+        : (title = `SMS ${this.state.selectedRows[0].mobile}`)
+    }
+
     return (
       <div>
         <Modal
-          title={
-            this.state.selectedRows.length > 1
-              ? `SMS ${this.state.selectedRows[0].mobile} 외`
-              : `SMS ${this.state.selectedRows[0].mobile}`
-          }
+          title={title}
           // title="SMS"
           visible={this.state.smsVisible}
           onOk={this.handleSmsOk}
@@ -333,6 +341,23 @@ export default class People extends Component {
     await console.log('state', this.state.sms)
     await console.log('selected rows: ', this.state.selectedRowKeys)
     await console.log('preparing to send')
+
+    if (this.state.selectedRowKeys.length === 0) {
+      try {
+        await Axios.post(API.sendSMS, {
+          user_id: this.props.user_id,
+          rm_code: '',
+          recipient: this.state.sms.receiver,
+          body: this.state.sms.content,
+          position: ''
+        })
+        await console.log(`문자를 보냈습니다.`)
+        // await this.resetSelections()
+      } catch (err) {
+        console.log('send one SMS error', err)
+      }
+    }
+
     if (this.state.selectedRowKeys.length === 1) {
       try {
         await Axios.post(API.sendSMS, {
@@ -1133,7 +1158,7 @@ export default class People extends Component {
             icon="message"
             onClick={this.showSmsModal}
             style={{ marginRight: 5 }}
-            disabled={!hasSelected}
+            // disabled={!hasSelected}
           >
             SMS
           </Button>
