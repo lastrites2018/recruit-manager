@@ -894,19 +894,16 @@ export default class People extends Component {
         console.log('failed to delete to a resume', err)
       }
     } else {
-      // 여기는 안되네 또 흠!!
       try {
         for (let i = 0; i < this.state.selectedRowKeys.length; i++) {
           await deletedRecipients.push(this.state.selectedRows[i].name)
-          await setTimeout(() => {
-            Axios.post(API.deleteResume, {
-              user_id: this.props.user_id,
-              rm_code: this.state.selectedRowKeys[i]
-            })
-          }, 500)
+          await Axios.post(API.deleteResume, {
+            user_id: this.props.user_id,
+            rm_code: this.state.selectedRowKeys[i]
+          })
         }
         await this.success(
-          `${deletedRecipients.join('님, ')} 님의 레쥬메를 삭제했습니다.`
+          `${deletedRecipients.join(' 님, ')} 님의 레쥬메를 삭제했습니다.`
         )
         await this.fetch()
         await this.setState({ selectedRowKeys: [], selectedRows: [] })
