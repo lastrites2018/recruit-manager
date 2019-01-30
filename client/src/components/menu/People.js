@@ -68,7 +68,7 @@ export default class People extends Component {
       },
       {
         key: 'birth',
-        title: '나이',
+        title: '출생년도',
         dataIndex: 'birth',
         width: 75,
         align: 'center',
@@ -623,8 +623,8 @@ export default class People extends Component {
     this.setState({ visible: false })
   }
 
-  handleSearchReset = () => {
-    this.setState({
+  handleSearchReset = async () => {
+    await this.setState({
       mail: {},
       under_birth: '',
       upper_birth: '',
@@ -649,7 +649,7 @@ export default class People extends Component {
       positionData: [],
       searchCount: 0
     })
-    this.fetch()
+    await this.fetch()
   }
 
   // handleSelectChange = value => {
@@ -1088,20 +1088,25 @@ export default class People extends Component {
               marginLeft: '20px',
               width: '5%'
             }}
-            placeholder="min_age"
+            placeholder="최소생년"
             name="under_birth"
+            maxLength={4}
+            value={this.state.under_birth}
             onChange={this.handleAgeChange}
           />
           <Input
             style={{
               width: '5%'
             }}
-            placeholder="max_age"
+            placeholder="최대생년"
             name="upper_birth"
+            maxLength={4}
+            value={this.state.upper_birth}
             onChange={this.handleAgeChange}
           />
           <Checkbox
             style={{ marginLeft: '30px' }}
+            value={this.state.isTopSchool}
             onChange={this.checkTopschool}
           >
             Top School
@@ -1112,6 +1117,7 @@ export default class People extends Component {
           style={{ marginLeft: '20px', width: '20%' }}
           placeholder="검색어 (한 칸 띄고 입력해주세요!)"
           onChange={this.handleAndOR}
+          value={this.state.andOr}
         />
         <br />
         <Select
