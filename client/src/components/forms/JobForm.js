@@ -26,8 +26,8 @@ class JobForm extends React.Component {
         detail: this.state.newPosition.notes,
         keyword: this.state.newPosition.keyword,
         valid: 'alive',
-        age_from: this.state.newPosition.min_age,
-        age_to: this.state.newPosition.max_age
+        under_birth: this.state.newPosition.under_birth,
+        upper_birth: this.state.newPosition.upper_birth
       })
       await console.log('position added')
       await this.props.close()
@@ -115,16 +115,17 @@ class JobForm extends React.Component {
           })(<Input.TextArea rows={4} />)}
         </Form.Item>
 
-        <Form.Item label="Age" {...formItemLayout} style={{ marginBottom: 0 }}>
+        <Form.Item
+          label="Birth Year"
+          {...formItemLayout}
+          style={{ marginBottom: 0 }}
+        >
           <Form.Item
             style={{ display: 'inline-block', width: 'calc(50% - 12px)' }}
           >
-            {getFieldDecorator('min_age', {
-              initialValue: 25,
-              rules: [
-                { type: 'number', message: 'Min age must be a number.' },
-                { required: true, message: 'Please fill in the min age.' }
-              ]
+            {getFieldDecorator('under_birth', {
+              initialValue: 1900,
+              rules: [{ type: 'number' }, { required: true }]
             })(<Input />)}
           </Form.Item>
           <span
@@ -139,12 +140,9 @@ class JobForm extends React.Component {
           <Form.Item
             style={{ display: 'inline-block', width: 'calc(50% - 12px)' }}
           >
-            {getFieldDecorator('max_age', {
-              initialValue: 35,
-              rules: [
-                { type: 'number', message: 'Max age must be a number.' },
-                { required: true, message: 'Please fill in the max age.' }
-              ]
+            {getFieldDecorator('upper_birth', {
+              initialValue: 2100,
+              rules: [{ type: 'number' }, { required: true }]
             })(<Input />)}
           </Form.Item>
         </Form.Item>

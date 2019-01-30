@@ -24,7 +24,8 @@ export default class Job extends Component {
       pagination: {},
       selectedRowKeys: [],
       selectedRows: [],
-      visible: false
+      visible: false,
+      updateVisible: false
     }
 
     this.columns = [
@@ -284,15 +285,15 @@ export default class Job extends Component {
   )
 
   showModal = () => {
-    this.setState({ updateVisible: true })
+    this.setState({ visible: true })
   }
 
   handleModalOk = () => {
-    this.setState({ updateVisible: false })
+    this.setState({ visible: false })
   }
 
   handleModalCancel = () => {
-    this.setState({ updateVisible: false, selectedRowKeys: [] })
+    this.setState({ visible: false, selectedRowKeys: [] })
   }
 
   showUpdateModal = () => {
