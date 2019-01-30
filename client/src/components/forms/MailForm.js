@@ -147,16 +147,16 @@ class MailForm extends React.Component {
 
         <Form.Item {...formItemLayout} label="Sign">
           {getFieldDecorator('sign', {
-            initialValue: '강상모 드림',
+            initialValue: `커리어셀파 헤드헌터 강상모 \n+82 010 3929 7682 \nwww.careersherpa.co.kr`,
             rules: [{ required: true, message: 'Please fill in the sign.' }]
-          })(<Input />)}
+          })(<Input.TextArea rows={4} />)}
         </Form.Item>
 
         <Form.Item {...tailFormItemLayout}>
           <Button
             type="primary"
             htmlType="submit"
-            onKeyPress={() => this.handleSubmit}
+            // onKeyPress={() => this.handleSubmit}
           >
             SEND
           </Button>
