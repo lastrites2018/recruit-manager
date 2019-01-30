@@ -2,7 +2,6 @@ import React from 'react'
 import Axios from 'axios'
 import { Button, Form, Input, Select } from 'antd'
 import API from '../../util/api'
-import { Placeholder } from 'semantic-ui-react'
 
 class SmsForm extends React.Component {
   state = {
@@ -36,7 +35,7 @@ class SmsForm extends React.Component {
   }
 
   componentDidMount() {
-    console.log('sms 요청확인')
+    // console.log('sms 요청확인')
     this.fetchPosition()
   }
 
@@ -66,7 +65,6 @@ class SmsForm extends React.Component {
       }
     }
 
-    console.log('hehe', this.props.selectedRows)
     let receivers =
       this.props.selectedRows.length > 1
         ? this.props.selectedRows.map((row, index) => row.name).join(',')
@@ -83,7 +81,7 @@ class SmsForm extends React.Component {
     const optionList = this.state.positionData.map(position => {
       return (
         <Select.Option value={position.keyword} key={position.position_id}>
-          {`${position.title}    키워드 : ${position.keyword}`}
+          {`${position.title}: ${position.keyword}`}
           {/* {`${position.title}    키워드 : ${position.keyword}`} */}
         </Select.Option>
       )
