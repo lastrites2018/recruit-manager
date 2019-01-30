@@ -22,21 +22,35 @@ class UpdateResumeForm extends React.Component {
     console.log('updateResume!!!!! 접근')
     try {
       await console.log('update resume to this: ', this.state.newResume)
+      await console.log('error', this.state.newResume.birth_year)
       await Axios.post(API.updateResume, {
         user_id: this.props.user_id,
         rm_code: this.props.selected[0].rm_code,
         name: this.state.newResume.name,
         birth: this.state.newResume.birth_year,
-        gender: this.state.newResume.gender,
-        mobile: this.state.newResume.mobile,
-        email: this.state.newResume.email,
-        address: this.state.newResume.address,
+        // gender: this.state.newResume.gender,
+        // mobile: this.state.newResume.mobile,
+        email: this.state.newResume.email, // 혹은 이메일 문제!
+        address: this.state.newResume.address || '', // 어드레스 문제?
         job_keyword: this.state.newResume.keywords,
         job_title: this.state.newResume.job_title,
         educational_history: this.state.newResume.educational_history,
         career_history: this.state.newResume.career_history,
         salary_requirement: this.state.newResume.salary_requirement,
-        working_area: this.state.newResume.working_area
+        working_area: this.state.newResume.working_area || '',
+        // salary_requirement: 'yes!',
+        // working_area: 'null'
+        // name: '타마고',
+        // birth: '1900',
+        gender: '남',
+        mobile: '01072214890'
+        // email: 'sungunkim367@gmail.com',
+        // address: 'null'
+        // job_keyword: 'fetch bark',
+        // job_title: 'doga'
+        // educational_history: 'behavior school',
+        // career_history: 'stayhome dog',
+        // working_area: 'null'
       })
       await console.log('resume updated')
       await this.props.peopleFetch()
