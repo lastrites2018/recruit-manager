@@ -263,11 +263,12 @@ export default class SMS extends Component {
     }
 
     return (
-      <div>
+      <div style={{ marginLeft: '20px' }}>
         <Button
           type="primary"
           icon="message"
           onClick={this.showModal}
+          style={{ marginTop: '10px' }}
           // onClick={this.sendSMS}
         >
           Follow up
@@ -275,6 +276,8 @@ export default class SMS extends Component {
         <Table
           columns={this.columns}
           // rowKey={record => record.login.uuid}
+          bordered
+          style={{ marginTop: '16px', width: '85%' }}
           dataSource={this.state.data}
           pagination={this.state.pagination}
           loading={this.state.loading}

@@ -318,25 +318,41 @@ export default class Job extends Component {
 
     return (
       <div style={{ marginLeft: '20px' }}>
-        <Button type="primary" icon="user-add" onClick={this.showModal}>
-          등록
-        </Button>
-
-        <Popconfirm
-          title="Are you sure you want to delete this?"
-          onConfirm={this.handleDeleteConfirm}
-          onCancel={this.handleDeleteCancel}
-          okText="OK"
-          cancelText="Cancel"
-        >
-          <Button type="primary" icon="delete">
-            삭제
+        <div style={{ marginTop: '16px', width: '85%' }}>
+          <Button
+            style={{ marginRight: 5, marginBottom: 16 }}
+            type="primary"
+            icon="user-add"
+            onClick={this.showModal}
+          >
+            등록
           </Button>
-        </Popconfirm>
 
-        <Button type="primary" icon="edit" onClick={this.showUpdateModal}>
-          편집
-        </Button>
+          <Popconfirm
+            title="Are you sure you want to delete this?"
+            onConfirm={this.handleDeleteConfirm}
+            onCancel={this.handleDeleteCancel}
+            okText="OK"
+            cancelText="Cancel"
+          >
+            <Button
+              type="primary"
+              icon="delete"
+              style={{ marginRight: 5, marginBottom: 16 }}
+            >
+              삭제
+            </Button>
+          </Popconfirm>
+
+          <Button
+            type="primary"
+            icon="edit"
+            onClick={this.showUpdateModal}
+            style={{ marginRight: 5, marginBottom: 16 }}
+          >
+            편집
+          </Button>
+        </div>
 
         <this.jobModal />
         <this.updateJobModal />
@@ -344,7 +360,7 @@ export default class Job extends Component {
           columns={this.columns}
           rowKey="position_id"
           size="small"
-          style={{ marginTop: '16px', width: '95%' }}
+          style={{ marginTop: '10px', width: '95%' }}
           bordered
           dataSource={this.state.data}
           pagination={this.state.pagination}
