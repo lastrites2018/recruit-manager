@@ -413,12 +413,20 @@ export default class People extends Component {
         this.state.clickedData.mobile
       } | ${this.state.clickedData.email}`
     })
+    await this.setState({
+      resumeDetailTitle: `${this.state.clickedData.name} | ${
+        this.state.clickedData.age
+      } | ${this.state.clickedData.gender} | ${
+        this.state.clickedData.mobile
+      }} | ${this.state.clickedData.email}`
+    })
 
     await this.getResumeDetail(clickedData.rm_code)
     await this.showModal()
   }
 
   fetch = () => {
+    console.log('people-fetch')
     Axios.post(API.mainTable, {
       user_id: this.props.user_id,
       under_age: 0,
@@ -436,6 +444,7 @@ export default class People extends Component {
         each.key = i
         return each
       })
+      console.log('fetch-result', result)
       this.setState({
         dataSource: result,
         pagination
@@ -644,6 +653,8 @@ export default class People extends Component {
         onOk={this.handleOk}
         onCancel={this.handleCancel}
         footer={null}
+        // bodyStyle={{ height: '400px' }}
+        width="50%"
       >
         <Row type="flex" justify="center" align="middle">
           <Col span={14}>
@@ -678,7 +689,9 @@ export default class People extends Component {
           </Col>
         </Row>
         <Divider />
-        <Row type="flex" align="middle">
+        <Row>
+          {/* <Row align="middle"> */}
+          {/* <Row type="flex" align="middle"> */}
           <Col span={6}>
             <Button
               type="primary"
@@ -687,7 +700,8 @@ export default class People extends Component {
               onClick={this.onLeftClick}
             />
           </Col>
-          <Col span={6} offset={12}>
+          <Col span={18} style={{ textAlign: 'right' }}>
+            {/* <Col span={6} offset={12}> */}
             <Button
               type="primary"
               icon="right"
@@ -886,7 +900,7 @@ export default class People extends Component {
           rm_code: this.state.selectedRowKeys[0]
         })
         await this.success(
-          `${this.state.selectedRows[0].name} 님의 레쥬메를 삭제했습니다.`
+          `${this.state.selectedRows[0].name} 님의 Resume를 삭제했습니다.`
         )
         await this.fetch()
         await this.setState({ selectedRowKeys: [], selectedRows: [] })
@@ -903,7 +917,12 @@ export default class People extends Component {
               user_id: this.props.user_id,
               rm_code: this.state.selectedRowKeys[i]
             })
-          }, 500)
+          }, 100)
+          await console.log(
+            'this.state.selectedRowKeys[i]',
+            this.state.selectedRowKeys[i]
+          )
+          await console.log('this.props.user_id,', this.props.user_id)
         }
         await this.success(
           `${deletedRecipients.join('님, ')} 님의 레쥬메를 삭제했습니다.`
@@ -1060,7 +1079,7 @@ export default class People extends Component {
         </Button>
 
         <br />
-        <div style={{ marginLeft: '20px' }}>
+        <div style={{ marginLeft: '20px', width: '95%' }}>
           <br />
           <Button
             type="primary"
@@ -1115,7 +1134,6 @@ export default class People extends Component {
           <Table
             columns={columns}
             bordered
-            style={{ width: '95%' }}
             dataSource={dataSource}
             components={components}
             rowKey="rm_code"
