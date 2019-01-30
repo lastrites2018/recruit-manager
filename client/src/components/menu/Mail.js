@@ -234,7 +234,6 @@ export default class Mail extends Component {
           body:
             this.state.mail.content +
             '\n\n' +
-            '[Position Detail]: ' +
             this.state.mail.position_detail +
             '\n\n' +
             this.state.mail.sign,

@@ -232,7 +232,6 @@ export default class People extends Component {
           body:
             this.state.mail.content +
             '\n\n' +
-            '[Position Detail]: ' +
             this.state.mail.position_detail +
             '\n\n' +
             this.state.mail.sign,
@@ -917,7 +916,7 @@ export default class People extends Component {
           })
         }
         await this.success(
-          `${deletedRecipients.join(' 님, ')} 님의 레쥬메를 삭제했습니다.`
+          `${deletedRecipients.join(' 님, ')} 님의 Resume를 삭제했습니다.`
         )
         await this.fetch()
         await this.setState({ selectedRowKeys: [], selectedRows: [] })
