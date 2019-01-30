@@ -108,7 +108,7 @@ class UpdateResumeForm extends React.Component {
             style={{ display: 'inline-block', width: 'calc(25% - 12px)' }}
           >
             {getFieldDecorator('birth_year', {
-              initialValue: this.props.selected[0].age,
+              initialValue: this.props.selected[0].birth,
               rules: [
                 { required: true, message: 'Please fill in the birth year.' }
               ]

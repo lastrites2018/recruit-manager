@@ -3,7 +3,7 @@ import { Button, Form, Input, Select } from 'antd'
 
 class CrawlingForm extends React.Component {
   state = {
-    age: null,
+    birth: null,
     keywords: [],
     area: null,
     website: null
@@ -52,8 +52,11 @@ class CrawlingForm extends React.Component {
 
     return (
       <Form onSubmit={this.handleSubmit}>
-        <Form.Item {...formItemLayout} label="Experience" style={{ marginBottom: 0 }}>
-          
+        <Form.Item
+          {...formItemLayout}
+          label="Experience"
+          style={{ marginBottom: 0 }}
+        >
           <Form.Item
             style={{ display: 'inline-block', width: 'calc(25% - 12px)' }}
           >
@@ -74,28 +77,28 @@ class CrawlingForm extends React.Component {
             {getFieldDecorator('max_experience')(<Input placeholder="10" />)}
           </Form.Item>
         </Form.Item>
-      
+
         <Form.Item {...formItemLayout} label="Age" style={{ marginBottom: 0 }}>
           <Form.Item
-              style={{ display: 'inline-block', width: 'calc(25% - 12px)' }}
-            >
-              {getFieldDecorator('min_age')(<Input placeholder="25" />)}
-            </Form.Item>
-            <span
-              style={{
-                display: 'inline-block',
-                width: '24px',
-                textAlign: 'center'
-              }}
-            >
-              -
-            </span>
-            <Form.Item
-              style={{ display: 'inline-block', width: 'calc(25% - 12px)' }}
-            >
-              {getFieldDecorator('max_age')(<Input placeholder="35" />)}
-            </Form.Item>
+            style={{ display: 'inline-block', width: 'calc(25% - 12px)' }}
+          >
+            {getFieldDecorator('min_age')(<Input placeholder="25" />)}
           </Form.Item>
+          <span
+            style={{
+              display: 'inline-block',
+              width: '24px',
+              textAlign: 'center'
+            }}
+          >
+            -
+          </span>
+          <Form.Item
+            style={{ display: 'inline-block', width: 'calc(25% - 12px)' }}
+          >
+            {getFieldDecorator('max_age')(<Input placeholder="35" />)}
+          </Form.Item>
+        </Form.Item>
 
         <Form.Item {...formItemLayout} label="Position">
           {getFieldDecorator('position')(<Input />)}

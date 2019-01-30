@@ -67,12 +67,12 @@ export default class People extends Component {
         ...this.getColumnSearchProps('name')
       },
       {
-        key: 'age',
+        key: 'birth',
         title: '나이',
-        dataIndex: 'age',
+        dataIndex: 'birth',
         width: 75,
         align: 'center',
-        ...this.getColumnSearchProps('age')
+        ...this.getColumnSearchProps('birth')
       },
       {
         key: 'school',
@@ -426,9 +426,9 @@ export default class People extends Component {
         clickedData.gender && clickedData.gender !== 'nu'
           ? clickedData.gender
           : '등록된 성별 없음',
-      age:
-        clickedData.age && clickedData.age !== 'null'
-          ? clickedData.age
+      birth:
+        clickedData.birth && clickedData.birth !== 'null'
+          ? clickedData.birth
           : '등록된 나이 없음',
       name:
         clickedData.name && clickedData.name !== 'null'
@@ -449,8 +449,8 @@ export default class People extends Component {
     console.log('people-fetch')
     Axios.post(API.mainTable, {
       user_id: this.props.user_id,
-      under_age: 0,
-      upper_age: 90,
+      under_birth: 1900,
+      upper_birth: 2100,
       top_school: false,
       keyword: ''
     }).then(data => {
@@ -560,7 +560,7 @@ export default class People extends Component {
 
       rowKey: this.state.manualKey, // unique key 값을 안 준다
       name: 'sunny',
-      age: '100',
+      birth: '100',
       school: 'uc berkeley',
       company: 'codestates'
     }
@@ -640,7 +640,7 @@ export default class People extends Component {
     }
     await this.setState({
       resumeDetailTitle: `${this.state.clickedData.name} ${
-        this.state.clickedData.age
+        this.state.clickedData.birth
       } | ${this.state.clickedData.gender} | ${
         this.state.clickedData.mobile
       } | ${this.state.clickedData.email}`
@@ -657,7 +657,7 @@ export default class People extends Component {
     }
     await this.setState({
       resumeDetailTitle: `${this.state.clickedData.name} ${
-        this.state.clickedData.age
+        this.state.clickedData.birth
       } | ${this.state.clickedData.gender} | ${
         this.state.clickedData.mobile
       } | ${this.state.clickedData.email}`
