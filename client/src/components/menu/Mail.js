@@ -227,12 +227,13 @@ export default class Mail extends Component {
         await Axios.post(API.sendMail, {
           user_id: this.props.user_id,
           rm_code: this.state.selectedRows[0].rm_code,
-          sender: 'rmrm.help@gmail.com',
+          sender: 'rmrm@careersherpa.co.kr',
           recipient: this.state.selectedRows[0].recipient,
           subject: this.state.mail.title,
           body:
             this.state.mail.content +
             '\n\n' +
+            'Position Detail\n\n' +
             this.state.mail.position_detail +
             '\n\n' +
             this.state.mail.sign,
