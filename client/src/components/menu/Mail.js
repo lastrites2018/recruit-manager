@@ -261,7 +261,12 @@ export default class Mail extends Component {
               sender: 'rmrm.help@gmail.com',
               recipient: this.state.selectedRows[i].recipient,
               subject: this.state.mail.title,
-              body: this.state.mail.content,
+              body:
+                this.state.mail.content +
+                '\n\n' +
+                this.state.mail.position_detail +
+                '\n\n' +
+                this.state.mail.sign,
               position: ''
             })
           }, 100)

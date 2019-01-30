@@ -255,7 +255,12 @@ export default class People extends Component {
               sender: 'rmrm.help@gmail.com',
               recipient: this.state.selectedRows[i].email,
               subject: this.state.mail.title,
-              body: this.state.mail.content,
+              body:
+                this.state.mail.content +
+                '\n\n' +
+                this.state.mail.position_detail +
+                '\n\n' +
+                this.state.mail.sign,
               position: ''
             })
           }, 100)
