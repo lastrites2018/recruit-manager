@@ -391,6 +391,8 @@ export default class People extends Component {
       await Axios.post(API.rmDetail, {
         user_id: this.props.user_id,
         rm_code: this.state.clickedData.rm_code
+        // user_id: 'rmrm',
+        // rm_code: 'incrute_2017042102318'
       })
         .then(res => {
           console.log('getResumeDetail_res', res.data.result)
@@ -406,20 +408,34 @@ export default class People extends Component {
 
   handleClick = async clickedData => {
     await this.setState({ clickedData })
+
+    const resumeTitle = {
+      mobile:
+        clickedData.mobile && clickedData.mobile !== 'null'
+          ? clickedData.mobile
+          : '등록된 번호 없음',
+      email:
+        clickedData.email && clickedData.email !== 'null'
+          ? clickedData.email
+          : '등록된 이메일 없음',
+      gender:
+        clickedData.gender && clickedData.gender !== 'nu'
+          ? clickedData.gender
+          : '등록된 성별 없음',
+      age:
+        clickedData.age && clickedData.age !== 'null'
+          ? clickedData.age
+          : '등록된 나이 없음',
+      name:
+        clickedData.name && clickedData.name !== 'null'
+          ? clickedData.name
+          : '등록된 이름 없음'
+    }
     await this.setState({
-      resumeDetailTitle: `${this.state.clickedData.name} | ${
-        this.state.clickedData.age
-      } | ${this.state.clickedData.gender} | ${
-        this.state.clickedData.mobile
-      } | ${this.state.clickedData.email}`
+      resumeDetailTitle: `${resumeTitle.name} | ${resumeTitle.age} | ${
+        resumeTitle.gender
+      } | ${resumeTitle.mobile} | ${resumeTitle.email}`
     })
-    // await this.setState({
-    //   resumeDetailTitle: `${this.state.clickedData.name} | ${
-    //     this.state.clickedData.age
-    //   } | ${this.state.clickedData.gender} | ${
-    //     this.state.clickedData.mobile
-    //   }} | ${this.state.clickedData.email}`
-    // })
 
     await this.getResumeDetail(clickedData.rm_code)
     await this.showModal()
@@ -656,38 +672,42 @@ export default class People extends Component {
         // bodyStyle={{ height: '400px' }}
         width="50%"
       >
-        <Row type="flex" justify="center" align="middle">
-          <Col span={14}>
+        {/* <Row type="flex" justify="center" align="left"> */}
+        <Row style={{ textAlign: 'left' }}>
+          <Col>
             <h3>[ School ]</h3>
           </Col>
         </Row>
-        <Row type="flex" justify="center" align="middle">
+        <Row style={{ textAlign: 'left' }}>
           <Col span={14}>
             <p>{this.state.resumeDetailData[0].school}</p>
           </Col>
         </Row>
         <Divider />
-        <Row type="flex" justify="center" align="middle">
+        <Row style={{ textAlign: 'left' }}>
           <Col span={14}>
             <h3>[ Company ]</h3>
           </Col>
         </Row>
-        <Row type="flex" justify="center" align="middle">
+        <Row style={{ textAlign: 'left' }}>
+          {/* <Row type="flex" justify="center" align="middle"> */}
           <Col span={14}>
             <p>{this.state.resumeDetailData[0].company}</p>
           </Col>
         </Row>
         <Divider />
-        <Row type="flex" justify="center" align="middle">
+        <Row style={{ textAlign: 'left' }}>
+          {/* <Row type="flex" justify="center" align="middle"> */}
           <Col span={14}>
             <h3>[ Others ]</h3>
           </Col>
         </Row>
-        <Row type="flex" justify="center" align="middle">
+        <Row style={{ textAlign: 'left' }}>
           <Col span={14}>
             <p>{this.state.resumeDetailData[0].others}</p>
           </Col>
         </Row>
+        <this.memoTable />
         <Divider />
         <Row>
           {/* <Row align="middle"> */}
@@ -714,57 +734,79 @@ export default class People extends Component {
     </div>
   )
 
-  // memoTable = () => {
-  //   //temp
+  memoTable = () => {
+    const columns = [
+      {
+        title: 'Position',
+        dataIndex: 'memo_position',
+        align: 'center',
+        width: '20%'
+      },
+      {
+        title: 'Client',
+        dataIndex: 'memo_client',
+        align: 'center',
+        width: 100
+      },
+      {
+        title: '담당 헤드헌터',
+        dataIndex: 'memo_username',
+        align: 'center',
+        width: 75
+      },
+      {
+        title: '일시',
+        dataIndex: 'memo_date',
+        align: 'center',
+        width: 90
+      },
+      {
+        title: '메모',
+        dataIndex: 'memo_text',
+        align: 'center',
+        width: '30%'
+      }
+    ]
 
-  //   const columns = [
-  //     {
-  //       title: 'Client',
-  //       dataIndex: 'client'
-  //     },
-  //     {
-  //       title: 'Date',
-  //       dataIndex: 'date'
-  //     },
-  //     {
-  //       title: 'Text',
-  //       dataIndex: 'text'
-  //     },
-  //     {
-  //       title: 'Username',
-  //       dataIndex: 'username'
-  //     }
-  //   ]
+    // console.log(
+    //   'this.state.resumeDetailData[0]',
+    //   this.state.resumeDetailData[0]
+    // )
 
-  //   console.log('tp', this.state.resumeDetailData[0])
+    if (!this.state.resumeDetailData[0].memo) {
+      return (
+        <div>
+          <Divider />
+          <Row style={{ textAlign: 'left' }}>
+            <Col span={14}>
+              <h3>[ Position & Memo ]</h3>
+            </Col>
+          </Row>
+          <div>메모 내용이 없습니다.</div>
+        </div>
+      )
+    }
 
-  //   // if (!this.state.resumeDetailData[0].memo) {
-  //   //   return
-  //   // }
+    return (
+      <div>
+        <Divider />
+        <Row style={{ textAlign: 'left' }}>
+          {/* <Row type="flex" justify="center" align="middle"> */}
+          <Col span={14}>
+            <h3>[ Position & Memo ]</h3>
+          </Col>
+        </Row>
 
-  //   // const datas = this.state.resumeDetailData[0].map(data => {
-  //   //   return {
-  //   //     client: data.memo.client,
-  //   //     date: data.memo.date,
-  //   //     position: data.memo.position,
-  //   //     text: data.memo.text,
-  //   //     username: data.memo.username
-  //   //     // memo_client: "강남상사"
-  //   //     // memo_date: "2019-01-24"
-  //   //     // memo_position: "추천을 하려고 했었음 확인"
-  //   //     // memo_text: "경리"
-  //   //     // memo_username: "username"
-  //   //   }
-  //   // })
-  //   return (
-  //     <div>
-  //       <h4>Middle size table</h4>
-  //       {/* <Table columns={columns} dataSource={datas} size="middle" />
-  //       <h4>Small size table</h4>
-  //       <Table columns={columns} dataSource={datas} size="small" /> */}
-  //     </div>
-  //   )
-  // }
+        <Table
+          // style={{ width: '95%' }}
+          bordered
+          columns={columns}
+          dataSource={this.state.resumeDetailData[0].memo}
+          size="middle"
+        />
+      </div>
+    )
+  }
 
   getColumnSearchProps = dataIndex => ({
     filterDropdown: ({
@@ -1037,7 +1079,7 @@ export default class People extends Component {
         <br />
         <Input
           style={{ marginLeft: '20px', width: '20%' }}
-          placeholder="검색어 (or)"
+          placeholder="검색어 (or 검색을 원하시면 한 칸 띄고 입력해주세요!)"
           onChange={this.handleAndOR}
         />
         <br />
