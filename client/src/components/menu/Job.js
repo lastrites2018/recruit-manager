@@ -11,7 +11,8 @@ import {
   Tag,
   Input,
   Button,
-  Icon
+  Icon,
+  Tooltip
 } from 'antd'
 import Highlighter from 'react-highlight-words'
 
@@ -316,7 +317,10 @@ export default class Job extends Component {
         name: record.name
       })
     }
-
+    const { selectedRowKeys } = this.state
+    const hasSelectedOne = selectedRowKeys.length === 1
+    const hasSelectedMultiple = selectedRowKeys.length >= 1
+    const editButtonToolTip = <span>편집을 위해서는 하나만 선택해주세요.</span>
     return (
       <div style={{ marginLeft: '20px' }}>
         <div style={{ marginTop: '16px', width: '85%' }}>
@@ -329,30 +333,50 @@ export default class Job extends Component {
             등록
           </Button>
 
-          <Popconfirm
-            title="Are you sure you want to delete this?"
-            onConfirm={this.handleDeleteConfirm}
-            onCancel={this.handleDeleteCancel}
-            okText="OK"
-            cancelText="Cancel"
-          >
+          {hasSelectedMultiple ? (
+            <Popconfirm
+              title="Are you sure you want to delete this?"
+              onConfirm={this.handleDeleteConfirm}
+              onCancel={this.handleDeleteCancel}
+              okText="OK"
+              cancelText="Cancel"
+              disabled={!hasSelectedMultiple}
+            >
+              <Button
+                type="primary"
+                icon="delete"
+                style={{ marginRight: 5, marginBottom: 16 }}
+                disabled={!hasSelectedMultiple}
+              >
+                삭제
+              </Button>
+            </Popconfirm>
+          ) : (
             <Button
               type="primary"
               icon="delete"
               style={{ marginRight: 5, marginBottom: 16 }}
+              disabled={!hasSelectedMultiple}
             >
               삭제
             </Button>
-          </Popconfirm>
+          )}
 
-          <Button
-            type="primary"
-            icon="edit"
-            onClick={this.showUpdateModal}
-            style={{ marginRight: 5, marginBottom: 16 }}
+          <Tooltip
+            placement="right"
+            title={editButtonToolTip}
+            visible={selectedRowKeys.length > 1}
           >
-            편집
-          </Button>
+            <Button
+              type="primary"
+              icon="edit"
+              onClick={this.showUpdateModal}
+              style={{ marginRight: 5, marginBottom: 16 }}
+              disabled={!hasSelectedOne}
+            >
+              편집
+            </Button>
+          </Tooltip>
         </div>
 
         <this.jobModal />
