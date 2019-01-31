@@ -1074,8 +1074,8 @@ export default class People extends Component {
       }
     })
 
-    const optionList = this.state.positionData.map((position, index) => (
-      <Option value={position.keyword} key={index}>
+    const optionList = this.state.positionData.map(position => (
+      <Option value={position.keyword} key={position.position_id}>
         {`${position.title}    키워드 : ${position.keyword}`}
       </Option>
     ))
