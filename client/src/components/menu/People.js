@@ -72,6 +72,11 @@ export default class People extends Component {
         dataIndex: 'birth',
         width: 75,
         align: 'center',
+        // render: (text, row, index) => { // 검색기능과 render를 같이 못 씀
+        //   console.log('text', text)
+        //   // return <a href="#">나이</a>
+        //   return <span>{text} 나이</span>
+        // }
         ...this.getColumnSearchProps('birth')
       },
       {
@@ -139,6 +144,12 @@ export default class People extends Component {
             </a>
           )
         }
+      },
+      {
+        key: 'email', //날짜에 맞게 데이터 맞게 들어왔는지 확인용
+        title: 'email(테스트용)',
+        dataIndex: 'email',
+        width: 120
       },
       {
         key: 'modified_date', //날짜에 맞게 데이터 맞게 들어왔는지 확인용
@@ -225,7 +236,8 @@ export default class People extends Component {
           user_id: this.props.user_id,
           rm_code: this.state.selectedRows[0].rm_code,
           sender: 'rmrm@careersherpa.co.kr',
-          recipient: this.state.selectedRows[0].email,
+          recipient: 'joinsusang@gmail.com',
+          // recipient: this.state.selectedRows[0].email,
           subject: this.state.mail.title,
           body:
             this.state.mail.content +
@@ -1225,7 +1237,7 @@ export default class People extends Component {
             })}
           />
           {this.state.visible && <this.peopleModal />}
-          <this.mailModal />
+          {this.state.mailVisible && <this.mailModal />}
           {this.state.smsVisible && <this.smsModal />}
           {/* <this.smsModal /> */}
           <this.addResumeModal />

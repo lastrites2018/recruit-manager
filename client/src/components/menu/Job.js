@@ -18,6 +18,7 @@ import {
   Tooltip
 } from 'antd'
 import Highlighter from 'react-highlight-words'
+import { sortBy } from 'lodash'
 
 export default class Job extends Component {
   constructor(props) {
@@ -52,7 +53,16 @@ export default class Job extends Component {
         title: '포지션 상세',
         dataIndex: 'detail',
         width: '100',
-        ...this.getColumnSearchProps('detail')
+        ...this.getColumnSearchProps('detail'),
+        render: text => {
+          var slicedText =
+            text.length > 50 ? `${text.slice(0, 50)} (중략)` : text
+          // text.length > 50 ? `${text.slice(0, 50)} ▼ 더 보기` : text
+          console.log('sl', slicedText)
+          console.log('tl', text.length)
+          return <span>{slicedText}</span>
+        }
+        // render: text => <span>{text.length > 20 ? text.slice(20) : text}</span>
       },
       {
         title: '키워드',
@@ -161,10 +171,15 @@ export default class Job extends Component {
       const pagination = { ...this.state.pagination }
       // Read total count from server
       // pagination.total = data.totalCount
-      console.log('job', data.data.result)
+      const positonSort = sortBy(data.data.result, [
+        function(job) {
+          return Number(job.position_id.slice(2))
+        }
+      ])
+
       this.setState({
         loading: false,
-        data: data.data.result.reverse(),
+        data: positonSort.reverse(),
         pagination
       })
     })
@@ -413,7 +428,12 @@ export default class Job extends Component {
         name: record.name
       })
     }
-    const { selectedRowKeys } = this.state
+    const {
+      visible,
+      updateVisible,
+      detailVisible,
+      selectedRowKeys
+    } = this.state
     const hasSelectedOne = selectedRowKeys.length === 1
     const hasSelectedMultiple = selectedRowKeys.length >= 1
     const editButtonToolTip = <span>편집을 위해서는 하나만 선택해주세요.</span>
@@ -477,10 +497,9 @@ export default class Job extends Component {
             </Button>
           </Tooltip>
         </div>
-
-        <this.jobModal />
-        <this.updateJobModal />
-        <this.detailJobModal />
+        {visible && <this.jobModal />}
+        {updateVisible && <this.updateJobModal />}
+        {detailVisible && <this.detailJobModal />}
         <Table
           columns={this.columns}
           bordered
