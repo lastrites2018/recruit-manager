@@ -15,6 +15,7 @@ import {
   Tooltip
 } from 'antd'
 import Highlighter from 'react-highlight-words'
+import { sortBy } from 'lodash'
 
 export default class Job extends Component {
   constructor(props) {
@@ -155,10 +156,15 @@ export default class Job extends Component {
       const pagination = { ...this.state.pagination }
       // Read total count from server
       // pagination.total = data.totalCount
-      console.log('job', data.data.result)
+      const positonSort = sortBy(data.data.result, [
+        function(job) {
+          return Number(job.position_id.slice(2))
+        }
+      ])
+
       this.setState({
         loading: false,
-        data: data.data.result.reverse(),
+        data: positonSort.reverse(),
         pagination
       })
     })
@@ -317,7 +323,7 @@ export default class Job extends Component {
         name: record.name
       })
     }
-    const { selectedRowKeys } = this.state
+    const { visible, updateVisible, selectedRowKeys } = this.state
     const hasSelectedOne = selectedRowKeys.length === 1
     const hasSelectedMultiple = selectedRowKeys.length >= 1
     const editButtonToolTip = <span>편집을 위해서는 하나만 선택해주세요.</span>
@@ -378,9 +384,8 @@ export default class Job extends Component {
             </Button>
           </Tooltip>
         </div>
-
-        <this.jobModal />
-        <this.updateJobModal />
+        {visible && <this.jobModal />}
+        {updateVisible && <this.updateJobModal />}
         <Table
           columns={this.columns}
           rowKey="position_id"

@@ -14,6 +14,7 @@ class JobForm extends React.Component {
       if (!err) this.setState({ newPosition: values })
     })
     this.addPosition()
+    this.setState({ newPosition: {} })
   }
 
   addPosition = async () => {
