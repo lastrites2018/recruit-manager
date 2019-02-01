@@ -4,14 +4,17 @@ import API from '../../util/api'
 import JobForm from '../forms/JobForm'
 import UpdateJobForm from '../forms/UpdateJobForm'
 import {
+  Button,
+  Col,
+  Divider,
+  Icon,
+  Input,
   message,
   Modal,
   Popconfirm,
+  Row,
   Table,
   Tag,
-  Input,
-  Button,
-  Icon,
   Tooltip
 } from 'antd'
 import Highlighter from 'react-highlight-words'
@@ -21,12 +24,15 @@ export default class Job extends Component {
     super(props)
     this.state = {
       loading: true,
+      clickedData: [],
       data: [],
       pagination: {},
       selectedRowKeys: [],
       selectedRows: [],
       visible: false,
-      updateVisible: false
+      updateVisible: false,
+      detailVisible: false,
+      detailTitle: 'Job Detail'
     }
 
     this.columns = [
@@ -285,6 +291,84 @@ export default class Job extends Component {
     </div>
   )
 
+  detailJobModal = () => (
+    <div>
+      <Modal
+        title={this.state.detailTitle}
+        visible={this.state.detailVisible}
+        onOk={this.handleDetailModalOk}
+        onCancel={this.handleDetailModalCancel}
+        footer={null}
+        width="80%"
+      >
+        <Row style={{ textAlign: 'left' }}>
+          <Col>
+            <h3>[ Company ]</h3>
+          </Col>
+        </Row>
+        <Row style={{ textAlign: 'left' }}>
+          <Col span={14}>
+            <p>{this.state.clickedData.company}</p>
+          </Col>
+        </Row>
+        <Divider />
+        <Row style={{ textAlign: 'left' }}>
+          <Col span={14}>
+            <h3>[ Position ]</h3>
+          </Col>
+        </Row>
+        <Row style={{ textAlign: 'left' }}>
+          <Col span={14}>
+            <p>{this.state.clickedData.title}</p>
+          </Col>
+        </Row>
+        <Divider />
+        <Row style={{ textAlign: 'left' }}>
+          <Col span={14}>
+            <h3>[ Keywords ]</h3>
+          </Col>
+        </Row>
+        <Row style={{ textAlign: 'left' }}>
+          <Col span={14}>
+            <p>{this.state.clickedData.keyword}</p>
+          </Col>
+        </Row>
+        <Divider />
+        <Row style={{ textAlign: 'left' }}>
+          <Col span={14}>
+            <h3>[ Detail ]</h3>
+          </Col>
+        </Row>
+        <Row style={{ textAlign: 'left' }}>
+          <Col span={14}>
+            <p>{this.state.clickedData.detail}</p>
+          </Col>
+        </Row>
+        <Divider />
+        <Row style={{ textAlign: 'left' }}>
+          <Col span={14}>
+            <h3>[ Modified Date ]</h3>
+          </Col>
+        </Row>
+        <Row style={{ textAlign: 'left' }}>
+          <Col span={14}>
+            <p>{this.state.clickedData.modified_date}</p>
+          </Col>
+        </Row>
+      </Modal>
+    </div>
+  )
+
+  handleClick = async clickedData => {
+    await this.setState({ clickedData })
+    await this.setState({
+      detailTitle: `${clickedData.company} | ${
+        clickedData.title
+      } | ${clickedData.valid.toUpperCase()}`
+    })
+    await this.showDetailModal()
+  }
+
   showModal = () => {
     this.setState({ visible: true })
   }
@@ -309,6 +393,18 @@ export default class Job extends Component {
     this.setState({ updateVisible: false, selectedRowKeys: [] })
   }
 
+  showDetailModal = () => {
+    this.setState({ detailVisible: true })
+  }
+
+  handleDetailModalOk = () => {
+    this.setState({ detailVisible: false })
+  }
+
+  handleDetailModalCancel = () => {
+    this.setState({ detailVisible: false, selectedRowKeys: [] })
+  }
+
   render() {
     const rowSelection = {
       onChange: this.onSelectChange,
@@ -321,6 +417,9 @@ export default class Job extends Component {
     const hasSelectedOne = selectedRowKeys.length === 1
     const hasSelectedMultiple = selectedRowKeys.length >= 1
     const editButtonToolTip = <span>편집을 위해서는 하나만 선택해주세요.</span>
+
+    console.log(this.state.clickedData)
+
     return (
       <div style={{ marginLeft: '20px' }}>
         <div style={{ marginTop: '16px', width: '85%' }}>
@@ -381,17 +480,24 @@ export default class Job extends Component {
 
         <this.jobModal />
         <this.updateJobModal />
+        <this.detailJobModal />
         <Table
           columns={this.columns}
+          bordered
+          dataSource={this.state.data}
           rowKey="position_id"
           size="small"
           style={{ marginTop: '10px', width: '95%' }}
-          bordered
-          dataSource={this.state.data}
           pagination={this.state.pagination}
           loading={this.state.loading}
           onChange={this.handleTableChange}
           rowSelection={rowSelection}
+          onRow={record => ({
+            onClick: () => {
+              console.log('record', record)
+              this.handleClick(record)
+            }
+          })}
         />
       </div>
     )
