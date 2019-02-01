@@ -17,7 +17,6 @@ class UpdateJobForm extends React.Component {
   }
 
   updatePosition = async () => {
-    // come back after API is fixed
     await console.log('selected props: ', this.props.selected.position_id)
     await console.log('user_id: ', this.props.user_id)
     await console.log('updatePosition: ', this.state.newPosition)
