@@ -738,7 +738,13 @@ export default class People extends Component {
         </Row>
         <Row style={{ textAlign: 'left' }}>
           <Col span={14}>
-            <p>{this.state.resumeDetailData[0].others}</p>
+            <details>
+              <summary>
+                {this.state.resumeDetailData[0].others.slice(0, 20)}
+              </summary>
+              <p>{this.state.resumeDetailData[0].others}</p>
+            </details>
+            {/* <p>{this.state.resumeDetailData[0].others}</p> */}
           </Col>
         </Row>
         <this.memoTable />
