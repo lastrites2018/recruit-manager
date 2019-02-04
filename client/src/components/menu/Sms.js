@@ -181,28 +181,57 @@ export default class SMS extends Component {
     this.setState({ visible: false })
   }
 
-  writeSmsContent = form => {
-    this.setState({ sms: form })
-    this.sendSMS()
-    this.handleCancel()
+  // writeSmsContent = form => {
+  //   this.setState({ sms: form })
+  //   this.sendSMS()
+  //   this.handleCancel()
+  //   this.resetSelections()
+  // }
+
+  writeSmsContent = async form => {
+    await this.setState({ sms: form })
+    await this.sendSMS()
+    await this.handleCancel()
+    await this.resetSelections()
   }
 
-  smsModal = () => (
-    <div>
-      <Modal
-        title="SMS"
-        visible={this.state.visible}
-        onOk={this.handleOk}
-        onCancel={this.handleCancel}
-        footer={null}
-      >
-        <SmsForm.SmsRegistration
-          selectedRows={this.state.selectedRows}
-          sms={this.writeSmsContent}
-        />
-      </Modal>
-    </div>
-  )
+  resetSelections = () => {
+    setTimeout(() => {
+      console.log('sms-resetting row selection')
+      this.setState({
+        selectedRowKeys: [],
+        selectedRows: []
+      })
+    }, 1000)
+  }
+
+  smsModal = () => {
+    let title
+    if (this.state.selectedRows.length === 0) {
+      title = 'SMS'
+    } else {
+      this.state.selectedRows.length > 1
+        ? (title = `SMS ${this.state.selectedRows[0].mobile} 외`)
+        : (title = `SMS ${this.state.selectedRows[0].mobile}`)
+    }
+
+    return (
+      <div>
+        <Modal
+          title={title}
+          visible={this.state.visible}
+          onOk={this.handleOk}
+          onCancel={this.handleCancel}
+          footer={null}
+        >
+          <SmsForm.SmsRegistration
+            selectedRows={this.state.selectedRows}
+            writeSmsContent={this.writeSmsContent}
+          />
+        </Modal>
+      </div>
+    )
+  }
 
   sendSMS = async () => {
     await console.log('state', this.state.sms)
@@ -243,17 +272,16 @@ export default class SMS extends Component {
     }
   }
 
-  resetSelections = () => {
-    setTimeout(() => {
-      console.log('resetting row selection')
-      this.setState({
-        selectedRowKeys: [],
-        selectedRows: []
-      })
-    }, 2000)
+  resetSelections = async () => {
+    await this.setState({
+      selectedRowKeys: [],
+      selectedRows: []
+    })
+    await console.log('resetting row selection')
   }
 
   render() {
+    const { visible } = this.state
     const rowSelection = {
       onChange: this.onSelectChange,
       getCheckboxProps: record => ({
@@ -284,7 +312,7 @@ export default class SMS extends Component {
           onChange={this.handleTableChange}
           rowSelection={rowSelection}
         />
-        <this.smsModal />
+        {visible && <this.smsModal />}
       </div>
     )
   }

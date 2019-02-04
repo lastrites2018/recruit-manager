@@ -298,6 +298,7 @@ export default class Mail extends Component {
         name: record.name
       })
     }
+    const { visible } = this.state
 
     return (
       <div style={{ marginLeft: '20px' }}>
@@ -322,7 +323,7 @@ export default class Mail extends Component {
           onChange={this.handleTableChange}
           rowSelection={rowSelection}
         />
-        <this.mailModal />
+        {visible && <this.mailModal />}
       </div>
     )
   }
