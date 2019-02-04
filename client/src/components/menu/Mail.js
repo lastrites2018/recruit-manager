@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import Axios from 'axios'
 import API from '../../util/api'
 import MailForm from '../forms/MailForm'
-import { Modal, Table, Input, Button, Icon } from 'antd'
+import { Button, Col, Divider, Icon, Input, Modal, Table, Row } from 'antd'
 import Highlighter from 'react-highlight-words'
 
 export default class Mail extends Component {
@@ -14,9 +14,12 @@ export default class Mail extends Component {
       loading: true,
       data: [],
       mail: {},
+      mailDetail: {},
+      mailDetailTitle: '',
       pagination: {},
       selectedRowKeys: [],
       selectedRows: [],
+      detailVisible: false,
       visible: false,
       searchText: ''
     }
@@ -182,6 +185,72 @@ export default class Mail extends Component {
     })
   }
 
+  mailModal = () => (
+    <div>
+      <Modal
+        title="Mail"
+        visible={this.state.visible}
+        onOk={this.handleOk}
+        onCancel={this.handleCancel}
+        footer={null}
+      >
+        <MailForm.MailRegistration
+          mail={this.writeMailContent}
+          allRecipients={this.state.allRecipients}
+          allEmails={this.state.allEmails}
+        />
+      </Modal>
+    </div>
+  )
+
+  mailDetailModal = () => (
+    <div>
+      <Modal
+        title={this.state.mailDetailTitle}
+        visible={this.state.detailVisible}
+        onOK={this.handleDetailOK}
+        onCancel={this.handleDetailCancel}
+        footer={null}
+        width="50%"
+      >
+        <Row style={{ textAlign: 'left' }}>
+          <Col span={14}>
+            <h3>[ Content ]</h3>
+          </Col>
+        </Row>
+        <Row style={{ textAlign: 'left' }}>
+          <Col span={14}>
+            <p>{this.state.mailDetail.body}</p>
+          </Col>
+        </Row>
+        <Divider />
+        <Row style={{ textAlign: 'left' }}>
+          <Col span={14}>
+            <h3>[ Send Date ]</h3>
+          </Col>
+        </Row>
+        <Row style={{ textAlign: 'left' }}>
+          <Col span={14}>
+            <p>{this.state.mailDetail.send_date}</p>
+          </Col>
+        </Row>
+      </Modal>
+    </div>
+  )
+
+  showDetailModal = () => {
+    console.log('show mail detail modal')
+    this.setState({ detailVisible: true })
+  }
+
+  handleDetailOk = () => {
+    this.setState({ detailVisible: false })
+  }
+
+  handleDetailCancel = () => {
+    this.setState({ detailVisible: false })
+  }
+
   showModal = () => {
     console.log('show modal')
     this.setState({ visible: true })
@@ -200,24 +269,6 @@ export default class Mail extends Component {
     this.sendMail()
     this.handleCancel()
   }
-
-  mailModal = () => (
-    <div>
-      <Modal
-        title="Mail"
-        visible={this.state.visible}
-        onOk={this.handleOk}
-        onCancel={this.handleCancel}
-        footer={null}
-      >
-        <MailForm.MailRegistration
-          mail={this.writeMailContent}
-          allRecipients={this.state.allRecipients}
-          allEmails={this.state.allEmails}
-        />
-      </Modal>
-    </div>
-  )
 
   sendMail = async () => {
     await console.log('selected rows: ', this.state.selectedRows)
@@ -298,7 +349,7 @@ export default class Mail extends Component {
         name: record.name
       })
     }
-    const { visible } = this.state
+    const { visible, detailVisible } = this.state
 
     return (
       <div style={{ marginLeft: '20px' }}>
@@ -322,8 +373,19 @@ export default class Mail extends Component {
           loading={this.state.loading}
           onChange={this.handleTableChange}
           rowSelection={rowSelection}
+          onRow={record => ({
+            onClick: () => {
+              console.log('record', record)
+              this.setState({
+                mailDetail: record,
+                mailDetailTitle: `${record.name} | ${record.recipient}`
+              })
+              this.showDetailModal()
+            }
+          })}
         />
         {visible && <this.mailModal />}
+        {detailVisible && <this.mailDetailModal />}
       </div>
     )
   }

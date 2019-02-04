@@ -44,6 +44,11 @@ export default class SMS extends Component {
         ...this.getColumnSearchProps('position')
       },
       {
+        title: 'Content',
+        dataIndex: 'body',
+        ...this.getColumnSearchProps('body')
+      },
+      {
         title: '수신확인',
         dataIndex: '수신확인',
         ...this.getColumnSearchProps('수신확인')
