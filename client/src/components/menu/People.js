@@ -72,12 +72,21 @@ export default class People extends Component {
         dataIndex: 'birth',
         width: 75,
         align: 'center',
-        // render: (text, row, index) => { // 검색기능과 render를 같이 못 씀
-        //   console.log('text', text)
-        //   // return <a href="#">나이</a>
-        //   return <span>{text} 나이</span>
-        // }
         ...this.getColumnSearchProps('birth')
+        // render: (text, row, index) => {
+        //   // 검색기능과 render를 같이 못 씀 -> 같이 쓸 수 있 지 만 나이 추가 데이터는 검색 안됨
+        //   let age
+        //   if (text !== 'null' && text) {
+        //     let date = new Date()
+        //     let year = date.getFullYear()
+        //     age = year - Number(text) + 1
+        //   }
+        //   return (
+        //     <span>
+        //       {text} 나이 {age}
+        //     </span>
+        //   )
+        // }
       },
       {
         key: 'school',
@@ -145,12 +154,12 @@ export default class People extends Component {
           )
         }
       },
-      {
-        key: 'email', //날짜에 맞게 데이터 맞게 들어왔는지 확인용
-        title: 'email(테스트용)',
-        dataIndex: 'email',
-        width: 120
-      },
+      // {
+      //   key: 'email', //날짜에 맞게 데이터 맞게 들어왔는지 확인용
+      //   title: 'email(테스트용)',
+      //   dataIndex: 'email',
+      //   width: 120
+      // },
       {
         key: 'modified_date', //날짜에 맞게 데이터 맞게 들어왔는지 확인용
         title: '등록 날짜(테스트용)',
@@ -341,7 +350,7 @@ export default class People extends Component {
         >
           <SmsForm.SmsRegistration
             selectedRows={this.state.selectedRows}
-            sms={this.writeSmsContent}
+            writeSmsContent={this.writeSmsContent}
           />
         </Modal>
       </div>
@@ -362,7 +371,7 @@ export default class People extends Component {
           body: this.state.sms.content,
           position: ''
         })
-        await console.log(`문자를 보냈습니다.`)
+        await console.log(`${this.state.sms.receiver}에 문자를 보냈습니다.`)
         // await this.resetSelections()
       } catch (err) {
         console.log('send one SMS error', err)
@@ -378,7 +387,9 @@ export default class People extends Component {
           body: this.state.sms.content,
           position: ''
         })
-        await console.log(`문자를 보냈습니다.`)
+        await console.log(
+          `${this.state.selectedRows[0].mobile}에 문자를 보냈습니다.`
+        )
         // await this.resetSelections()
       } catch (err) {
         console.log('send one SMS error', err)
@@ -750,12 +761,22 @@ export default class People extends Component {
         </Row>
         <Row style={{ textAlign: 'left' }}>
           <Col span={14}>
-            <details>
+            {this.state.resumeDetailData[0].others.length > 200 ? (
+              <details>
+                <summary>
+                  {this.state.resumeDetailData[0].others.slice(0, 40)}
+                </summary>
+                <p>{this.state.resumeDetailData[0].others}</p>
+              </details>
+            ) : (
+              this.state.resumeDetailData[0].others
+            )}
+            {/* <details>
               <summary>
                 {this.state.resumeDetailData[0].others.slice(0, 20)}
               </summary>
               <p>{this.state.resumeDetailData[0].others}</p>
-            </details>
+            </details> */}
             {/* <p>{this.state.resumeDetailData[0].others}</p> */}
           </Col>
         </Row>
@@ -1207,6 +1228,7 @@ export default class People extends Component {
           >
             삭제
           </Button>
+
           <Button
             type="primary"
             icon="user-add"

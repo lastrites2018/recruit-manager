@@ -2,10 +2,11 @@ import React from 'react'
 import Axios from 'axios'
 import { Button, Form, Input, Select } from 'antd'
 import API from '../../util/api'
+import ShortId from 'shortid'
 
 class SmsForm extends React.Component {
   state = {
-    positon: '',
+    position: '',
     positionData: []
   }
 
@@ -13,7 +14,7 @@ class SmsForm extends React.Component {
     e.preventDefault()
     this.props.form.validateFieldsAndScroll((err, values) => {
       if (!err) {
-        this.props.sms(values)
+        this.props.writeSmsContent(values)
         console.log('Received values of form: ', values)
       }
     })
@@ -27,10 +28,15 @@ class SmsForm extends React.Component {
     Axios.post(API.getPosition, {
       user_id: this.props.user_id
     }).then(data => {
+      const keyAddedResult = data.data.result.map(data => {
+        data.key = ShortId.generate()
+        return data
+      })
       this.setState({
-        positionData: data.data.result
+        positionData: keyAddedResult
       })
       console.log('position data', data.data.result)
+      console.log('position data + key', keyAddedResult)
     })
   }
 
@@ -41,6 +47,8 @@ class SmsForm extends React.Component {
 
   render() {
     const { getFieldDecorator } = this.props.form
+    const { selectedRows } = this.props
+    const { position } = this.state
 
     const formItemLayout = {
       labelCol: {
@@ -66,21 +74,14 @@ class SmsForm extends React.Component {
     }
 
     let receivers =
-      this.props.selectedRows.length > 1
-        ? this.props.selectedRows.map((row, index) => row.name).join(',')
-        : // ? this.props.selectedRows.map((row, index) => row.name).join(',')
+      selectedRows.length > 1
+        ? selectedRows.map((row, index) => row.name).join(',')
+        : // ? selectedRows.map((row, index) => row.name).join(',')
           null
-
-    // const optionList = this.state.positionData.map((position, index) => (
-    //   <Select.Option value={position.keyword} key={position.position_id}>
-    //     {`${position.title}    키워드 : ${position.keyword}`}
-    //     {/* {`${position.title}    키워드 : ${position.keyword}`} */}
-    //   </Select.Option>
-    // ))
 
     const optionList = this.state.positionData.map(position => {
       return (
-        <Select.Option value={position.keyword} key={position.position_id}>
+        <Select.Option value={position.title} key={position.key}>
           {`${position.title}: ${position.keyword}`}
           {/* {`${position.title}    키워드 : ${position.keyword}`} */}
         </Select.Option>
@@ -92,41 +93,31 @@ class SmsForm extends React.Component {
     let positionRule
     let smsContent
     let recipientPlaceholder
-    if (this.props.selectedRows.length === 0) {
+    if (selectedRows.length === 0) {
       smsName = ''
       signupRule = [{ required: false }]
       positionRule = [{ required: false }]
       smsContent = ''
       recipientPlaceholder = '한 명만 보낼 수 있습니다. 폰 번호를 입력해주세요.'
     } else {
-      smsName = receivers || this.props.selectedRows[0].name
+      smsName = receivers || selectedRows[0].name
       signupRule = [{ required: true, message: 'Please fill in the sign.' }]
       positionRule = [
         { required: true, message: 'Please fill in the content.' }
       ]
-      smsContent = `안녕하세요, 어제 제안드렸던 ${
-        this.state.position
-      } 에 대해서 어떻게 생각해보셨는지 문의차 다시 문자 드립니다. 간략히 검토후 의향에 대해서 회신 주시면 감사하겠습니다.`
+      smsContent = `안녕하세요, 어제 제안드렸던 ${position} 에 대해서 어떻게 생각해보셨는지 문의차 다시 문자 드립니다. 간략히 검토후 의향에 대해서 회신 주시면 감사하겠습니다.`
       recipientPlaceholder = ''
     }
 
     return (
       <Form onSubmit={this.handleSubmit}>
-        {/* <Form.Item label="Title: " {...formItemLayout}>
-          {getFieldDecorator('title', {
-            initialValue: `채용 제안`,
-            rules: [{ required: true, message: 'Please fill in the title.' }]
-          })(<Input />)}
-        </Form.Item> */}
-
         <Form.Item
           label="Recipient: " // Recipient
           {...formItemLayout}
         >
           {getFieldDecorator('receiver', {
             initialValue: smsName
-
-            // initialValue: receivers || this.props.selectedRows[0].name
+            // initialValue: receivers || selectedRows[0].name
           })(<Input placeholder={recipientPlaceholder} />)}
         </Form.Item>
 
@@ -136,13 +127,13 @@ class SmsForm extends React.Component {
           })(<Input />)}
         </Form.Item> */}
 
-        {this.props.selectedRows.length !== 0 ? (
+        {selectedRows.length !== 0 ? (
           <Form.Item label="Positions: " {...formItemLayout} hasFeedback>
             {getFieldDecorator('select', {
               rules: positionRule
             })(
               <Select
-                value={this.state.position}
+                // value={position}
                 showSearch
                 style={{ width: '90 %' }}
                 optionFilterProp="children"
@@ -161,9 +152,6 @@ class SmsForm extends React.Component {
         <Form.Item {...formItemLayout} label="Content">
           {getFieldDecorator('content', {
             initialValue: smsContent,
-            // initialValue: `안녕하세요, 어제 제안드렸던 ${
-            //   this.state.position
-            // } 에 대해서 어떻게 생각해보셨는지 문의차 다시 메일 드립니다. 간략히 검토후 의향에 대해서 회신 주시면 감사하겠습니다.`,
             rules: [{ required: true, message: 'Please fill in the content.' }]
           })(<Input.TextArea rows={4} />)}
         </Form.Item>
@@ -176,7 +164,11 @@ class SmsForm extends React.Component {
         </Form.Item> */}
 
         <Form.Item {...tailFormItemLayout}>
-          <Button type="primary" htmlType="submit">
+          <Button
+            type="primary"
+            htmlType="submit"
+            disabled={selectedRows.length >= 1 && !!!position}
+          >
             SEND
           </Button>
         </Form.Item>
