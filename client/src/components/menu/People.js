@@ -1131,7 +1131,7 @@ export default class People extends Component {
           <Input
             style={{
               marginLeft: '20px',
-              width: '5%'
+              width: '6%'
             }}
             placeholder="최소생년"
             name="under_birth"
@@ -1141,7 +1141,7 @@ export default class People extends Component {
           />
           <Input
             style={{
-              width: '5%'
+              width: '6%'
             }}
             placeholder="최대생년"
             name="upper_birth"

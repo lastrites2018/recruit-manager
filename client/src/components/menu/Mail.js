@@ -307,7 +307,7 @@ export default class Mail extends Component {
             this.state.mail.position_detail +
             '\n\n' +
             this.state.mail.sign,
-          position: '' // 공백이라도 보내야 함.
+          position: '데이터|입력테스트' // 공백이라도 보내야 함.
         })
           .then(data => {
             console.log('data', data)

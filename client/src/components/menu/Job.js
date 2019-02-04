@@ -173,15 +173,53 @@ export default class Job extends Component {
       // Read total count from server
       // pagination.total = data.totalCount
       console.log('data.data.result', data.data.result)
-      const positonSort = sortBy(data.data.result, [
-        function(job) {
-          return Number(job.position_id.slice(2))
-        }
-      ])
+
+      // const aliveArr = data.data.result.map(data => data.valid === 'alive')
+      let aliveArr = []
+      let expiredArr = []
+      let holdArr = []
+
+      data.data.result.forEach(data => {
+        if (data.valid === 'alive') aliveArr.push(data)
+        if (data.valid === 'expired') expiredArr.push(data)
+        if (data.valid === 'hold') holdArr.push(data)
+      })
+
+      aliveArr.sort((a, b) => {
+        // decend
+        return (
+          new Date(b.modified_date).getTime() -
+          new Date(a.modified_date).getTime()
+        )
+      })
+      holdArr.sort((a, b) => {
+        // decend
+        return (
+          new Date(b.modified_date).getTime() -
+          new Date(a.modified_date).getTime()
+        )
+      })
+      expiredArr.sort((a, b) => {
+        // decend
+        return (
+          new Date(b.modified_date).getTime() -
+          new Date(a.modified_date).getTime()
+        )
+      })
+      const positionSort = aliveArr.concat(holdArr).concat(expiredArr)
+
+      // const positonSort = sortBy(data.data.result, [
+      //   function(job) {
+      //     return job.position
+      //     // return Number(job.position_id.slice(2))
+      //   }
+      // ])
+
+      console.log('positionSort', positionSort)
 
       this.setState({
         loading: false,
-        data: positonSort.reverse(),
+        data: positionSort,
         pagination
       })
     })
