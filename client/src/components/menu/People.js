@@ -246,8 +246,8 @@ export default class People extends Component {
           user_id: this.props.user_id,
           rm_code: this.state.selectedRows[0].rm_code,
           sender: 'rmrm@careersherpa.co.kr',
-          recipient: 'joinsusang@gmail.com',
-          // recipient: this.state.selectedRows[0].email,
+          // recipient: 'joinsusang@gmail.com',
+          recipient: this.state.selectedRows[0].email,
           subject: this.state.mail.title,
           body:
             this.state.mail.content +
@@ -543,9 +543,9 @@ export default class People extends Component {
     } = this.state
     let unitedSearch = ''
     let positionSplit = ''
-    let positionKeyword = positionData.filter(
-      data => data.title === positionTitle
-    )[0].keyword
+    let positionKeyword =
+      positionTitle &&
+      positionData.filter(data => data.title === positionTitle)[0].keyword
 
     if (positionKeyword && positionKeyword.includes(' ')) {
       let commaDeletedpositon = positionKeyword.replace(/,/gi, '')

@@ -297,8 +297,8 @@ export default class Mail extends Component {
           user_id: this.props.user_id,
           rm_code: this.state.selectedRows[0].rm_code,
           sender: 'rmrm@careersherpa.co.kr',
-          recipient: 'joinsusang@gmail.com',
-          // recipient: this.state.selectedRows[0].recipient,
+          // recipient: 'joinsusang@gmail.com',
+          recipient: this.state.selectedRows[0].recipient,
           subject: this.state.mail.title,
           body:
             this.state.mail.content +
