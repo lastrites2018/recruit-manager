@@ -41,7 +41,11 @@ export default class Job extends Component {
         title: '포지션 제목',
         dataIndex: 'title',
         width: '15%',
-        ...this.getColumnSearchProps('title')
+        ...this.getColumnSearchProps('title'),
+        sorter: (a, b) => a.title.length - b.title.length
+        // sortOrder:
+        //   this.state.sortedInfo.columnKey === 'title' &&
+        //   this.state.sortedInfo.order
       },
       {
         title: '포지션 회사',
@@ -320,51 +324,51 @@ export default class Job extends Component {
           </Col>
         </Row>
         <Row style={{ textAlign: 'left' }}>
-          <Col span={14}>
+          <Col span={18}>
             <p>{this.state.clickedData.company}</p>
           </Col>
         </Row>
         <Divider />
         <Row style={{ textAlign: 'left' }}>
-          <Col span={14}>
+          <Col span={18}>
             <h3>[ Position ]</h3>
           </Col>
         </Row>
         <Row style={{ textAlign: 'left' }}>
-          <Col span={14}>
+          <Col span={18}>
             <p>{this.state.clickedData.title}</p>
           </Col>
         </Row>
         <Divider />
         <Row style={{ textAlign: 'left' }}>
-          <Col span={14}>
+          <Col span={18}>
             <h3>[ Keywords ]</h3>
           </Col>
         </Row>
         <Row style={{ textAlign: 'left' }}>
-          <Col span={14}>
+          <Col span={18}>
             <p>{this.state.clickedData.keyword}</p>
           </Col>
         </Row>
         <Divider />
         <Row style={{ textAlign: 'left' }}>
-          <Col span={14}>
+          <Col span={18}>
             <h3>[ Detail ]</h3>
           </Col>
         </Row>
         <Row style={{ textAlign: 'left' }}>
-          <Col span={14}>
+          <Col span={18}>
             <p>{this.state.clickedData.detail}</p>
           </Col>
         </Row>
         <Divider />
         <Row style={{ textAlign: 'left' }}>
-          <Col span={14}>
+          <Col span={18}>
             <h3>[ Modified Date ]</h3>
           </Col>
         </Row>
         <Row style={{ textAlign: 'left' }}>
-          <Col span={14}>
+          <Col span={18}>
             <p>{this.state.clickedData.modified_date}</p>
           </Col>
         </Row>

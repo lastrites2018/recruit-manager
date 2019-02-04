@@ -14,6 +14,13 @@ class MailForm extends React.Component {
     e.preventDefault()
     this.props.form.validateFieldsAndScroll((err, values) => {
       if (!err) {
+        let localRmDataObj = JSON.parse(localStorage.getItem('recruitManager'))
+        if (!localRmDataObj) {
+          localRmDataObj = {}
+        }
+        localRmDataObj.userSign = values.sign
+        localStorage.setItem('recruitManager', JSON.stringify(localRmDataObj))
+
         this.props.mail(values)
         console.log('Received values of form: ', values)
       }
@@ -51,6 +58,12 @@ class MailForm extends React.Component {
 
   render() {
     const { getFieldDecorator } = this.props.form
+    const {
+      position,
+      positionData,
+      positionCompany,
+      positionDetail
+    } = this.state
 
     const formItemLayout = {
       labelCol: {
@@ -75,23 +88,30 @@ class MailForm extends React.Component {
       }
     }
 
-    const optionList = this.state.positionData.map(position => (
+    const optionList = positionData.map(position => (
       <Select.Option value={position.title} key={position.position_id}>
         {`${position.title}: ${position.keyword}`}
       </Select.Option>
     ))
 
-    console.log('position', this.state.position)
-    console.log('company', this.state.positionCompany)
-    console.log('position detail', this.state.positionDetail)
+    console.log('position : ', position)
+    console.log('company : ', positionCompany)
+    console.log('position detail :', positionDetail)
+
+    let userSign
+
+    const localRmDataObj = JSON.parse(localStorage.getItem('recruitManager'))
+    if (localRmDataObj && localRmDataObj.userSign) {
+      userSign = localRmDataObj.userSign
+    } else {
+      userSign = `커리어셀파 헤드헌터 강상모 \n+82 010 3929 7682 \nwww.careersherpa.co.kr`
+    }
 
     return (
       <Form onSubmit={this.handleSubmit}>
         <Form.Item label="Title" {...formItemLayout}>
           {getFieldDecorator('title', {
-            initialValue: `${this.state.positionCompany} ${
-              this.state.position
-            } 채용 제안`,
+            initialValue: `${positionCompany} ${position} 채용 제안`,
             rules: [{ required: true }]
           })(<Input />)}
         </Form.Item>
@@ -113,9 +133,7 @@ class MailForm extends React.Component {
 
         <Form.Item label="Content" {...formItemLayout}>
           {getFieldDecorator('content', {
-            initialValue: `안녕하세요, \n\n어제 제안드렸던 [${
-              this.state.position
-            }] 에 대해서 어떻게 생각해보셨는지 문의차 다시 메일 드립니다. \n\n간략히 검토후 의향에 대해서 회신 주시면 감사하겠습니다.`,
+            initialValue: `안녕하세요, \n\n어제 제안드렸던 [${position}] 에 대해서 어떻게 생각해보셨는지 문의차 다시 메일 드립니다. \n\n간략히 검토후 의향에 대해서 회신 주시면 감사하겠습니다.`,
             rules: [{ required: true }]
           })(<Input.TextArea rows={4} />)}
         </Form.Item>
@@ -125,7 +143,7 @@ class MailForm extends React.Component {
             rules: [{ required: true }]
           })(
             <Select
-              value={this.state.position}
+              value={position}
               showSearch
               style={{ width: '90 %' }}
               optionFilterProp="children"
@@ -143,13 +161,14 @@ class MailForm extends React.Component {
 
         <Form.Item label="Position Detail" {...formItemLayout}>
           {getFieldDecorator('position_detail', {
-            initialValue: this.state.positionDetail
+            initialValue: positionDetail
           })(<Input.TextArea rows={4} />)}
         </Form.Item>
 
         <Form.Item {...formItemLayout} label="Sign">
           {getFieldDecorator('sign', {
-            initialValue: `커리어셀파 헤드헌터 강상모 \n+82 010 3929 7682 \nwww.careersherpa.co.kr`,
+            initialValue: userSign,
+            // initialValue: `커리어셀파 헤드헌터 강상모 \n+82 010 3929 7682 \nwww.careersherpa.co.kr`,
             rules: [{ required: true }]
           })(<Input.TextArea rows={4} />)}
         </Form.Item>
@@ -158,6 +177,7 @@ class MailForm extends React.Component {
           <Button
             type="primary"
             htmlType="submit"
+            disabled={!!!position}
             // onKeyPress={() => this.handleSubmit}
           >
             SEND

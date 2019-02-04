@@ -24,6 +24,8 @@ export default class SMS extends Component {
         title: '수신인',
         dataIndex: 'name',
         render: e => <a href="javascript:">{e}</a>,
+        width: '15%',
+        align: 'center',
         ...this.getColumnSearchProps('name')
       },
       {
@@ -31,26 +33,36 @@ export default class SMS extends Component {
         dataIndex: 'modified_date',
         // dataIndex: 'send_date',
         sorter: true,
+        width: '13%',
+        align: 'center',
         ...this.getColumnSearchProps('modified_date')
       },
       {
         title: 'Client',
         dataIndex: 'client',
+        width: '50px',
+        align: 'center',
         ...this.getColumnSearchProps('client')
       },
       {
         title: 'Position',
         dataIndex: 'position',
+        width: '50px',
+        align: 'center',
         ...this.getColumnSearchProps('position')
       },
       {
         title: 'Content',
         dataIndex: 'body',
+        width: '25%',
+        align: 'center',
         ...this.getColumnSearchProps('body')
       },
       {
         title: '수신확인',
         dataIndex: '수신확인',
+        width: '15%',
+        align: 'center',
         ...this.getColumnSearchProps('수신확인')
       }
     ]
@@ -139,6 +151,7 @@ export default class SMS extends Component {
       const pagination = { ...this.state.pagination }
       // Read total count from server
       // pagination.total = data.totalCount
+      console.log('sms-fetch', data.data.result)
       this.setState({
         loading: false,
         data: data.data.result.reverse(),
@@ -296,7 +309,7 @@ export default class SMS extends Component {
     }
 
     return (
-      <div style={{ marginLeft: '20px' }}>
+      <div style={{ marginLeft: '20px', width: '90%' }}>
         <Button
           type="primary"
           icon="message"
@@ -310,7 +323,8 @@ export default class SMS extends Component {
           columns={this.columns}
           // rowKey={record => record.login.uuid}
           bordered
-          style={{ marginTop: '16px', width: '85%' }}
+          style={{ marginTop: '16px' }}
+          // style={{ marginTop: '16px', width: '85%' }}
           dataSource={this.state.data}
           pagination={this.state.pagination}
           loading={this.state.loading}

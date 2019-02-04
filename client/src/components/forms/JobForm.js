@@ -157,7 +157,7 @@ class JobForm extends React.Component {
           {getFieldDecorator('keyword', {
             initialValue: ''
           })(
-            <Input placeholder="키워드가 여러 개인 경우 한 칸 띄고 입력해주세요." />
+            <Input placeholder="키워드가 여러 개인 경우 ,를 넣고 한 칸 띄워주세요." />
             // tag 기능 제대로 쓸려면 키워드도 array로 받거나 기호를 사이에 넣어서 저장하고 가져오면 분할하던가 해줘야할듯.
           )}
         </Form.Item>

@@ -33,7 +33,7 @@ export default class People extends Component {
       under_birth: '',
       upper_birth: '',
       isTopSchool: false,
-      position: '',
+      positionTitle: '',
       dataSource: [],
       nextSource: {},
       selectedRowKeys: [],
@@ -55,7 +55,8 @@ export default class People extends Component {
       andOr: '',
       positionData: [],
       searchCount: 0,
-      currentKey: null
+      currentKey: null,
+      loading: true
     }
 
     this.columns = [
@@ -251,7 +252,7 @@ export default class People extends Component {
           body:
             this.state.mail.content +
             '\n\n' +
-            'Position Detail\n\n' +
+            '[Position Detail]\n\n' +
             this.state.mail.position_detail +
             '\n\n' +
             this.state.mail.sign,
@@ -513,6 +514,7 @@ export default class People extends Component {
       })
       console.log('fetch-result', result)
       this.setState({
+        loading: false,
         dataSource: result,
         pagination
       })
@@ -535,17 +537,23 @@ export default class People extends Component {
       under_birth,
       upper_birth,
       isTopSchool,
-      position,
-      andOr
+      positionTitle,
+      andOr,
+      positionData
     } = this.state
     let unitedSearch = ''
     let positionSplit = ''
+    let positionKeyword = positionData.filter(
+      data => data.title === positionTitle
+    )[0].keyword
 
-    if (position && position.includes(' ')) {
-      positionSplit = position.split(' ').join('||')
+    if (positionKeyword && positionKeyword.includes(' ')) {
+      let commaDeletedpositon = positionKeyword.replace(/,/gi, '')
+      positionSplit = commaDeletedpositon.split(' ').join('||')
     } else {
-      positionSplit = position
+      positionSplit = positionKeyword
     }
+    console.log('positionSplit', positionSplit)
 
     if (positionSplit && andOr) {
       unitedSearch = `${positionSplit}||${andOr}`
@@ -556,6 +564,7 @@ export default class People extends Component {
     }
 
     console.log('unitedSearch', unitedSearch)
+    this.setState({ loading: true })
     Axios.post(API.viewMainTablePosition, {
       user_id: this.props.user_id,
       under_birth: Number(under_birth) || 1900,
@@ -574,6 +583,7 @@ export default class People extends Component {
         return each
       })
       this.setState({
+        loading: false,
         dataSource: result,
         pagination,
         searchCount: result.length
@@ -586,8 +596,8 @@ export default class People extends Component {
     this.setState({ isTopSchool: e.target.checked })
   }
 
-  handlePositionChange = value => {
-    this.setState({ position: value })
+  handlePositionTitleChange = value => {
+    this.setState({ positionTitle: value })
   }
 
   handleAgeChange = e => {
@@ -653,7 +663,7 @@ export default class People extends Component {
       under_birth: '',
       upper_birth: '',
       isTopSchool: false,
-      position: '',
+      positionTitle: '',
       dataSource: [],
       selectedRowKeys: [],
       selectedRows: [],
@@ -674,14 +684,6 @@ export default class People extends Component {
       searchCount: 0
     })
     await this.fetch()
-  }
-
-  // handleSelectChange = value => {
-  //   this.setState({ selected: value })
-  // }
-
-  handleClearSelected = () => {
-    this.setState({ position: null })
   }
 
   onLeftClick = async () => {
@@ -736,31 +738,31 @@ export default class People extends Component {
           </Col>
         </Row>
         <Row style={{ textAlign: 'left' }}>
-          <Col span={14}>
+          <Col span={18}>
             <p>{this.state.resumeDetailData[0].school}</p>
           </Col>
         </Row>
         <Divider />
         <Row style={{ textAlign: 'left' }}>
-          <Col span={14}>
+          <Col span={18}>
             <h3>[ Company ]</h3>
           </Col>
         </Row>
         <Row style={{ textAlign: 'left' }}>
           {/* <Row type="flex" justify="center" align="middle"> */}
-          <Col span={14}>
+          <Col span={18}>
             <p>{this.state.resumeDetailData[0].company}</p>
           </Col>
         </Row>
         <Divider />
         <Row style={{ textAlign: 'left' }}>
           {/* <Row type="flex" justify="center" align="middle"> */}
-          <Col span={14}>
+          <Col span={18}>
             <h3>[ Others ]</h3>
           </Col>
         </Row>
         <Row style={{ textAlign: 'left' }}>
-          <Col span={14}>
+          <Col span={18}>
             {this.state.resumeDetailData[0].others.length > 200 ? (
               <details>
                 <summary>
@@ -851,7 +853,7 @@ export default class People extends Component {
         <div>
           <Divider />
           <Row style={{ textAlign: 'left' }}>
-            <Col span={14}>
+            <Col span={18}>
               <h3>[ Position & Memo ]</h3>
             </Col>
           </Row>
@@ -865,7 +867,7 @@ export default class People extends Component {
         <Divider />
         <Row style={{ textAlign: 'left' }}>
           {/* <Row type="flex" justify="center" align="middle"> */}
-          <Col span={14}>
+          <Col span={18}>
             <h3>[ Position & Memo ]</h3>
           </Col>
         </Row>
@@ -1114,8 +1116,11 @@ export default class People extends Component {
     })
 
     const optionList = this.state.positionData.map(position => (
-      <Option value={position.keyword} key={position.position_id}>
-        {`${position.title}    키워드 : ${position.keyword}`}
+      // <Option value={position.keyword}>
+      // caution : 여기는 value가 position_keyword 여야 하지만 error로 title
+      // value는 must unique value
+      <Option value={position.title} key={position.position_id}>
+        {`${position.title}: ${position.keyword}`}
       </Option>
     ))
 
@@ -1161,11 +1166,11 @@ export default class People extends Component {
         />
         <br />
         <Select
-          value={this.state.position}
+          value={this.state.positionTitle}
           showSearch
           style={{ marginTop: '1px', marginLeft: '20px', width: '30%' }}
           optionFilterProp="children"
-          onChange={this.handlePositionChange}
+          onChange={this.handlePositionTitleChange}
           filterOption={(input, option) =>
             option.props.children.toLowerCase().indexOf(input.toLowerCase()) >=
             0
@@ -1249,6 +1254,7 @@ export default class People extends Component {
             dataSource={dataSource}
             components={components}
             rowKey="rm_code"
+            loading={this.state.loading}
             rowClassName={() => 'editable-row'}
             rowSelection={rowSelection}
             onRow={record => ({
