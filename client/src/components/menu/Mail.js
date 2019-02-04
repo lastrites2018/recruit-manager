@@ -4,6 +4,7 @@ import API from '../../util/api'
 import MailForm from '../forms/MailForm'
 import { Button, Col, Divider, Icon, Input, Modal, Table, Row } from 'antd'
 import Highlighter from 'react-highlight-words'
+import { sortBy } from 'lodash'
 
 export default class Mail extends Component {
   constructor(props) {
@@ -28,6 +29,8 @@ export default class Mail extends Component {
         title: '수신인',
         dataIndex: 'name',
         render: text => <a href="javascript:">{text}</a>,
+        width: '15%',
+        align: 'center',
         ...this.getColumnSearchProps('name')
       },
       {
@@ -35,21 +38,29 @@ export default class Mail extends Component {
         dataIndex: 'modified_date',
         // dataIndex: 'send_date',
         sorter: true,
+        width: '110px',
+        align: 'center',
         ...this.getColumnSearchProps('modified_date')
       },
       {
         title: 'Client',
         dataIndex: 'client',
+        width: '50px',
+        align: 'center',
         ...this.getColumnSearchProps('client')
       },
       {
         title: 'Position',
         dataIndex: 'position',
+        width: '50px',
+        align: 'center',
         ...this.getColumnSearchProps('position')
       },
       {
         title: '수신확인',
         dataIndex: '수신확인',
+        width: '100px',
+        align: 'center',
         ...this.getColumnSearchProps('수신확인')
       }
     ]
@@ -139,9 +150,15 @@ export default class Mail extends Component {
       const pagination = { ...this.state.pagination }
       // Read total count from server
       // pagination.total = data.totalCount
+      console.log('mail-fetch', data.data.result)
+      const mailSort = sortBy(data.data.result, [
+        function(mail) {
+          return Number(mail.mail_id.slice(5))
+        }
+      ])
       this.setState({
         loading: false,
-        data: data.data.result.reverse(),
+        data: mailSort.reverse(),
         pagination
       })
     })
@@ -214,23 +231,23 @@ export default class Mail extends Component {
         width="50%"
       >
         <Row style={{ textAlign: 'left' }}>
-          <Col span={14}>
-            <h3>[ Content ]</h3>
+          <Col span={18}>
+            <h3>[ Send Content ]</h3>
           </Col>
         </Row>
         <Row style={{ textAlign: 'left' }}>
-          <Col span={14}>
+          <Col span={18}>
             <p>{this.state.mailDetail.body}</p>
           </Col>
         </Row>
         <Divider />
         <Row style={{ textAlign: 'left' }}>
-          <Col span={14}>
+          <Col span={18}>
             <h3>[ Send Date ]</h3>
           </Col>
         </Row>
         <Row style={{ textAlign: 'left' }}>
-          <Col span={14}>
+          <Col span={18}>
             <p>{this.state.mailDetail.send_date}</p>
           </Col>
         </Row>
@@ -275,16 +292,18 @@ export default class Mail extends Component {
     await console.log('preparing to send')
     if (this.state.selectedRows.length === 1) {
       try {
+        await this.setState({ loading: true })
         await Axios.post(API.sendMail, {
           user_id: this.props.user_id,
           rm_code: this.state.selectedRows[0].rm_code,
           sender: 'rmrm@careersherpa.co.kr',
-          recipient: this.state.selectedRows[0].recipient,
+          recipient: 'joinsusang@gmail.com',
+          // recipient: this.state.selectedRows[0].recipient,
           subject: this.state.mail.title,
           body:
             this.state.mail.content +
             '\n\n' +
-            'Position Detail\n\n' +
+            '[Position Detail]\n\n' +
             this.state.mail.position_detail +
             '\n\n' +
             this.state.mail.sign,
@@ -296,6 +315,7 @@ export default class Mail extends Component {
           .catch(err => {
             console.log(err.response)
           })
+        await this.setState({ loading: false })
         await alert(`메일을 보냈습니다.`)
         // await this.resetSelections()
       } catch (err) {
