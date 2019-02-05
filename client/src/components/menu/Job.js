@@ -18,7 +18,6 @@ import {
   Tooltip
 } from 'antd'
 import Highlighter from 'react-highlight-words'
-import { sortBy } from 'lodash'
 
 export default class Job extends Component {
   constructor(props) {
@@ -172,9 +171,8 @@ export default class Job extends Component {
       const pagination = { ...this.state.pagination }
       // Read total count from server
       // pagination.total = data.totalCount
-      console.log('data.data.result', data.data.result)
+      // console.log('data.data.result', data.data.result)
 
-      // const aliveArr = data.data.result.map(data => data.valid === 'alive')
       let aliveArr = []
       let expiredArr = []
       let holdArr = []
@@ -186,21 +184,21 @@ export default class Job extends Component {
       })
 
       aliveArr.sort((a, b) => {
-        // decend
+        // descend
         return (
           new Date(b.modified_date).getTime() -
           new Date(a.modified_date).getTime()
         )
       })
       holdArr.sort((a, b) => {
-        // decend
+        // descend
         return (
           new Date(b.modified_date).getTime() -
           new Date(a.modified_date).getTime()
         )
       })
       expiredArr.sort((a, b) => {
-        // decend
+        // descend
         return (
           new Date(b.modified_date).getTime() -
           new Date(a.modified_date).getTime()
@@ -208,14 +206,7 @@ export default class Job extends Component {
       })
       const positionSort = aliveArr.concat(holdArr).concat(expiredArr)
 
-      // const positonSort = sortBy(data.data.result, [
-      //   function(job) {
-      //     return job.position
-      //     // return Number(job.position_id.slice(2))
-      //   }
-      // ])
-
-      console.log('positionSort', positionSort)
+      // console.log('positionSort', positionSort)
 
       this.setState({
         loading: false,
@@ -322,6 +313,7 @@ export default class Job extends Component {
           user_id={this.props.user_id}
           close={this.handleModalCancel}
           jobFetch={this.fetch}
+          jobData={this.state.data}
         />
       </Modal>
     </div>
