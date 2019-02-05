@@ -41,16 +41,18 @@ export default class Job extends Component {
         dataIndex: 'title',
         width: '15%',
         ...this.getColumnSearchProps('title'),
-        sorter: (a, b) => a.title.length - b.title.length
+        sorter: (a, b) => a.title.length - b.title.length,
         // sortOrder:
         //   this.state.sortedInfo.columnKey === 'title' &&
         //   this.state.sortedInfo.order
+        onCell: this.cellClickEvent
       },
       {
         title: '포지션 회사',
         dataIndex: 'company',
         width: '15%',
-        ...this.getColumnSearchProps('company')
+        ...this.getColumnSearchProps('company'),
+        onCell: this.cellClickEvent
       },
       {
         title: '포지션 상세',
@@ -62,7 +64,8 @@ export default class Job extends Component {
             text.length > 50 ? `${text.slice(0, 50)} (중략)` : text
           // text.length > 50 ? `${text.slice(0, 50)} ▼ 더 보기` : text
           return <span>{slicedText}</span>
-        }
+        },
+        onCell: this.cellClickEvent
       },
       {
         title: '키워드',
@@ -74,13 +77,15 @@ export default class Job extends Component {
               <Tag color="blue">{tag}</Tag>
             ))}
           </span>
-        )
+        ),
+        onCell: this.cellClickEvent
       },
       {
         title: '등록일시',
         dataIndex: 'modified_date',
         width: '100',
-        ...this.getColumnSearchProps('modified_date')
+        ...this.getColumnSearchProps('modified_date'),
+        onCell: this.cellClickEvent
       },
       {
         title: 'Status',
@@ -88,6 +93,14 @@ export default class Job extends Component {
       }
     ]
   }
+
+  cellClickEvent = record => ({
+    onClick: () => {
+      console.log('record', record)
+      this.handleClick(record)
+    }
+  })
+
   getColumnSearchProps = dataIndex => ({
     filterDropdown: ({
       setSelectedKeys,
@@ -249,7 +262,7 @@ export default class Job extends Component {
       this.setState({
         selectedRowKeys: []
       })
-    }, 2000)
+    }, 1000)
   }
 
   handleDeleteConfirm = async e => {
@@ -541,12 +554,13 @@ export default class Job extends Component {
           loading={this.state.loading}
           onChange={this.handleTableChange}
           rowSelection={rowSelection}
-          onRow={record => ({
-            onClick: () => {
-              console.log('record', record)
-              this.handleClick(record)
-            }
-          })}
+          // onRow={record => ({
+
+          //   onClick: () => {
+          //     console.log('record', record)
+          //     this.handleClick(record)
+          //   }
+          // })}
         />
       </div>
     )
