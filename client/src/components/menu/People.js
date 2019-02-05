@@ -391,7 +391,7 @@ export default class People extends Component {
           rm_code: this.state.selectedRowKeys[0],
           recipient: this.state.selectedRows[0].mobile,
           body: this.state.sms.content,
-          position: ''
+          position: `${this.state.sms.positionCompany}|${this.state.sms.select}`
         })
         await console.log(
           `${this.state.selectedRows[0].mobile}에 문자를 보냈습니다.`
@@ -409,7 +409,9 @@ export default class People extends Component {
               rm_code: this.state.selectedRowKeys[i],
               recipient: this.state.selectedRows[i].mobile,
               body: this.state.sms.content,
-              position: ''
+              position: `${this.state.sms.positionCompany}|${
+                this.state.sms.select
+              }`
             })
           }, 100)
         }

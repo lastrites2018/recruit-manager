@@ -8,13 +8,15 @@ class SmsForm extends React.Component {
   state = {
     position: '',
     positionData: [],
-    contentLength: 0
+    smsLength: 0,
+    positionCompany: ''
   }
 
   handleSubmit = e => {
     e.preventDefault()
     this.props.form.validateFieldsAndScroll((err, values) => {
       if (!err) {
+        values.positionCompany = this.state.positionCompany
         this.props.writeSmsContent(values)
         console.log('Received values of form: ', values)
       }
@@ -22,7 +24,14 @@ class SmsForm extends React.Component {
   }
 
   handlePositionChange = value => {
-    this.setState({ position: value })
+    const positionDataIndex = this.state.positionData.findIndex(
+      data => data.title === value
+    )
+    if (positionDataIndex !== -1)
+      this.setState({
+        position: value,
+        positionCompany: this.state.positionData[positionDataIndex].company
+      })
   }
 
   fetchPosition = () => {
@@ -41,10 +50,9 @@ class SmsForm extends React.Component {
     })
   }
 
-  contentLength = event => {
-    console.log('event', event)
+  checkSmsLength = event => {
     this.setState({
-      contentLength: event.target.value.length
+      smsLength: event.target.value.length
     })
   }
 
@@ -160,13 +168,11 @@ class SmsForm extends React.Component {
           {getFieldDecorator('content', {
             initialValue: smsContent,
             rules: [{ required: true, message: 'Please fill in the content.' }]
-          })(<Input.TextArea rows={4} onChange={this.contentLength} />)}
+          })(<Input.TextArea rows={4} onChange={this.checkSmsLength} />)}
         </Form.Item>
-        {/* <span>{this.state.contentLength}/90</span> */}
+        {/* <span>{this.state.smsLength}/90</span> */}
         <span style={{ float: 'right' }}>
-          {this.state.contentLength
-            ? this.state.contentLength
-            : smsContent.length}
+          {this.state.smsLength ? this.state.smsLength : smsContent.length}
           /90
         </span>
 

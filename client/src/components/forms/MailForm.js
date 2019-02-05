@@ -29,16 +29,29 @@ class MailForm extends React.Component {
     this.setState({ position: '', positionCompany: '', positionDetail: '' })
   }
 
-  handlePositionChange = async value => {
-    await this.setState({ position: value })
-    for (let i = 0; i < this.state.positionData.length; i++) {
-      if (this.state.positionData[i].title === this.state.position) {
-        await this.setState({
-          positionDetail: this.state.positionData[i].detail,
-          positionCompany: this.state.positionData[i].company
-        })
-      }
-    }
+  // handlePositionChange = async value => {
+  //   await this.setState({ position: value })
+  //   for (let i = 0; i < this.state.positionData.length; i++) {
+  //     if (this.state.positionData[i].title === this.state.position) {
+  //       await this.setState({
+  //         positionDetail: this.state.positionData[i].detail,
+  //         positionCompany: this.state.positionData[i].company
+  //       })
+  //     }
+  //   }
+  // }
+
+  handlePositionChange = value => {
+    // 위 함수 리팩토링 for문 끝까지 도는 것에서, 하나라도 발견하면 끝나는 findIndex로
+    const positionDataIndex = this.state.positionData.findIndex(
+      data => data.title === value
+    )
+    if (positionDataIndex !== -1)
+      this.setState({
+        position: value,
+        positionDetail: this.state.positionData[positionDataIndex].detail,
+        positionCompany: this.state.positionData[positionDataIndex].company
+      })
   }
 
   fetchPosition = () => {
