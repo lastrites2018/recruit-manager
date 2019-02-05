@@ -209,13 +209,14 @@ export default class People extends Component {
     <div>
       <Modal
         title="Mail"
+        width="50%"
         visible={this.state.mailVisible}
         onOk={this.handleMailOk}
         onCancel={this.handleMailCancel}
         footer={null}
       >
         <MailForm.MailRegistration
-          mail={this.writeMailContent}
+          writeMailContent={this.writeMailContent}
           allRecipients={this.state.allRecipients}
           allEmails={this.state.allEmails}
         />
@@ -256,7 +257,9 @@ export default class People extends Component {
             this.state.mail.position_detail +
             '\n\n' +
             this.state.mail.sign,
-          position: ''
+          position: `${this.state.mail.positionCompany}|${
+            this.state.mail.position
+          }` // 공백이라도 보내야 함.
         })
         await this.success(
           `메일을 ${this.state.selectedRows[0].name} 님에게 보냈습니다.`
@@ -282,7 +285,9 @@ export default class People extends Component {
                 this.state.mail.position_detail +
                 '\n\n' +
                 this.state.mail.sign,
-              position: ''
+              position: `${this.state.mail.positionCompany}|${
+                this.state.mail.position
+              }` // 공백이라도 보내야 함.
             })
           }, 100)
         }
@@ -417,12 +422,10 @@ export default class People extends Component {
   }
 
   resetSelections = () => {
-    setTimeout(() => {
-      console.log('resetting row selection')
-      this.setState({
-        selectedRowKeys: []
-      })
-    }, 2000)
+    console.log('resetting row selection')
+    this.setState({
+      selectedRowKeys: []
+    })
   }
 
   onSelectChange = async (selectedRowKeys, selectedRows) => {
@@ -1073,6 +1076,7 @@ export default class People extends Component {
           close={this.handleUpdateResumeCancel}
           addSuccess={this.handleUpdateResumeOk}
           peopleFetch={this.fetch}
+          resetSelections={this.resetSelections}
         />
       </Modal>
     </div>
@@ -1220,7 +1224,8 @@ export default class People extends Component {
             icon="edit"
             onClick={this.showUpdateResumeModal}
             style={{ float: 'right', marginRight: 5, marginBottom: 16 }}
-            disabled={!hasSelected}
+            disabled={selectedRowKeys.length !== 1}
+            // disabled={!hasSelected}
           >
             편집
           </Button>
@@ -1268,8 +1273,8 @@ export default class People extends Component {
           {this.state.mailVisible && <this.mailModal />}
           {this.state.smsVisible && <this.smsModal />}
           {/* <this.smsModal /> */}
-          <this.addResumeModal />
-          <this.updateResumeModal />
+          {this.state.visibleNewResume && <this.addResumeModal />}
+          {this.state.visibleUpdateResume && <this.updateResumeModal />}
         </div>
       </div>
     )

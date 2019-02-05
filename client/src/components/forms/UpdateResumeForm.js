@@ -40,6 +40,7 @@ class UpdateResumeForm extends React.Component {
         working_area: this.state.newResume.working_area || ''
       })
       await console.log('resume updated')
+      await this.props.resetSelections()
       await this.props.peopleFetch()
       await this.props.addSuccess()
     } catch (err) {

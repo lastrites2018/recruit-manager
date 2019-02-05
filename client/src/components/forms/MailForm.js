@@ -21,7 +21,8 @@ class MailForm extends React.Component {
         localRmDataObj.userSign = values.sign
         localStorage.setItem('recruitManager', JSON.stringify(localRmDataObj))
 
-        this.props.mail(values)
+        values.positionCompany = this.state.positionCompany
+        this.props.writeMailContent(values)
         console.log('Received values of form: ', values)
       }
     })
@@ -120,22 +121,22 @@ class MailForm extends React.Component {
           {getFieldDecorator('receiver', {
             initialValue: this.props.allRecipients.join(', '),
             rules: [{ required: true }]
-          })(<Input />)}
+          })(<Input autosize />)}
         </Form.Item>
 
         <Form.Item label="Emails" {...formItemLayout}>
-          {/* Input에 readOnly 하고 싶은데 안됨! */}
+          {/* Input에 readOnly 하고 싶은데 안됨! -> disabled 쓰면 됨*/}
           {getFieldDecorator('email', {
             initialValue: this.props.allEmails.join(', '),
             rules: [{ required: true }]
-          })(<Input.TextArea rows={2} />)}
+          })(<Input.TextArea rows={1} autosize />)}
         </Form.Item>
 
         <Form.Item label="Content" {...formItemLayout}>
           {getFieldDecorator('content', {
             initialValue: `안녕하세요, \n\n어제 제안드렸던 [${position}] 에 대해서 어떻게 생각해보셨는지 문의차 다시 메일 드립니다. \n\n간략히 검토후 의향에 대해서 회신 주시면 감사하겠습니다.`,
             rules: [{ required: true }]
-          })(<Input.TextArea rows={4} />)}
+          })(<Input.TextArea rows={4} autosize={{ maxRows: 15 }} />)}
         </Form.Item>
 
         <Form.Item label="Positions" {...formItemLayout} hasFeedback>
@@ -162,7 +163,7 @@ class MailForm extends React.Component {
         <Form.Item label="Position Detail" {...formItemLayout}>
           {getFieldDecorator('position_detail', {
             initialValue: positionDetail
-          })(<Input.TextArea rows={4} />)}
+          })(<Input.TextArea rows={4} autosize={{ maxRows: 15 }} />)}
         </Form.Item>
 
         <Form.Item {...formItemLayout} label="Sign">
@@ -170,7 +171,7 @@ class MailForm extends React.Component {
             initialValue: userSign,
             // initialValue: `커리어셀파 헤드헌터 강상모 \n+82 010 3929 7682 \nwww.careersherpa.co.kr`,
             rules: [{ required: true }]
-          })(<Input.TextArea rows={4} />)}
+          })(<Input.TextArea rows={3} autosize={{ maxRows: 15 }} />)}
         </Form.Item>
 
         <Form.Item {...tailFormItemLayout}>
