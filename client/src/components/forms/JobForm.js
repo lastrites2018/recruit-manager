@@ -11,10 +11,14 @@ class JobForm extends React.Component {
   handleSubmit = e => {
     e.preventDefault()
     this.props.form.validateFieldsAndScroll((err, values) => {
-      if (!err) this.setState({ newPosition: values })
+      console.log('register-job', values)
+      // if (!err) this.setState({ newPosition: values })
+      if (!err)
+        this.setState({ newPosition: values }, () => {
+          this.addPosition()
+        })
     })
-    this.addPosition()
-    this.setState({ newPosition: {} })
+    // this.addPosition()
   }
 
   addPosition = async () => {
