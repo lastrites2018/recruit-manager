@@ -316,6 +316,7 @@ export default class Job extends Component {
     <div>
       <Modal
         title=""
+        width="45%"
         visible={this.state.visible}
         onOk={this.handleModalOk}
         onCancel={this.handleModalCancel}

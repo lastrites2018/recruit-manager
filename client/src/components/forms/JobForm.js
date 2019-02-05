@@ -124,7 +124,7 @@ class JobForm extends React.Component {
     ]
 
     return (
-      <Form onSubmit={this.handleSubmit}>
+      <Form onSubmit={this.handleSubmit} layout="vertical">
         <Form.Item
           {...formItemLayout}
           help={
@@ -140,15 +140,20 @@ class JobForm extends React.Component {
             rules: [{ required: true, message: 'Please fill in the position.' }]
           })(<Input onChange={this.handlePositionTitleChange} id="success" />)}
         </Form.Item>
+
         <Form.Item {...formItemLayout} label="Company">
           {getFieldDecorator('company', {
             rules: [{ required: true, message: 'Please fill in the company.' }]
           })(<Input />)}
         </Form.Item>
-        <Form.Item {...formItemLayout} label="Notes">
+
+        <Form.Item label="Notes">
+          {/* <Form.Item {...formItemLayout} label="Notes"> */}
           {getFieldDecorator('notes', {
             initialValue: ''
-          })(<Input.TextArea rows={4} />)}
+          })(
+            <Input.TextArea rows={4} autosize={{ minRows: 4, maxRows: 35 }} />
+          )}
         </Form.Item>
 
         <Form.Item
