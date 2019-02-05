@@ -37,7 +37,7 @@ export default class Mail extends Component {
         title: '발송시간',
         dataIndex: 'modified_date',
         // dataIndex: 'send_date',
-        sorter: true,
+        // sorter: true,
         width: '110px',
         align: 'center',
         ...this.getColumnSearchProps('modified_date')
