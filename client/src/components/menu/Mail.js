@@ -15,7 +15,6 @@ import {
 } from 'antd'
 import Highlighter from 'react-highlight-words'
 import { sortBy } from 'lodash'
-import { TimeoutError } from 'rxjs'
 
 export default class Mail extends Component {
   constructor(props) {
