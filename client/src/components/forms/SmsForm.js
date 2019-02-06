@@ -7,13 +7,16 @@ import ShortId from 'shortid'
 class SmsForm extends React.Component {
   state = {
     position: '',
-    positionData: []
+    positionData: [],
+    smsLength: 0,
+    positionCompany: ''
   }
 
   handleSubmit = e => {
     e.preventDefault()
     this.props.form.validateFieldsAndScroll((err, values) => {
       if (!err) {
+        values.positionCompany = this.state.positionCompany
         this.props.writeSmsContent(values)
         console.log('Received values of form: ', values)
       }
@@ -21,7 +24,14 @@ class SmsForm extends React.Component {
   }
 
   handlePositionChange = value => {
-    this.setState({ position: value })
+    const positionDataIndex = this.state.positionData.findIndex(
+      data => data.title === value
+    )
+    if (positionDataIndex !== -1)
+      this.setState({
+        position: value,
+        positionCompany: this.state.positionData[positionDataIndex].company
+      })
   }
 
   fetchPosition = () => {
@@ -37,6 +47,12 @@ class SmsForm extends React.Component {
       })
       console.log('position data', data.data.result)
       console.log('position data + key', keyAddedResult)
+    })
+  }
+
+  checkSmsLength = event => {
+    this.setState({
+      smsLength: event.target.value.length
     })
   }
 
@@ -89,19 +105,18 @@ class SmsForm extends React.Component {
     })
 
     let smsName
-    let signupRule
+    // let signupRule
     let positionRule
-    let smsContent
+    let smsContent = ''
     let recipientPlaceholder
     if (selectedRows.length === 0) {
       smsName = ''
-      signupRule = [{ required: false }]
+      // signupRule = [{ required: false }]
       positionRule = [{ required: false }]
-      smsContent = ''
       recipientPlaceholder = '한 명만 보낼 수 있습니다. 폰 번호를 입력해주세요.'
     } else {
       smsName = receivers || selectedRows[0].name
-      signupRule = [{ required: true, message: 'Please fill in the sign.' }]
+      // signupRule = [{ required: true, message: 'Please fill in the sign.' }]
       positionRule = [
         { required: true, message: 'Please fill in the content.' }
       ]
@@ -153,8 +168,13 @@ class SmsForm extends React.Component {
           {getFieldDecorator('content', {
             initialValue: smsContent,
             rules: [{ required: true, message: 'Please fill in the content.' }]
-          })(<Input.TextArea rows={4} />)}
+          })(<Input.TextArea rows={4} onChange={this.checkSmsLength} />)}
         </Form.Item>
+        {/* <span>{this.state.smsLength}/90</span> */}
+        <span style={{ float: 'right' }}>
+          {this.state.smsLength ? this.state.smsLength : smsContent.length}
+          /90
+        </span>
 
         {/* <Form.Item {...formItemLayout} label="Sign">
           {getFieldDecorator('sign', {

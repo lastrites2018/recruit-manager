@@ -32,7 +32,7 @@ export default class SMS extends Component {
         title: '발송시간',
         dataIndex: 'modified_date',
         // dataIndex: 'send_date',
-        sorter: true,
+        // sorter: true,
         width: '13%',
         align: 'center',
         ...this.getColumnSearchProps('modified_date')
@@ -262,7 +262,8 @@ export default class SMS extends Component {
           rm_code: this.state.selectedRowKeys[0],
           recipient: this.state.selectedRows[0].recipient,
           body: this.state.sms.content,
-          position: ''
+          // position: ''
+          position: `${this.state.sms.positionCompany}|${this.state.sms.select}`
         })
         await console.log(`문자를 보냈습니다.`)
         await this.resetSelections()
@@ -278,7 +279,9 @@ export default class SMS extends Component {
               rm_code: this.state.selectedRowKeys[i],
               recipient: this.state.selectedRows[i].recipient,
               body: this.state.sms.content,
-              position: ''
+              position: `${this.state.sms.positionCompany}|${
+                this.state.sms.select
+              }`
             })
           }, 100)
         }

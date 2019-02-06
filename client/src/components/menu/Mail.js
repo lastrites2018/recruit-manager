@@ -37,7 +37,7 @@ export default class Mail extends Component {
         title: '발송시간',
         dataIndex: 'modified_date',
         // dataIndex: 'send_date',
-        sorter: true,
+        // sorter: true,
         width: '110px',
         align: 'center',
         ...this.getColumnSearchProps('modified_date')
@@ -212,7 +212,7 @@ export default class Mail extends Component {
         footer={null}
       >
         <MailForm.MailRegistration
-          mail={this.writeMailContent}
+          writeMailContent={this.writeMailContent}
           allRecipients={this.state.allRecipients}
           allEmails={this.state.allEmails}
         />
@@ -281,10 +281,11 @@ export default class Mail extends Component {
     this.setState({ visible: false })
   }
 
-  writeMailContent = form => {
-    this.setState({ mail: form })
-    this.sendMail()
-    this.handleCancel()
+  writeMailContent = async form => {
+    await this.setState({ mail: form })
+    await this.sendMail()
+    await this.handleCancel()
+    await this.fetch()
   }
 
   sendMail = async () => {
@@ -307,7 +308,9 @@ export default class Mail extends Component {
             this.state.mail.position_detail +
             '\n\n' +
             this.state.mail.sign,
-          position: '' // 공백이라도 보내야 함.
+          position: `${this.state.mail.positionCompany}|${
+            this.state.mail.position
+          }` // 공백이라도 보내야 함.
         })
           .then(data => {
             console.log('data', data)
@@ -338,7 +341,9 @@ export default class Mail extends Component {
                 this.state.mail.position_detail +
                 '\n\n' +
                 this.state.mail.sign,
-              position: ''
+              position: `${this.state.mail.positionCompany}|${
+                this.state.mail.position
+              }`
             })
           }, 100)
         }

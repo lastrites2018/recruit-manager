@@ -18,7 +18,6 @@ import {
   Tooltip
 } from 'antd'
 import Highlighter from 'react-highlight-words'
-import { sortBy } from 'lodash'
 
 export default class Job extends Component {
   constructor(props) {
@@ -42,16 +41,18 @@ export default class Job extends Component {
         dataIndex: 'title',
         width: '15%',
         ...this.getColumnSearchProps('title'),
-        sorter: (a, b) => a.title.length - b.title.length
+        sorter: (a, b) => a.title.length - b.title.length,
         // sortOrder:
         //   this.state.sortedInfo.columnKey === 'title' &&
         //   this.state.sortedInfo.order
+        onCell: this.cellClickEvent
       },
       {
         title: '포지션 회사',
         dataIndex: 'company',
         width: '15%',
-        ...this.getColumnSearchProps('company')
+        ...this.getColumnSearchProps('company'),
+        onCell: this.cellClickEvent
       },
       {
         title: '포지션 상세',
@@ -63,7 +64,8 @@ export default class Job extends Component {
             text.length > 50 ? `${text.slice(0, 50)} (중략)` : text
           // text.length > 50 ? `${text.slice(0, 50)} ▼ 더 보기` : text
           return <span>{slicedText}</span>
-        }
+        },
+        onCell: this.cellClickEvent
       },
       {
         title: '키워드',
@@ -75,20 +77,69 @@ export default class Job extends Component {
               <Tag color="blue">{tag}</Tag>
             ))}
           </span>
-        )
+        ),
+        onCell: this.cellClickEvent
       },
       {
         title: '등록일시',
         dataIndex: 'modified_date',
         width: '100',
-        ...this.getColumnSearchProps('modified_date')
+        ...this.getColumnSearchProps('modified_date'),
+        onCell: this.cellClickEvent
       },
       {
         title: 'Status',
-        dataIndex: 'valid'
+        dataIndex: 'valid',
+
+        render: e => (
+          <span>
+            {e.split(', ').map(tag => {
+              let color
+              if (tag === 'alive') color = 'geekblue'
+              else if (tag === 'hold') color = 'purple'
+              else if (tag === 'expired') color = 'gray'
+
+              return <Tag color={color}>{tag}</Tag>
+            })}
+          </span>
+        ),
+        onCell: this.statusToggle
       }
     ]
   }
+
+  cellClickEvent = record => ({
+    onClick: () => {
+      this.handleClick(record)
+    }
+  })
+
+  statusToggle = record => ({
+    onClick: () => {
+      let validCheck
+      if (record.valid === 'alive') validCheck = 'hold'
+      else if (record.valid === 'hold') validCheck = 'expired'
+      else if (record.valid === 'expired') validCheck = 'alive'
+      Axios.post(API.deletePosition, {
+        user_id: this.props.user_id,
+        position_id: record.position_id,
+        valid: validCheck
+      }).then(res => {
+        // sort 때문에 fetch 하면 무조건 내려감, 그래서... for user exp
+        const positionDataIndex = this.state.data.findIndex(
+          data => data.position_id === record.position_id
+        )
+        if (positionDataIndex !== -1) {
+          const dataTempChange = this.state.data.slice()
+          dataTempChange[positionDataIndex].valid = validCheck
+          this.setState({
+            positionCompany: dataTempChange
+          })
+        }
+      })
+    }
+  })
+
   getColumnSearchProps = dataIndex => ({
     filterDropdown: ({
       setSelectedKeys,
@@ -173,15 +224,46 @@ export default class Job extends Component {
       // Read total count from server
       // pagination.total = data.totalCount
       console.log('data.data.result', data.data.result)
-      const positonSort = sortBy(data.data.result, [
-        function(job) {
-          return Number(job.position_id.slice(2))
-        }
-      ])
+
+      let aliveArr = []
+      let expiredArr = []
+      let holdArr = []
+
+      data.data.result.forEach(data => {
+        if (data.valid === 'alive') aliveArr.push(data)
+        if (data.valid === 'expired') expiredArr.push(data)
+        if (data.valid === 'hold') holdArr.push(data)
+      })
+
+      aliveArr.sort((a, b) => {
+        // descend
+        return (
+          new Date(b.modified_date).getTime() -
+          new Date(a.modified_date).getTime()
+        )
+      })
+
+      holdArr.sort((a, b) => {
+        // descend
+        return (
+          new Date(b.modified_date).getTime() -
+          new Date(a.modified_date).getTime()
+        )
+      })
+      expiredArr.sort((a, b) => {
+        // descend
+        return (
+          new Date(b.modified_date).getTime() -
+          new Date(a.modified_date).getTime()
+        )
+      })
+      const positionSort = aliveArr.concat(holdArr).concat(expiredArr)
+
+      // console.log('positionSort', positionSort)
 
       this.setState({
         loading: false,
-        data: positonSort.reverse(),
+        data: positionSort,
         pagination
       })
     })
@@ -220,7 +302,7 @@ export default class Job extends Component {
       this.setState({
         selectedRowKeys: []
       })
-    }, 2000)
+    }, 1000)
   }
 
   handleDeleteConfirm = async e => {
@@ -274,6 +356,7 @@ export default class Job extends Component {
     <div>
       <Modal
         title=""
+        width="45%"
         visible={this.state.visible}
         onOk={this.handleModalOk}
         onCancel={this.handleModalCancel}
@@ -284,6 +367,7 @@ export default class Job extends Component {
           user_id={this.props.user_id}
           close={this.handleModalCancel}
           jobFetch={this.fetch}
+          jobData={this.state.data}
         />
       </Modal>
     </div>
@@ -511,12 +595,13 @@ export default class Job extends Component {
           loading={this.state.loading}
           onChange={this.handleTableChange}
           rowSelection={rowSelection}
-          onRow={record => ({
-            onClick: () => {
-              console.log('record', record)
-              this.handleClick(record)
-            }
-          })}
+          // onRow={record => ({
+
+          //   onClick: () => {
+          //     console.log('record', record)
+          //     this.handleClick(record)
+          //   }
+          // })}
         />
       </div>
     )

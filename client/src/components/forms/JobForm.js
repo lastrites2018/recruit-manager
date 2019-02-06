@@ -1,20 +1,44 @@
 import React from 'react'
 import Axios from 'axios'
-import { Button, Cascader, Form, Input } from 'antd'
+import { Button, Cascader, Form, Input, message } from 'antd'
 import API from '../../util/api'
+import { throttle } from 'lodash'
 
 class JobForm extends React.Component {
-  state = {
-    newPosition: {}
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      newPosition: {},
+      positionTitleStatus: ''
+    }
+    this.handlePositionTitleChange = this.handlePositionTitleChange.bind(this) // binding this because onChange is called in another scope
+    this.throttledOnChange = throttle(this.throttledOnChange.bind(this), 200) // debouncing function to 200ms and binding this
+  }
+
+  handlePositionTitleChange(event) {
+    this.throttledOnChange(event.target.value) // sending only the values not the entire event
+  }
+
+  throttledOnChange(value) {
+    if (this.props.jobData.some(data => data.title === value)) {
+      this.setState({ positionTitleStatus: 'error' })
+      return
+    }
+    this.setState({ positionTitleStatus: 'success' })
   }
 
   handleSubmit = e => {
     e.preventDefault()
     this.props.form.validateFieldsAndScroll((err, values) => {
-      if (!err) this.setState({ newPosition: values })
+      console.log('register-job', values)
+      // if (!err) this.setState({ newPosition: values })
+      if (!err && this.state.positionTitleStatus !== 'error')
+        this.setState({ newPosition: values }, () => {
+          this.addPosition()
+        })
     })
-    this.addPosition()
-    this.setState({ newPosition: {} })
+    // this.addPosition()
   }
 
   addPosition = async () => {
@@ -33,6 +57,7 @@ class JobForm extends React.Component {
       await console.log('position added')
       await this.props.close()
       await this.props.jobFetch()
+      await message.success('Job Position has been added!')
     } catch (err) {
       console.log(err)
     }
@@ -99,21 +124,36 @@ class JobForm extends React.Component {
     ]
 
     return (
-      <Form onSubmit={this.handleSubmit}>
-        <Form.Item {...formItemLayout} label="Position">
+      <Form onSubmit={this.handleSubmit} layout="vertical">
+        <Form.Item
+          {...formItemLayout}
+          help={
+            this.state.positionTitleStatus === 'error'
+              ? '이미 존재하는 포지션 제목입니다.'
+              : null
+          }
+          validateStatus={this.state.positionTitleStatus}
+          hasFeedback
+          label="Position"
+        >
           {getFieldDecorator('position', {
             rules: [{ required: true, message: 'Please fill in the position.' }]
-          })(<Input />)}
+          })(<Input onChange={this.handlePositionTitleChange} id="success" />)}
         </Form.Item>
+
         <Form.Item {...formItemLayout} label="Company">
           {getFieldDecorator('company', {
             rules: [{ required: true, message: 'Please fill in the company.' }]
           })(<Input />)}
         </Form.Item>
-        <Form.Item {...formItemLayout} label="Notes">
+
+        <Form.Item label="Notes">
+          {/* <Form.Item {...formItemLayout} label="Notes"> */}
           {getFieldDecorator('notes', {
             initialValue: ''
-          })(<Input.TextArea rows={4} />)}
+          })(
+            <Input.TextArea rows={4} autosize={{ minRows: 4, maxRows: 35 }} />
+          )}
         </Form.Item>
 
         <Form.Item
