@@ -89,15 +89,54 @@ export default class Job extends Component {
       },
       {
         title: 'Status',
-        dataIndex: 'valid'
+        dataIndex: 'valid',
+
+        render: e => (
+          <span>
+            {e.split(', ').map(tag => {
+              let color
+              if (tag === 'alive') color = 'geekblue'
+              else if (tag === 'hold') color = 'purple'
+              else if (tag === 'expired') color = 'gray'
+
+              return <Tag color={color}>{tag}</Tag>
+            })}
+          </span>
+        ),
+        onCell: this.statusToggle
       }
     ]
   }
 
   cellClickEvent = record => ({
     onClick: () => {
-      console.log('record', record)
       this.handleClick(record)
+    }
+  })
+
+  statusToggle = record => ({
+    onClick: () => {
+      let validCheck
+      if (record.valid === 'alive') validCheck = 'hold'
+      else if (record.valid === 'hold') validCheck = 'expired'
+      else if (record.valid === 'expired') validCheck = 'alive'
+      Axios.post(API.deletePosition, {
+        user_id: this.props.user_id,
+        position_id: record.position_id,
+        valid: validCheck
+      }).then(res => {
+        // sort 때문에 fetch 하면 무조건 내려감, 그래서... for user exp
+        const positionDataIndex = this.state.data.findIndex(
+          data => data.position_id === record.position_id
+        )
+        if (positionDataIndex !== -1) {
+          const dataTempChange = this.state.data.slice()
+          dataTempChange[positionDataIndex].valid = validCheck
+          this.setState({
+            positionCompany: dataTempChange
+          })
+        }
+      })
     }
   })
 
@@ -184,7 +223,7 @@ export default class Job extends Component {
       const pagination = { ...this.state.pagination }
       // Read total count from server
       // pagination.total = data.totalCount
-      // console.log('data.data.result', data.data.result)
+      console.log('data.data.result', data.data.result)
 
       let aliveArr = []
       let expiredArr = []
@@ -203,6 +242,7 @@ export default class Job extends Component {
           new Date(a.modified_date).getTime()
         )
       })
+
       holdArr.sort((a, b) => {
         // descend
         return (
