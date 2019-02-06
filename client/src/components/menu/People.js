@@ -247,7 +247,6 @@ export default class People extends Component {
           user_id: this.props.user_id,
           rm_code: this.state.selectedRows[0].rm_code,
           sender: 'rmrm@careersherpa.co.kr',
-          // recipient: 'joinsusang@gmail.com',
           recipient: this.state.selectedRows[0].email,
           subject: this.state.mail.title,
           body:
@@ -259,7 +258,7 @@ export default class People extends Component {
             this.state.mail.sign,
           position: `${this.state.mail.positionCompany}|${
             this.state.mail.position
-          }` // 공백이라도 보내야 함.
+          }`
         })
         await this.success(
           `메일을 ${this.state.selectedRows[0].name} 님에게 보냈습니다.`
@@ -367,7 +366,6 @@ export default class People extends Component {
     await console.log('state', this.state.sms)
     await console.log('selected rows: ', this.state.selectedRowKeys)
     await console.log('preparing to send')
-
     if (this.state.selectedRowKeys.length === 0) {
       try {
         await Axios.post(API.sendSMS, {

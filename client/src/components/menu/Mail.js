@@ -2,9 +2,20 @@ import React, { Component } from 'react'
 import Axios from 'axios'
 import API from '../../util/api'
 import MailForm from '../forms/MailForm'
-import { Button, Col, Divider, Icon, Input, Modal, Table, Row } from 'antd'
+import {
+  Button,
+  Col,
+  Divider,
+  Icon,
+  Input,
+  message,
+  Modal,
+  Table,
+  Row
+} from 'antd'
 import Highlighter from 'react-highlight-words'
 import { sortBy } from 'lodash'
+import { TimeoutError } from 'rxjs'
 
 export default class Mail extends Component {
   constructor(props) {
@@ -269,7 +280,6 @@ export default class Mail extends Component {
   }
 
   showModal = () => {
-    console.log('show modal')
     this.setState({ visible: true })
   }
 
@@ -285,20 +295,30 @@ export default class Mail extends Component {
     await this.setState({ mail: form })
     await this.sendMail()
     await this.handleCancel()
-    await this.fetch()
+    setTimeout(this.fetch, 2000)
+  }
+
+  success = msg => {
+    message.success(msg)
+  }
+
+  getAllRecipients = async () => {
+    let allRecipients = [],
+      allEmails = []
+    for (let i = 0; i < this.state.selectedRows.length; i++) {
+      await allRecipients.push(this.state.selectedRows[i].name)
+      await allEmails.push(this.state.selectedRows[i].recipient)
+    }
+    await this.setState({ allRecipients, allEmails })
   }
 
   sendMail = async () => {
-    await console.log('selected rows: ', this.state.selectedRows)
-    await console.log('preparing to send')
     if (this.state.selectedRows.length === 1) {
       try {
-        await this.setState({ loading: true })
         await Axios.post(API.sendMail, {
           user_id: this.props.user_id,
           rm_code: this.state.selectedRows[0].rm_code,
           sender: 'rmrm@careersherpa.co.kr',
-          // recipient: 'joinsusang@gmail.com',
           recipient: this.state.selectedRows[0].recipient,
           subject: this.state.mail.title,
           body:
@@ -310,23 +330,18 @@ export default class Mail extends Component {
             this.state.mail.sign,
           position: `${this.state.mail.positionCompany}|${
             this.state.mail.position
-          }` // 공백이라도 보내야 함.
+          }`
         })
-          .then(data => {
-            console.log('data', data)
-          })
-          .catch(err => {
-            console.log(err.response)
-          })
-        await this.setState({ loading: false })
-        await alert(`메일을 보냈습니다.`)
+        await this.success(
+          `메일을 ${this.state.selectedRows[0].name} 님에게 보냈습니다.`
+        )
         // await this.resetSelections()
       } catch (err) {
         console.log('send one email error', err)
       }
     } else {
       try {
-        console.log(this.state.selectedRowKeys, this.state.selectedRows)
+        let listOfRecipients = []
         for (let i = 0; i < this.state.selectedRows.length; i++) {
           await setTimeout(() => {
             Axios.post(API.sendMail, {
@@ -347,7 +362,12 @@ export default class Mail extends Component {
             })
           }, 100)
         }
-        await alert(`메일을 보냈습니다.`)
+        for (let j = 0; j < this.state.selectedRows.length; j++) {
+          await listOfRecipients.push(this.state.selectedRows[j].name)
+        }
+        await this.success(
+          `메일을 ${listOfRecipients.join(' 님, ')} 님에게 보냈습니다.`
+        )
         // await this.resetSelections()
       } catch (err) {
         console.log('send multiple emails error', err)
@@ -384,7 +404,6 @@ export default class Mail extends Component {
           onClick={this.showModal}
           disabled={!this.state.selectedRows.length}
           style={{ marginTop: '10px' }}
-          // onClick={this.sendMail}
         >
           Follow up
         </Button>
