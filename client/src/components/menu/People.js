@@ -247,7 +247,6 @@ export default class People extends Component {
           user_id: this.props.user_id,
           rm_code: this.state.selectedRows[0].rm_code,
           sender: 'rmrm@careersherpa.co.kr',
-          // recipient: 'joinsusang@gmail.com',
           recipient: this.state.selectedRows[0].email,
           subject: this.state.mail.title,
           body:
@@ -259,7 +258,7 @@ export default class People extends Component {
             this.state.mail.sign,
           position: `${this.state.mail.positionCompany}|${
             this.state.mail.position
-          }` // 공백이라도 보내야 함.
+          }`
         })
         await this.success(
           `메일을 ${this.state.selectedRows[0].name} 님에게 보냈습니다.`
@@ -367,7 +366,6 @@ export default class People extends Component {
     await console.log('state', this.state.sms)
     await console.log('selected rows: ', this.state.selectedRowKeys)
     await console.log('preparing to send')
-
     if (this.state.selectedRowKeys.length === 0) {
       try {
         await Axios.post(API.sendSMS, {
@@ -618,27 +616,6 @@ export default class People extends Component {
     this.setState({ dataSource: dataSource.filter(item => item.key !== key) })
   }
 
-  handleAdd = () => {
-    const { count, dataSource, manualKey } = this.state
-    const newData = {
-      // uniq key 가 필요함 수정 필요!
-
-      // Warning: Each record in table should have a unique `key` prop,
-      // or set `rowKey` to an unique primary key.
-
-      rowKey: this.state.manualKey, // unique key 값을 안 준다
-      name: 'sunny',
-      birth: '100',
-      school: 'uc berkeley',
-      company: 'codestates'
-    }
-    this.setState({
-      dataSource: [...dataSource, newData],
-      count: count + 1,
-      manualKey: manualKey + 1
-    })
-  }
-
   handleSave = row => {
     const newData = [...this.state.dataSource]
     const index = newData.findIndex(item => row.key === item.key)
@@ -733,10 +710,8 @@ export default class People extends Component {
         onOk={this.handleOk}
         onCancel={this.handleCancel}
         footer={null}
-        // bodyStyle={{ height: '400px' }}
         width="50%"
       >
-        {/* <Row type="flex" justify="center" align="left"> */}
         <Row style={{ textAlign: 'left' }}>
           <Col>
             <h3>[ School ]</h3>
@@ -754,14 +729,12 @@ export default class People extends Component {
           </Col>
         </Row>
         <Row style={{ textAlign: 'left' }}>
-          {/* <Row type="flex" justify="center" align="middle"> */}
           <Col span={18}>
             <p>{this.state.resumeDetailData[0].company}</p>
           </Col>
         </Row>
         <Divider />
         <Row style={{ textAlign: 'left' }}>
-          {/* <Row type="flex" justify="center" align="middle"> */}
           <Col span={18}>
             <h3>[ Others ]</h3>
           </Col>
@@ -778,20 +751,11 @@ export default class People extends Component {
             ) : (
               this.state.resumeDetailData[0].others
             )}
-            {/* <details>
-              <summary>
-                {this.state.resumeDetailData[0].others.slice(0, 20)}
-              </summary>
-              <p>{this.state.resumeDetailData[0].others}</p>
-            </details> */}
-            {/* <p>{this.state.resumeDetailData[0].others}</p> */}
           </Col>
         </Row>
         <this.memoTable />
         <Divider />
         <Row>
-          {/* <Row align="middle"> */}
-          {/* <Row type="flex" align="middle"> */}
           <Col span={6}>
             <Button
               type="primary"
@@ -801,7 +765,6 @@ export default class People extends Component {
             />
           </Col>
           <Col span={18} style={{ textAlign: 'right' }}>
-            {/* <Col span={6} offset={12}> */}
             <Button
               type="primary"
               icon="right"
@@ -848,11 +811,6 @@ export default class People extends Component {
       }
     ]
 
-    // console.log(
-    //   'this.state.resumeDetailData[0]',
-    //   this.state.resumeDetailData[0]
-    // )
-
     if (!this.state.resumeDetailData[0].memo) {
       return (
         <div>
@@ -871,14 +829,12 @@ export default class People extends Component {
       <div>
         <Divider />
         <Row style={{ textAlign: 'left' }}>
-          {/* <Row type="flex" justify="center" align="middle"> */}
           <Col span={18}>
             <h3>[ Position & Memo ]</h3>
           </Col>
         </Row>
 
         <Table
-          // style={{ width: '95%' }}
           bordered
           columns={columns}
           dataSource={this.state.resumeDetailData[0].memo}
@@ -1217,7 +1173,6 @@ export default class People extends Component {
             icon="message"
             onClick={this.showSmsModal}
             style={{ marginRight: 5 }}
-            // disabled={!hasSelected}
           >
             SMS
           </Button>
@@ -1227,7 +1182,6 @@ export default class People extends Component {
             onClick={this.showUpdateResumeModal}
             style={{ float: 'right', marginRight: 5, marginBottom: 16 }}
             disabled={selectedRowKeys.length !== 1}
-            // disabled={!hasSelected}
           >
             편집
           </Button>
@@ -1274,7 +1228,6 @@ export default class People extends Component {
           {this.state.visible && <this.peopleModal />}
           {this.state.mailVisible && <this.mailModal />}
           {this.state.smsVisible && <this.smsModal />}
-          {/* <this.smsModal /> */}
           {this.state.visibleNewResume && <this.addResumeModal />}
           {this.state.visibleUpdateResume && <this.updateResumeModal />}
         </div>

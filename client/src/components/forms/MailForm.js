@@ -61,12 +61,10 @@ class MailForm extends React.Component {
       this.setState({
         positionData: data.data.result
       })
-      console.log('position data', data.data.result)
     })
   }
 
   componentDidMount() {
-    console.log('mailform 요청확인')
     this.fetchPosition()
   }
 
@@ -107,10 +105,6 @@ class MailForm extends React.Component {
         {`${position.title}: ${position.keyword}`}
       </Select.Option>
     ))
-
-    console.log('position : ', position)
-    console.log('company : ', positionCompany)
-    console.log('position detail :', positionDetail)
 
     let userSign
 
