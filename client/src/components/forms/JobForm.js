@@ -138,7 +138,7 @@ class JobForm extends React.Component {
         >
           {getFieldDecorator('position', {
             rules: [{ required: true, message: 'Please fill in the position.' }]
-          })(<Input onChange={this.handlePositionTitleChange} id="success" />)}
+          })(<Input onChange={this.handlePositionTitleChange} />)}
         </Form.Item>
 
         <Form.Item {...formItemLayout} label="Company">
