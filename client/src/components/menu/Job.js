@@ -387,6 +387,7 @@ export default class Job extends Component {
           close={this.handleUpdateModalCancel}
           selected={this.state.selectedRows[0]}
           jobFetch={this.fetch}
+          jobData={this.state.data}
         />
       </Modal>
     </div>
