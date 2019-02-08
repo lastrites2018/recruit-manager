@@ -163,7 +163,7 @@ export default class People extends Component {
       // },
       {
         key: 'modified_date', //날짜에 맞게 데이터 맞게 들어왔는지 확인용
-        title: '등록 날짜(테스트용)',
+        title: '마지막 수정 일자(테스트용)',
         dataIndex: 'modified_date',
         width: 120,
         ...this.getColumnSearchProps('modified_date')
@@ -928,14 +928,6 @@ export default class People extends Component {
     this.setState({ andOr: words })
   }
 
-  filterAndOr = () => {
-    // api 기다리는 중
-  }
-
-  // handleNewResume = (newResume) => {
-  //   this.setState({ newResume: newResume })
-  // }
-
   showAddResumeModal = () => {
     this.setState({ visibleNewResume: true })
   }
@@ -1077,14 +1069,19 @@ export default class People extends Component {
       }
     })
 
-    const optionList = this.state.positionData.map(position => (
-      // <Option value={position.keyword}>
-      // caution : 여기는 value가 position_keyword 여야 하지만 error로 title
-      // value는 must unique value
-      <Option value={position.title} key={position.position_id}>
-        {`${position.title}: ${position.keyword}`}
-      </Option>
-    ))
+    const optionList = this.state.positionData
+      .filter(position => position.valid === 'alive')
+      .sort((a, b) => {
+        return (
+          new Date(b.modified_date).getTime() -
+          new Date(a.modified_date).getTime()
+        )
+      })
+      .map(position => (
+        <Option value={position.title} key={position.position_id}>
+          {`${position.title}: ${position.keyword}`}
+        </Option>
+      ))
 
     return (
       <div>

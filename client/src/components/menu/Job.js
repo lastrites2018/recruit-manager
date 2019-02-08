@@ -81,7 +81,7 @@ export default class Job extends Component {
         onCell: this.cellClickEvent
       },
       {
-        title: '등록일시',
+        title: '마지막 수정 일시',
         dataIndex: 'modified_date',
         width: '100',
         ...this.getColumnSearchProps('modified_date'),
@@ -90,7 +90,22 @@ export default class Job extends Component {
       {
         title: 'Status',
         dataIndex: 'valid',
-
+        filters: [
+          {
+            text: 'alive',
+            value: 'alive'
+          },
+          {
+            text: 'hold',
+            value: 'hold'
+          },
+          {
+            text: 'expired',
+            value: 'expired'
+          }
+        ],
+        filterMultiple: false,
+        onFilter: (value, record) => record.valid.indexOf(value) === 0,
         render: e => (
           <span>
             {e.split(', ').map(tag => {

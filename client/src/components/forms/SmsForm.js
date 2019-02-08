@@ -57,14 +57,14 @@ class SmsForm extends React.Component {
   }
 
   componentDidMount() {
-    // console.log('sms 요청확인')
     this.fetchPosition()
   }
 
   render() {
     const { getFieldDecorator } = this.props.form
     const { selectedRows } = this.props
-    const { position } = this.state
+    const { position, positionData } = this.state
+    const Option = Select.Option
 
     const formItemLayout = {
       labelCol: {
@@ -95,14 +95,19 @@ class SmsForm extends React.Component {
         : // ? selectedRows.map((row, index) => row.name).join(',')
           null
 
-    const optionList = this.state.positionData.map(position => {
-      return (
-        <Select.Option value={position.title} key={position.key}>
+    const optionList = positionData
+      .filter(position => position.valid === 'alive')
+      .sort((a, b) => {
+        return (
+          new Date(b.modified_date).getTime() -
+          new Date(a.modified_date).getTime()
+        )
+      })
+      .map(position => (
+        <Option value={position.title} key={position.key}>
           {`${position.title}: ${position.keyword}`}
-          {/* {`${position.title}    키워드 : ${position.keyword}`} */}
-        </Select.Option>
-      )
-    })
+        </Option>
+      ))
 
     let smsName
     // let signupRule

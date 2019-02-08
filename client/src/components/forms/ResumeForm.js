@@ -19,7 +19,6 @@ class ResumeForm extends React.Component {
   }
 
   uploadResume = async () => {
-    // FIXME: 피플 내림차순으로 바바꾸기
     try {
       await console.log('newResume', this.state.newResume)
       await Axios.post(API.insertResume, {
@@ -36,15 +35,15 @@ class ResumeForm extends React.Component {
         career_history: this.state.newResume.career_history || '',
         salary_requirement: this.state.newResume.salary_requirement || '',
         working_area: this.state.newResume.working_area || ''
+      }).then(res => {
+        console.log('resume added')
+        this.props.addSuccess()
       })
-      await console.log('resume added')
       await this.props.peopleFetch()
-      await this.props.addSuccess()
     } catch (err) {
       console.log(err)
     }
   }
-
   render() {
     const { getFieldDecorator } = this.props.form
 

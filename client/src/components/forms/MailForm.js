@@ -76,6 +76,7 @@ class MailForm extends React.Component {
       positionCompany,
       positionDetail
     } = this.state
+    const Option = Select.Option
 
     const formItemLayout = {
       labelCol: {
@@ -100,11 +101,19 @@ class MailForm extends React.Component {
       }
     }
 
-    const optionList = positionData.map(position => (
-      <Select.Option value={position.title} key={position.position_id}>
-        {`${position.title}: ${position.keyword}`}
-      </Select.Option>
-    ))
+    const optionList = positionData
+      .filter(position => position.valid === 'alive')
+      .sort((a, b) => {
+        return (
+          new Date(b.modified_date).getTime() -
+          new Date(a.modified_date).getTime()
+        )
+      })
+      .map(position => (
+        <Option value={position.title} key={position.position_id}>
+          {`${position.title}: ${position.keyword}`}
+        </Option>
+      ))
 
     let userSign
 
@@ -136,7 +145,7 @@ class MailForm extends React.Component {
           {getFieldDecorator('email', {
             initialValue: this.props.allEmails.join(', '),
             rules: [{ required: true }]
-          })(<Input.TextArea rows={1} autosize />)}
+          })(<Input.TextArea rows={1} autosize disabled />)}
         </Form.Item>
 
         <Form.Item label="Content" {...formItemLayout}>
