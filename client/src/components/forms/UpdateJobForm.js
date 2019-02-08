@@ -1,6 +1,6 @@
 import React from 'react'
 import Axios from 'axios'
-import { Button, Form, Input } from 'antd'
+import { Button, Form, Input, Radio } from 'antd'
 import API from '../../util/api'
 import { throttle } from 'lodash'
 
@@ -196,12 +196,26 @@ class UpdateJobForm extends React.Component {
             })(<Input />)}
           </Form.Item>
         </Form.Item>
-        <Form.Item {...formItemLayout} label="Status">
+
+        {/* <Form.Item {...formItemLayout} label="Status">
           {getFieldDecorator('status', {
             initialValue: this.props.selected.valid,
             rules: [{ required: true, message: 'Please fill in the status.' }]
           })(<Input />)}
+        </Form.Item> */}
+
+        <Form.Item {...formItemLayout} label="Status">
+          {getFieldDecorator('status', {
+            initialValue: this.props.selected.valid
+          })(
+            <Radio.Group>
+              <Radio.Button value="alive">alive</Radio.Button>
+              <Radio.Button value="hold">hold</Radio.Button>
+              <Radio.Button value="expired">expired</Radio.Button>
+            </Radio.Group>
+          )}
         </Form.Item>
+
         <Form.Item {...tailFormItemLayout}>
           <Button type="primary" htmlType="submit">
             Edit
