@@ -164,10 +164,9 @@ class JobForm extends React.Component {
           <Form.Item
             style={{ display: 'inline-block', width: 'calc(50% - 12px)' }}
           >
-            {getFieldDecorator('under_birth', {
-              initialValue: 1900,
-              rules: [{ type: 'number' }, { required: true }]
-            })(<Input />)}
+            {getFieldDecorator('under_birth', { initialValue: 1900 })(
+              <Input />
+            )}
           </Form.Item>
           <span
             style={{
@@ -181,10 +180,9 @@ class JobForm extends React.Component {
           <Form.Item
             style={{ display: 'inline-block', width: 'calc(50% - 12px)' }}
           >
-            {getFieldDecorator('upper_birth', {
-              initialValue: 2100,
-              rules: [{ type: 'number' }, { required: true }]
-            })(<Input />)}
+            {getFieldDecorator('upper_birth', { initialValue: 2100 })(
+              <Input />
+            )}
           </Form.Item>
         </Form.Item>
 
