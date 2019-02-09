@@ -424,51 +424,51 @@ export default class Job extends Component {
           </Col>
         </Row>
         <Row style={{ textAlign: 'left' }}>
-          <Col span={18}>
+          <Col span={20}>
             <p>{this.state.clickedData.company}</p>
           </Col>
         </Row>
         <Divider />
         <Row style={{ textAlign: 'left' }}>
-          <Col span={18}>
+          <Col span={20}>
             <h3>[ Position ]</h3>
           </Col>
         </Row>
         <Row style={{ textAlign: 'left' }}>
-          <Col span={18}>
+          <Col span={20}>
             <p>{this.state.clickedData.title}</p>
           </Col>
         </Row>
         <Divider />
         <Row style={{ textAlign: 'left' }}>
-          <Col span={18}>
+          <Col span={20}>
             <h3>[ Keywords ]</h3>
           </Col>
         </Row>
         <Row style={{ textAlign: 'left' }}>
-          <Col span={18}>
+          <Col span={20}>
             <p>{this.state.clickedData.keyword}</p>
           </Col>
         </Row>
         <Divider />
         <Row style={{ textAlign: 'left' }}>
-          <Col span={18}>
+          <Col span={20}>
             <h3>[ Detail ]</h3>
           </Col>
         </Row>
         <Row style={{ textAlign: 'left' }}>
-          <Col span={18}>
+          <Col span={20}>
             <p>{this.state.clickedData.detail}</p>
           </Col>
         </Row>
         <Divider />
         <Row style={{ textAlign: 'left' }}>
-          <Col span={18}>
+          <Col span={20}>
             <h3>[ Modified Date ]</h3>
           </Col>
         </Row>
         <Row style={{ textAlign: 'left' }}>
-          <Col span={18}>
+          <Col span={20}>
             <p>{this.state.clickedData.modified_date}</p>
           </Col>
         </Row>
