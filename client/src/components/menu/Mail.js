@@ -241,23 +241,23 @@ export default class Mail extends Component {
         width="50%"
       >
         <Row style={{ textAlign: 'left' }}>
-          <Col span={18}>
+          <Col span={20}>
             <h3>[ Send Content ]</h3>
           </Col>
         </Row>
         <Row style={{ textAlign: 'left' }}>
-          <Col span={18}>
+          <Col span={20}>
             <p>{this.state.mailDetail.body}</p>
           </Col>
         </Row>
         <Divider />
         <Row style={{ textAlign: 'left' }}>
-          <Col span={18}>
+          <Col span={20}>
             <h3>[ Send Date ]</h3>
           </Col>
         </Row>
         <Row style={{ textAlign: 'left' }}>
-          <Col span={18}>
+          <Col span={20}>
             <p>{this.state.mailDetail.send_date}</p>
           </Col>
         </Row>

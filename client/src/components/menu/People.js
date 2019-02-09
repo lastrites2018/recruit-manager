@@ -702,6 +702,123 @@ export default class People extends Component {
     await this.getResumeDetail(this.state.clickedData.rm_code)
   }
 
+  // peopleModal = () => {
+  //   let schoolDetail = this.state.resumeDetailData[0].school
+  //     .split(`\\n`)
+  //     .map(line => {
+  //       return (
+  //         <span>
+  //           {line}
+  //           <br />
+  //         </span>
+  //       )
+  //     })
+
+  //   let companyDetail = this.state.resumeDetailData[0].company
+  //     // .split('null')
+  //     .split(`\\n`)
+  //     .map(line => {
+  //       return (
+  //         <span>
+  //           {line}
+  //           <br />
+  //         </span>
+  //       )
+  //     })
+
+  //   let othersDetail = this.state.resumeDetailData[0].others
+  //     .split(`\\n`)
+  //     .map(line => {
+  //       return (
+  //         <span>
+  //           {line}
+  //           <br />
+  //         </span>
+  //       )
+  //     })
+
+  //   return (
+  //     <div>
+  //       <Modal
+  //         title={this.state.resumeDetailTitle}
+  //         visible={this.state.visible}
+  //         onOk={this.handleOk}
+  //         onCancel={this.handleCancel}
+  //         footer={null}
+  //         width="50%"
+  //       >
+  //         <Row style={{ textAlign: 'left' }}>
+  //           <Col span={2} />
+  //           <Col span={20}>
+  //             <h3>[ School ]</h3>
+  //           </Col>
+  //         </Row>
+  //         <Row style={{ textAlign: 'left' }}>
+  //           <Col span={2} />
+  //           <Col span={20}>
+  //             {/* <p>{this.state.resumeDetailData[0].school}</p> */}
+  //             <p>{schoolDetail}</p>
+  //           </Col>
+  //         </Row>
+  //         <Divider />
+  //         <Row style={{ textAlign: 'left' }}>
+  //           <Col span={2} />
+  //           <Col span={20}>
+  //             <h3>[ Company ]</h3>
+  //           </Col>
+  //         </Row>
+  //         <Row style={{ textAlign: 'left' }}>
+  //           <Col span={18}>
+  //             <p>{companyDetail}</p>
+  //             {/* <p>{this.state.resumeDetailData[0].company}</p> */}
+  //           </Col>
+  //         </Row>
+  //         <Divider />
+  //         <Row style={{ textAlign: 'left' }}>
+  //           <Col span={18}>
+  //             <h3>[ Others ]</h3>
+  //           </Col>
+  //         </Row>
+  //         <Row style={{ textAlign: 'left' }}>
+  //           <Col span={20}>
+  //             {this.state.resumeDetailData[0].others.length > 200 ? (
+  //               <details>
+  //                 <summary>
+  //                   {this.state.resumeDetailData[0].others.slice(0, 40)}
+  //                 </summary>
+  //                 <p>{othersDetail}</p>
+  //                 {/* <p>{this.state.resumeDetailData[0].others}</p> */}
+  //               </details>
+  //             ) : (
+  //               othersDetail
+  //               // this.state.resumeDetailData[0].others
+  //             )}
+  //           </Col>
+  //         </Row>
+  //         <this.memoTable />
+  //         <Divider />
+  //         <Row>
+  //           <Col span={6}>
+  //             <Button
+  //               type="primary"
+  //               icon="left"
+  //               value="large"
+  //               onClick={this.onLeftClick}
+  //             />
+  //           </Col>
+  //           <Col span={18} style={{ textAlign: 'right' }}>
+  //             <Button
+  //               type="primary"
+  //               icon="right"
+  //               value="large"
+  //               onClick={this.onRightClick}
+  //             />
+  //           </Col>
+  //         </Row>
+  //       </Modal>
+  //     </div>
+  //   )
+  // }
   peopleModal = () => {
     let schoolDetail = this.state.resumeDetailData[0].school
       .split(`\\n`)
@@ -745,39 +862,64 @@ export default class People extends Component {
           onOk={this.handleOk}
           onCancel={this.handleCancel}
           footer={null}
-          width="50%"
+          width="80%"
         >
           <Row style={{ textAlign: 'left' }}>
-            <Col>
+            <Col span={2} />
+            <Col span={20}>
               <h3>[ School ]</h3>
             </Col>
+            <Col span={2} />
           </Row>
           <Row style={{ textAlign: 'left' }}>
-            <Col span={18}>
+            <Col span={2} />
+            <Col span={20}>
               {/* <p>{this.state.resumeDetailData[0].school}</p> */}
               <p>{schoolDetail}</p>
             </Col>
+            <Col span={2} />
           </Row>
           <Divider />
           <Row style={{ textAlign: 'left' }}>
-            <Col span={18}>
+            <Col span={2} />
+            <Col span={20}>
               <h3>[ Company ]</h3>
             </Col>
+            <Col span={2} />
           </Row>
-          <Row style={{ textAlign: 'left' }}>
-            <Col span={18}>
+          <Row>
+            <Col span={2} style={{ textAlign: 'left' }}>
+              <Button
+                type="primary"
+                icon="left"
+                value="large"
+                onClick={this.onLeftClick}
+              />
+            </Col>
+            <Col span={20}>
               <p>{companyDetail}</p>
               {/* <p>{this.state.resumeDetailData[0].company}</p> */}
             </Col>
+            <Col span={2} style={{ textAlign: 'right' }}>
+              <Button
+                type="primary"
+                icon="right"
+                value="large"
+                onClick={this.onRightClick}
+              />
+            </Col>
           </Row>
           <Divider />
           <Row style={{ textAlign: 'left' }}>
-            <Col span={18}>
+            <Col span={2} />
+            <Col span={20}>
               <h3>[ Others ]</h3>
             </Col>
+            <Col span={2} />
           </Row>
           <Row style={{ textAlign: 'left' }}>
-            <Col span={18}>
+            <Col span={2} />
+            <Col span={20}>
               {this.state.resumeDetailData[0].others.length > 200 ? (
                 <details>
                   <summary>
@@ -791,27 +933,9 @@ export default class People extends Component {
                 // this.state.resumeDetailData[0].others
               )}
             </Col>
+            <Col span={2} />
           </Row>
           <this.memoTable />
-          <Divider />
-          <Row>
-            <Col span={6}>
-              <Button
-                type="primary"
-                icon="left"
-                value="large"
-                onClick={this.onLeftClick}
-              />
-            </Col>
-            <Col span={18} style={{ textAlign: 'right' }}>
-              <Button
-                type="primary"
-                icon="right"
-                value="large"
-                onClick={this.onRightClick}
-              />
-            </Col>
-          </Row>
         </Modal>
       </div>
     )
@@ -856,11 +980,19 @@ export default class People extends Component {
         <div>
           <Divider />
           <Row style={{ textAlign: 'left' }}>
-            <Col span={18}>
+            <Col span={2} />
+            <Col span={20}>
               <h3>[ Position & Memo ]</h3>
             </Col>
+            <Col span={2} />
           </Row>
-          <div>메모 내용이 없습니다.</div>
+          <Row style={{ textAlign: 'left' }}>
+            <Col span={2} />
+            <Col span={20}>
+              <div>메모 내용이 없습니다.</div>
+            </Col>
+            <Col span={2} />
+          </Row>
         </div>
       )
     }
@@ -869,9 +1001,11 @@ export default class People extends Component {
       <div>
         <Divider />
         <Row style={{ textAlign: 'left' }}>
-          <Col span={18}>
+          <Col span={2} />
+          <Col span={20}>
             <h3>[ Position & Memo ]</h3>
           </Col>
+          <Col span={2} />
         </Row>
 
         <Table
