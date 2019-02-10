@@ -820,7 +820,6 @@ export default class People extends Component {
   //   )
   // }
   arrowKeyPush = async event => {
-    console.log('event', event.keyCode)
     if (this.state.visible && event.keyCode === 37) {
       // left arrow
       await this.setState({ currentKey: this.state.clickedData.key - 1 })
