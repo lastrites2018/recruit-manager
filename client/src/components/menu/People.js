@@ -669,35 +669,96 @@ export default class People extends Component {
   }
 
   onLeftClick = async () => {
+    const { clickedData } = this.state
+    const resumeTitle = {
+      mobile:
+        clickedData.mobile && clickedData.mobile !== 'null'
+          ? clickedData.mobile
+          : '등록된 번호 없음',
+      email:
+        clickedData.email && clickedData.email !== 'null'
+          ? clickedData.email
+          : '등록된 이메일 없음',
+      gender:
+        clickedData.gender && clickedData.gender !== 'nu'
+          ? clickedData.gender
+          : '등록된 성별 없음',
+      birth:
+        clickedData.birth && clickedData.birth !== 'null'
+          ? clickedData.birth
+          : '등록된 나이 없음',
+      name:
+        clickedData.name && clickedData.name !== 'null'
+          ? clickedData.name
+          : '등록된 이름 없음'
+    }
+    await this.setState({
+      resumeDetailTitle: `${resumeTitle.name} | ${resumeTitle.birth} | ${
+        resumeTitle.gender
+      } | ${resumeTitle.mobile} | ${resumeTitle.email}`
+    })
     await this.setState({ currentKey: this.state.clickedData.key - 1 })
     for (let i = 0; i < this.state.dataSource.length; i++) {
       if (this.state.dataSource[i].key === this.state.currentKey) {
         await this.setState({ clickedData: this.state.dataSource[i] })
       }
     }
+    // await this.setState({
+    //   resumeDetailTitle: `${this.state.clickedData.name} ${
+    //     this.state.clickedData.birth
+    //   } | ${this.state.clickedData.gender} | ${
+    //     this.state.clickedData.mobile
+    //   } | ${this.state.clickedData.email}`
+    // })
     await this.setState({
-      resumeDetailTitle: `${this.state.clickedData.name} ${
-        this.state.clickedData.birth
-      } | ${this.state.clickedData.gender} | ${
-        this.state.clickedData.mobile
-      } | ${this.state.clickedData.email}`
+      resumeDetailTitle: `${resumeTitle.name} | ${resumeTitle.birth} | ${
+        resumeTitle.gender
+      } | ${resumeTitle.mobile} | ${resumeTitle.email}`
     })
     await this.getResumeDetail(this.state.clickedData.rm_code)
   }
 
   onRightClick = async () => {
+    const { clickedData } = this.state
+    const resumeTitle = {
+      mobile:
+        clickedData.mobile && clickedData.mobile !== 'null'
+          ? clickedData.mobile
+          : '등록된 번호 없음',
+      email:
+        clickedData.email && clickedData.email !== 'null'
+          ? clickedData.email
+          : '등록된 이메일 없음',
+      gender:
+        clickedData.gender && clickedData.gender !== 'nu'
+          ? clickedData.gender
+          : '등록된 성별 없음',
+      birth:
+        clickedData.birth && clickedData.birth !== 'null'
+          ? clickedData.birth
+          : '등록된 나이 없음',
+      name:
+        clickedData.name && clickedData.name !== 'null'
+          ? clickedData.name
+          : '등록된 이름 없음'
+    }
     await this.setState({ currentKey: this.state.clickedData.key + 1 })
     for (let i = 0; i < this.state.dataSource.length; i++) {
       if (this.state.dataSource[i].key === this.state.currentKey) {
         await this.setState({ clickedData: this.state.dataSource[i] })
       }
     }
+    // await this.setState({
+    //   resumeDetailTitle: `${this.state.clickedData.name} ${
+    //     this.state.clickedData.birth
+    //   } | ${this.state.clickedData.gender} | ${
+    //     this.state.clickedData.mobile
+    //   } | ${this.state.clickedData.email}`
+    // })
     await this.setState({
-      resumeDetailTitle: `${this.state.clickedData.name} ${
-        this.state.clickedData.birth
-      } | ${this.state.clickedData.gender} | ${
-        this.state.clickedData.mobile
-      } | ${this.state.clickedData.email}`
+      resumeDetailTitle: `${resumeTitle.name} | ${resumeTitle.birth} | ${
+        resumeTitle.gender
+      } | ${resumeTitle.mobile} | ${resumeTitle.email}`
     })
     await this.getResumeDetail(this.state.clickedData.rm_code)
   }
