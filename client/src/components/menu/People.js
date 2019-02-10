@@ -163,7 +163,7 @@ export default class People extends Component {
       // },
       {
         key: 'modified_date', //날짜에 맞게 데이터 맞게 들어왔는지 확인용
-        title: '마지막 수정 일자(테스트용)',
+        title: '마지막 수정 일시',
         dataIndex: 'modified_date',
         width: 120,
         ...this.getColumnSearchProps('modified_date')
@@ -819,6 +819,41 @@ export default class People extends Component {
   //     </div>
   //   )
   // }
+  arrowKeyPush = async event => {
+    console.log('event', event.keyCode)
+    if (this.state.visible && event.keyCode === 37) {
+      // left arrow
+      await this.setState({ currentKey: this.state.clickedData.key - 1 })
+      for (let i = 0; i < this.state.dataSource.length; i++) {
+        if (this.state.dataSource[i].key === this.state.currentKey) {
+          await this.setState({ clickedData: this.state.dataSource[i] })
+        }
+      }
+      await this.setState({
+        resumeDetailTitle: `${this.state.clickedData.name} ${
+          this.state.clickedData.birth
+        } | ${this.state.clickedData.gender} | ${
+          this.state.clickedData.mobile
+        } | ${this.state.clickedData.email}`
+      })
+      await this.getResumeDetail(this.state.clickedData.rm_code)
+    } else if (this.state.visible && event.keyCode === 39) {
+      await this.setState({ currentKey: this.state.clickedData.key + 1 })
+      for (let i = 0; i < this.state.dataSource.length; i++) {
+        if (this.state.dataSource[i].key === this.state.currentKey) {
+          await this.setState({ clickedData: this.state.dataSource[i] })
+        }
+      }
+      await this.setState({
+        resumeDetailTitle: `${this.state.clickedData.name} ${
+          this.state.clickedData.birth
+        } | ${this.state.clickedData.gender} | ${
+          this.state.clickedData.mobile
+        } | ${this.state.clickedData.email}`
+      })
+      await this.getResumeDetail(this.state.clickedData.rm_code)
+    }
+  }
   peopleModal = () => {
     let schoolDetail = this.state.resumeDetailData[0].school
       .split(`\\n`)
@@ -1258,7 +1293,7 @@ export default class People extends Component {
       ))
 
     return (
-      <div>
+      <div onKeyDown={this.arrowKeyPush}>
         <br />
         <InputGroup compact>
           <Input
