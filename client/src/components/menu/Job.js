@@ -32,7 +32,8 @@ export default class Job extends Component {
       visible: false,
       updateVisible: false,
       detailVisible: false,
-      detailTitle: 'Job Detail'
+      detailTitle: 'Job Detail',
+      currentKey: null
     }
 
     this.columns = [
@@ -238,13 +239,19 @@ export default class Job extends Component {
       const pagination = { ...this.state.pagination }
       // Read total count from server
       // pagination.total = data.totalCount
-      console.log('data.data.result', data.data.result)
+      // console.log('data.data.result', data.data.result)
+
+      const result = data.data.result.map((row, i) => {
+        const each = Object.assign({}, row)
+        each.key = i
+        return each
+      })
 
       let aliveArr = []
       let expiredArr = []
       let holdArr = []
 
-      data.data.result.forEach(data => {
+      result.forEach(data => {
         if (data.valid === 'alive') aliveArr.push(data)
         if (data.valid === 'expired') expiredArr.push(data)
         if (data.valid === 'hold') holdArr.push(data)
@@ -281,6 +288,34 @@ export default class Job extends Component {
         data: positionSort,
         pagination
       })
+    })
+  }
+
+  onLeftClick = async () => {
+    await this.setState({ currentKey: this.state.clickedData.key - 1 })
+    for (let i = 0; i < this.state.data.length; i++) {
+      if (this.state.data[i].key === this.state.currentKey) {
+        await this.setState({ clickedData: this.state.data[i] })
+      }
+    }
+    await this.setState({
+      detailTitle: `${this.state.clickedData.company} ${
+        this.state.clickedData.title
+      } | ${this.state.clickedData.valid.toUpperCase()}`
+    })
+  }
+
+  onRightClick = async () => {
+    await this.setState({ currentKey: this.state.clickedData.key + 1 })
+    for (let i = 0; i < this.state.data.length; i++) {
+      if (this.state.data[i].key === this.state.currentKey) {
+        await this.setState({ clickedData: this.state.data[i] })
+      }
+    }
+    await this.setState({
+      detailTitle: `${this.state.clickedData.company} ${
+        this.state.clickedData.title
+      } | ${this.state.clickedData.valid.toUpperCase()}`
     })
   }
 
@@ -419,58 +454,92 @@ export default class Job extends Component {
         width="80%"
       >
         <Row style={{ textAlign: 'left' }}>
-          <Col>
+          <Col span={2} />
+          <Col span={20}>
             <h3>[ Company ]</h3>
           </Col>
+          <Col span={2} />
         </Row>
         <Row style={{ textAlign: 'left' }}>
+          <Col span={2} />
           <Col span={20}>
             <p>{this.state.clickedData.company}</p>
           </Col>
+          <Col span={2} />
         </Row>
         <Divider />
         <Row style={{ textAlign: 'left' }}>
+          <Col span={2} />
           <Col span={20}>
             <h3>[ Position ]</h3>
           </Col>
+          <Col span={2} />
         </Row>
         <Row style={{ textAlign: 'left' }}>
+          <Col span={2} />
           <Col span={20}>
             <p>{this.state.clickedData.title}</p>
           </Col>
+          <Col span={2} />
         </Row>
         <Divider />
         <Row style={{ textAlign: 'left' }}>
+          <Col span={2} />
           <Col span={20}>
             <h3>[ Keywords ]</h3>
           </Col>
+          <Col span={2} />
         </Row>
         <Row style={{ textAlign: 'left' }}>
+          <Col span={2} style={{ textAlign: 'left' }}>
+            <Button
+              type="primary"
+              icon="left"
+              value="large"
+              onClick={this.onLeftClick}
+            />
+          </Col>
           <Col span={20}>
             <p>{this.state.clickedData.keyword}</p>
           </Col>
+          <Col span={2} style={{ textAlign: 'right' }}>
+            <Button
+              type="primary"
+              icon="right"
+              value="large"
+              onClick={this.onRightClick}
+            />
+          </Col>
         </Row>
         <Divider />
         <Row style={{ textAlign: 'left' }}>
+          <Col span={2} />
           <Col span={20}>
             <h3>[ Detail ]</h3>
           </Col>
+          <Col span={2} />
         </Row>
         <Row style={{ textAlign: 'left' }}>
+          <Col span={2} />
           <Col span={20}>
             <p>{this.state.clickedData.detail}</p>
           </Col>
+          <Col span={2} />
         </Row>
         <Divider />
         <Row style={{ textAlign: 'left' }}>
+          <Col span={2} />
           <Col span={20}>
             <h3>[ Modified Date ]</h3>
           </Col>
+          <Col span={2} />
         </Row>
         <Row style={{ textAlign: 'left' }}>
+          <Col span={2} />
           <Col span={20}>
             <p>{this.state.clickedData.modified_date}</p>
           </Col>
+          <Col span={2} />
         </Row>
       </Modal>
     </div>
