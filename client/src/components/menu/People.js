@@ -669,47 +669,37 @@ export default class People extends Component {
   }
 
   onLeftClick = async () => {
-    const { clickedData } = this.state
-    const resumeTitle = {
-      mobile:
-        clickedData.mobile && clickedData.mobile !== 'null'
-          ? clickedData.mobile
-          : '등록된 번호 없음',
-      email:
-        clickedData.email && clickedData.email !== 'null'
-          ? clickedData.email
-          : '등록된 이메일 없음',
-      gender:
-        clickedData.gender && clickedData.gender !== 'nu'
-          ? clickedData.gender
-          : '등록된 성별 없음',
-      birth:
-        clickedData.birth && clickedData.birth !== 'null'
-          ? clickedData.birth
-          : '등록된 나이 없음',
-      name:
-        clickedData.name && clickedData.name !== 'null'
-          ? clickedData.name
-          : '등록된 이름 없음'
-    }
-    await this.setState({
-      resumeDetailTitle: `${resumeTitle.name} | ${resumeTitle.birth} | ${
-        resumeTitle.gender
-      } | ${resumeTitle.mobile} | ${resumeTitle.email}`
-    })
+
     await this.setState({ currentKey: this.state.clickedData.key - 1 })
     for (let i = 0; i < this.state.dataSource.length; i++) {
       if (this.state.dataSource[i].key === this.state.currentKey) {
         await this.setState({ clickedData: this.state.dataSource[i] })
       }
     }
-    // await this.setState({
-    //   resumeDetailTitle: `${this.state.clickedData.name} ${
-    //     this.state.clickedData.birth
-    //   } | ${this.state.clickedData.gender} | ${
-    //     this.state.clickedData.mobile
-    //   } | ${this.state.clickedData.email}`
-    // })
+    const { clickedData } = await this.state
+      
+    const resumeTitle = await {
+     mobile:
+       clickedData.mobile && clickedData.mobile !== 'null'
+         ? clickedData.mobile
+         : '등록된 번호 없음',
+     email:
+       clickedData.email && clickedData.email !== 'null'
+         ? clickedData.email
+         : '등록된 이메일 없음',
+     gender:
+       clickedData.gender && clickedData.gender !== 'nu'
+         ? clickedData.gender
+         : '등록된 성별 없음',
+     birth:
+       clickedData.birth && clickedData.birth !== 'null'
+         ? clickedData.birth
+         : '등록된 나이 없음',
+     name:
+       clickedData.name && clickedData.name !== 'null'
+         ? clickedData.name
+         : '등록된 이름 없음'
+   }
     await this.setState({
       resumeDetailTitle: `${resumeTitle.name} | ${resumeTitle.birth} | ${
         resumeTitle.gender
@@ -719,8 +709,16 @@ export default class People extends Component {
   }
 
   onRightClick = async () => {
-    const { clickedData } = this.state
-    const resumeTitle = {
+  
+    await this.setState({ currentKey: this.state.clickedData.key + 1 })
+    for (let i = 0; i < this.state.dataSource.length; i++) {
+      if (this.state.dataSource[i].key === this.state.currentKey) {
+        await this.setState({ clickedData: this.state.dataSource[i] })
+      }
+    }
+    const { clickedData } = await this.state
+      
+     const resumeTitle = await {
       mobile:
         clickedData.mobile && clickedData.mobile !== 'null'
           ? clickedData.mobile
@@ -742,19 +740,6 @@ export default class People extends Component {
           ? clickedData.name
           : '등록된 이름 없음'
     }
-    await this.setState({ currentKey: this.state.clickedData.key + 1 })
-    for (let i = 0; i < this.state.dataSource.length; i++) {
-      if (this.state.dataSource[i].key === this.state.currentKey) {
-        await this.setState({ clickedData: this.state.dataSource[i] })
-      }
-    }
-    // await this.setState({
-    //   resumeDetailTitle: `${this.state.clickedData.name} ${
-    //     this.state.clickedData.birth
-    //   } | ${this.state.clickedData.gender} | ${
-    //     this.state.clickedData.mobile
-    //   } | ${this.state.clickedData.email}`
-    // })
     await this.setState({
       resumeDetailTitle: `${resumeTitle.name} | ${resumeTitle.birth} | ${
         resumeTitle.gender
@@ -763,123 +748,6 @@ export default class People extends Component {
     await this.getResumeDetail(this.state.clickedData.rm_code)
   }
 
-  // peopleModal = () => {
-  //   let schoolDetail = this.state.resumeDetailData[0].school
-  //     .split(`\\n`)
-  //     .map(line => {
-  //       return (
-  //         <span>
-  //           {line}
-  //           <br />
-  //         </span>
-  //       )
-  //     })
-
-  //   let companyDetail = this.state.resumeDetailData[0].company
-  //     // .split('null')
-  //     .split(`\\n`)
-  //     .map(line => {
-  //       return (
-  //         <span>
-  //           {line}
-  //           <br />
-  //         </span>
-  //       )
-  //     })
-
-  //   let othersDetail = this.state.resumeDetailData[0].others
-  //     .split(`\\n`)
-  //     .map(line => {
-  //       return (
-  //         <span>
-  //           {line}
-  //           <br />
-  //         </span>
-  //       )
-  //     })
-
-  //   return (
-  //     <div>
-  //       <Modal
-  //         title={this.state.resumeDetailTitle}
-  //         visible={this.state.visible}
-  //         onOk={this.handleOk}
-  //         onCancel={this.handleCancel}
-  //         footer={null}
-  //         width="50%"
-  //       >
-  //         <Row style={{ textAlign: 'left' }}>
-  //           <Col span={2} />
-  //           <Col span={20}>
-  //             <h3>[ School ]</h3>
-  //           </Col>
-  //         </Row>
-  //         <Row style={{ textAlign: 'left' }}>
-  //           <Col span={2} />
-  //           <Col span={20}>
-  //             {/* <p>{this.state.resumeDetailData[0].school}</p> */}
-  //             <p>{schoolDetail}</p>
-  //           </Col>
-  //         </Row>
-  //         <Divider />
-  //         <Row style={{ textAlign: 'left' }}>
-  //           <Col span={2} />
-  //           <Col span={20}>
-  //             <h3>[ Company ]</h3>
-  //           </Col>
-  //         </Row>
-  //         <Row style={{ textAlign: 'left' }}>
-  //           <Col span={18}>
-  //             <p>{companyDetail}</p>
-  //             {/* <p>{this.state.resumeDetailData[0].company}</p> */}
-  //           </Col>
-  //         </Row>
-  //         <Divider />
-  //         <Row style={{ textAlign: 'left' }}>
-  //           <Col span={18}>
-  //             <h3>[ Others ]</h3>
-  //           </Col>
-  //         </Row>
-  //         <Row style={{ textAlign: 'left' }}>
-  //           <Col span={20}>
-  //             {this.state.resumeDetailData[0].others.length > 200 ? (
-  //               <details>
-  //                 <summary>
-  //                   {this.state.resumeDetailData[0].others.slice(0, 40)}
-  //                 </summary>
-  //                 <p>{othersDetail}</p>
-  //                 {/* <p>{this.state.resumeDetailData[0].others}</p> */}
-  //               </details>
-  //             ) : (
-  //               othersDetail
-  //               // this.state.resumeDetailData[0].others
-  //             )}
-  //           </Col>
-  //         </Row>
-  //         <this.memoTable />
-  //         <Divider />
-  //         <Row>
-  //           <Col span={6}>
-  //             <Button
-  //               type="primary"
-  //               icon="left"
-  //               value="large"
-  //               onClick={this.onLeftClick}
-  //             />
-  //           </Col>
-  //           <Col span={18} style={{ textAlign: 'right' }}>
-  //             <Button
-  //               type="primary"
-  //               icon="right"
-  //               value="large"
-  //               onClick={this.onRightClick}
-  //             />
-  //           </Col>
-  //         </Row>
-  //       </Modal>
-  //     </div>
-  //   )
-  // }
   arrowKeyPush = async event => {
     if (this.state.visible && event.keyCode === 37) {
       this.onLeftClick()
