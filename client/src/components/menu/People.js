@@ -821,36 +821,9 @@ export default class People extends Component {
   // }
   arrowKeyPush = async event => {
     if (this.state.visible && event.keyCode === 37) {
-      // left arrow
-      await this.setState({ currentKey: this.state.clickedData.key - 1 })
-      for (let i = 0; i < this.state.dataSource.length; i++) {
-        if (this.state.dataSource[i].key === this.state.currentKey) {
-          await this.setState({ clickedData: this.state.dataSource[i] })
-        }
-      }
-      await this.setState({
-        resumeDetailTitle: `${this.state.clickedData.name} ${
-          this.state.clickedData.birth
-        } | ${this.state.clickedData.gender} | ${
-          this.state.clickedData.mobile
-        } | ${this.state.clickedData.email}`
-      })
-      await this.getResumeDetail(this.state.clickedData.rm_code)
+      this.onLeftClick()
     } else if (this.state.visible && event.keyCode === 39) {
-      await this.setState({ currentKey: this.state.clickedData.key + 1 })
-      for (let i = 0; i < this.state.dataSource.length; i++) {
-        if (this.state.dataSource[i].key === this.state.currentKey) {
-          await this.setState({ clickedData: this.state.dataSource[i] })
-        }
-      }
-      await this.setState({
-        resumeDetailTitle: `${this.state.clickedData.name} ${
-          this.state.clickedData.birth
-        } | ${this.state.clickedData.gender} | ${
-          this.state.clickedData.mobile
-        } | ${this.state.clickedData.email}`
-      })
-      await this.getResumeDetail(this.state.clickedData.rm_code)
+      this.onRightClick()
     }
   }
   peopleModal = () => {
