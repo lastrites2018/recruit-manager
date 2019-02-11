@@ -4,11 +4,11 @@ jobs:
     docker:
       - image: circleci/node:8
 
-    working_directory: ~/client
+    working_directory: ~/recruit-manager/client
 
     steps:
-      - checkout
-        path: ~/
+      - checkout:
+        path: ~/recruit-manager
 
       - restore_cache:
           keys:
