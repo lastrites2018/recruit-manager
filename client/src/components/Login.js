@@ -56,7 +56,7 @@ export default class Login extends Component {
               <Grid.Column style={{ maxWidth: 450 }}>
                 <Header as="h2" color="red" textAlign="center">
                   <Image src="/favicon.ico" />
-                  Login to your account
+                  Sign in to your account
                 </Header>
                 <Form size="large" onSubmit={() => this._checkLogin()}>
                   <Segment stacked>
