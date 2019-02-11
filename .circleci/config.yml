@@ -31,5 +31,4 @@ jobs:
       - run: sudo pip install awscli --upgrade
       - run: aws --version
       - run: aws s3 ls
-      - run: ls -l
-      - run: yarn run deploy
+      - run: yarn deploy
