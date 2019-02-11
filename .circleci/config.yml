@@ -2,9 +2,9 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/node:7.10
+      - image: circleci/node:8
 
-    working_directory: ~/client
+    working_directory: ~/client/src
 
     steps:
       - checkout
