@@ -8,7 +8,7 @@ jobs:
 
     steps:
       - checkout
-      - run: ls -l ~/client
+        path: ~/client
 
       - restore_cache:
           keys:
