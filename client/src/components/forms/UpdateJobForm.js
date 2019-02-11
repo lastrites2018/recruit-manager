@@ -70,14 +70,20 @@ class UpdateJobForm extends React.Component {
     console.log('this.props.selected', this.props.selected)
     const { getFieldDecorator } = this.props.form
 
+    console.log('getFieldDecorator')
+
     const formItemLayout = {
       labelCol: {
-        xs: { span: 24 },
-        sm: { span: 8 }
+        xs: { span: 12 },
+        sm: { span: 4 }
+        // xs: { span: 24 },
+        // sm: { span: 8 }
       },
       wrapperCol: {
-        xs: { span: 24 },
-        sm: { span: 16 }
+        xs: { span: 18 },
+        sm: { span: 18 }
+        // xs: { span: 24 },
+        // sm: { span: 16 }
       }
     }
     const tailFormItemLayout = {
@@ -151,10 +157,13 @@ class UpdateJobForm extends React.Component {
             rules: [{ required: true, message: 'Please fill in the company.' }]
           })(<Input />)}
         </Form.Item>
-        <Form.Item {...formItemLayout} label="Notes">
+        <Form.Item label="Notes">
+          {/* <Form.Item {...formItemLayout} label="Notes"> */}
           {getFieldDecorator('notes', {
             initialValue: this.props.selected.detail
-          })(<Input.TextArea rows={4} />)}
+          })(
+            <Input.TextArea rows={4} autosize={{ minRows: 4, maxRows: 25 }} />
+          )}
         </Form.Item>
 
         <Form.Item {...formItemLayout} label="Keywords">
