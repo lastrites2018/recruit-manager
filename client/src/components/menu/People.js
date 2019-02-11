@@ -163,7 +163,7 @@ export default class People extends Component {
       // },
       {
         key: 'modified_date', //날짜에 맞게 데이터 맞게 들어왔는지 확인용
-        title: '마지막 수정 일자(테스트용)',
+        title: '마지막 수정 일시',
         dataIndex: 'modified_date',
         width: 120,
         ...this.getColumnSearchProps('modified_date')
@@ -669,156 +669,92 @@ export default class People extends Component {
   }
 
   onLeftClick = async () => {
+
     await this.setState({ currentKey: this.state.clickedData.key - 1 })
     for (let i = 0; i < this.state.dataSource.length; i++) {
       if (this.state.dataSource[i].key === this.state.currentKey) {
         await this.setState({ clickedData: this.state.dataSource[i] })
       }
     }
+    const { clickedData } = await this.state
+      
+    const resumeTitle = await {
+     mobile:
+       clickedData.mobile && clickedData.mobile !== 'null'
+         ? clickedData.mobile
+         : '등록된 번호 없음',
+     email:
+       clickedData.email && clickedData.email !== 'null'
+         ? clickedData.email
+         : '등록된 이메일 없음',
+     gender:
+       clickedData.gender && clickedData.gender !== 'nu'
+         ? clickedData.gender
+         : '등록된 성별 없음',
+     birth:
+       clickedData.birth && clickedData.birth !== 'null'
+         ? clickedData.birth
+         : '등록된 나이 없음',
+     name:
+       clickedData.name && clickedData.name !== 'null'
+         ? clickedData.name
+         : '등록된 이름 없음'
+   }
     await this.setState({
-      resumeDetailTitle: `${this.state.clickedData.name} ${
-        this.state.clickedData.birth
-      } | ${this.state.clickedData.gender} | ${
-        this.state.clickedData.mobile
-      } | ${this.state.clickedData.email}`
+      resumeDetailTitle: `${resumeTitle.name} | ${resumeTitle.birth} | ${
+        resumeTitle.gender
+      } | ${resumeTitle.mobile} | ${resumeTitle.email}`
     })
     await this.getResumeDetail(this.state.clickedData.rm_code)
   }
 
   onRightClick = async () => {
+  
     await this.setState({ currentKey: this.state.clickedData.key + 1 })
     for (let i = 0; i < this.state.dataSource.length; i++) {
       if (this.state.dataSource[i].key === this.state.currentKey) {
         await this.setState({ clickedData: this.state.dataSource[i] })
       }
     }
+    const { clickedData } = await this.state
+      
+     const resumeTitle = await {
+      mobile:
+        clickedData.mobile && clickedData.mobile !== 'null'
+          ? clickedData.mobile
+          : '등록된 번호 없음',
+      email:
+        clickedData.email && clickedData.email !== 'null'
+          ? clickedData.email
+          : '등록된 이메일 없음',
+      gender:
+        clickedData.gender && clickedData.gender !== 'nu'
+          ? clickedData.gender
+          : '등록된 성별 없음',
+      birth:
+        clickedData.birth && clickedData.birth !== 'null'
+          ? clickedData.birth
+          : '등록된 나이 없음',
+      name:
+        clickedData.name && clickedData.name !== 'null'
+          ? clickedData.name
+          : '등록된 이름 없음'
+    }
     await this.setState({
-      resumeDetailTitle: `${this.state.clickedData.name} ${
-        this.state.clickedData.birth
-      } | ${this.state.clickedData.gender} | ${
-        this.state.clickedData.mobile
-      } | ${this.state.clickedData.email}`
+      resumeDetailTitle: `${resumeTitle.name} | ${resumeTitle.birth} | ${
+        resumeTitle.gender
+      } | ${resumeTitle.mobile} | ${resumeTitle.email}`
     })
     await this.getResumeDetail(this.state.clickedData.rm_code)
   }
 
-  // peopleModal = () => {
-  //   let schoolDetail = this.state.resumeDetailData[0].school
-  //     .split(`\\n`)
-  //     .map(line => {
-  //       return (
-  //         <span>
-  //           {line}
-  //           <br />
-  //         </span>
-  //       )
-  //     })
-
-  //   let companyDetail = this.state.resumeDetailData[0].company
-  //     // .split('null')
-  //     .split(`\\n`)
-  //     .map(line => {
-  //       return (
-  //         <span>
-  //           {line}
-  //           <br />
-  //         </span>
-  //       )
-  //     })
-
-  //   let othersDetail = this.state.resumeDetailData[0].others
-  //     .split(`\\n`)
-  //     .map(line => {
-  //       return (
-  //         <span>
-  //           {line}
-  //           <br />
-  //         </span>
-  //       )
-  //     })
-
-  //   return (
-  //     <div>
-  //       <Modal
-  //         title={this.state.resumeDetailTitle}
-  //         visible={this.state.visible}
-  //         onOk={this.handleOk}
-  //         onCancel={this.handleCancel}
-  //         footer={null}
-  //         width="50%"
-  //       >
-  //         <Row style={{ textAlign: 'left' }}>
-  //           <Col span={2} />
-  //           <Col span={20}>
-  //             <h3>[ School ]</h3>
-  //           </Col>
-  //         </Row>
-  //         <Row style={{ textAlign: 'left' }}>
-  //           <Col span={2} />
-  //           <Col span={20}>
-  //             {/* <p>{this.state.resumeDetailData[0].school}</p> */}
-  //             <p>{schoolDetail}</p>
-  //           </Col>
-  //         </Row>
-  //         <Divider />
-  //         <Row style={{ textAlign: 'left' }}>
-  //           <Col span={2} />
-  //           <Col span={20}>
-  //             <h3>[ Company ]</h3>
-  //           </Col>
-  //         </Row>
-  //         <Row style={{ textAlign: 'left' }}>
-  //           <Col span={18}>
-  //             <p>{companyDetail}</p>
-  //             {/* <p>{this.state.resumeDetailData[0].company}</p> */}
-  //           </Col>
-  //         </Row>
-  //         <Divider />
-  //         <Row style={{ textAlign: 'left' }}>
-  //           <Col span={18}>
-  //             <h3>[ Others ]</h3>
-  //           </Col>
-  //         </Row>
-  //         <Row style={{ textAlign: 'left' }}>
-  //           <Col span={20}>
-  //             {this.state.resumeDetailData[0].others.length > 200 ? (
-  //               <details>
-  //                 <summary>
-  //                   {this.state.resumeDetailData[0].others.slice(0, 40)}
-  //                 </summary>
-  //                 <p>{othersDetail}</p>
-  //                 {/* <p>{this.state.resumeDetailData[0].others}</p> */}
-  //               </details>
-  //             ) : (
-  //               othersDetail
-  //               // this.state.resumeDetailData[0].others
-  //             )}
-  //           </Col>
-  //         </Row>
-  //         <this.memoTable />
-  //         <Divider />
-  //         <Row>
-  //           <Col span={6}>
-  //             <Button
-  //               type="primary"
-  //               icon="left"
-  //               value="large"
-  //               onClick={this.onLeftClick}
-  //             />
-  //           </Col>
-  //           <Col span={18} style={{ textAlign: 'right' }}>
-  //             <Button
-  //               type="primary"
-  //               icon="right"
-  //               value="large"
-  //               onClick={this.onRightClick}
-  //             />
-  //           </Col>
-  //         </Row>
-  //       </Modal>
-  //     </div>
-  //   )
-  // }
+  arrowKeyPush = async event => {
+    if (this.state.visible && event.keyCode === 37) {
+      this.onLeftClick()
+    } else if (this.state.visible && event.keyCode === 39) {
+      this.onRightClick()
+    }
+  }
   peopleModal = () => {
     let schoolDetail = this.state.resumeDetailData[0].school
       .split(`\\n`)
@@ -1258,7 +1194,7 @@ export default class People extends Component {
       ))
 
     return (
-      <div>
+      <div onKeyDown={this.arrowKeyPush}>
         <br />
         <InputGroup compact>
           <Input

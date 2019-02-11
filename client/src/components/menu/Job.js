@@ -241,17 +241,11 @@ export default class Job extends Component {
       // pagination.total = data.totalCount
       // console.log('data.data.result', data.data.result)
 
-      const result = data.data.result.map((row, i) => {
-        const each = Object.assign({}, row)
-        each.key = i
-        return each
-      })
-
       let aliveArr = []
       let expiredArr = []
       let holdArr = []
 
-      result.forEach(data => {
+      data.data.result.forEach(data => {
         if (data.valid === 'alive') aliveArr.push(data)
         if (data.valid === 'expired') expiredArr.push(data)
         if (data.valid === 'hold') holdArr.push(data)
@@ -281,11 +275,17 @@ export default class Job extends Component {
       })
       const positionSort = aliveArr.concat(holdArr).concat(expiredArr)
 
+      const ketAddedPositionSort = positionSort.map((row, i) => {
+        const each = Object.assign({}, row)
+        each.key = i
+        return each
+      })
+
       // console.log('positionSort', positionSort)
 
       this.setState({
         loading: false,
-        data: positionSort,
+        data: ketAddedPositionSort,
         pagination
       })
     })
@@ -299,10 +299,25 @@ export default class Job extends Component {
       }
     }
     await this.setState({
-      detailTitle: `${this.state.clickedData.company} ${
-        this.state.clickedData.title
-      } | ${this.state.clickedData.valid.toUpperCase()}`
+      detailTitle: this.detailTitle()
     })
+  }
+
+  detailTitle = () => (
+    <span>
+      {this.state.clickedData.company} {this.state.clickedData.title} |{' '}
+      {this.state.clickedData.modified_date} |{' '}
+      {this.tagColor(this.state.clickedData.valid)}
+    </span>
+  )
+
+  tagColor = tag => {
+    let color
+    if (tag === 'alive') color = 'geekblue'
+    else if (tag === 'hold') color = 'purple'
+    else if (tag === 'expired') color = 'gray'
+
+    return <Tag color={color}>{tag}</Tag>
   }
 
   onRightClick = async () => {
@@ -313,9 +328,7 @@ export default class Job extends Component {
       }
     }
     await this.setState({
-      detailTitle: `${this.state.clickedData.company} ${
-        this.state.clickedData.title
-      } | ${this.state.clickedData.valid.toUpperCase()}`
+      detailTitle: this.detailTitle()
     })
   }
 
@@ -402,6 +415,15 @@ export default class Job extends Component {
     message.error('Delete canceled.')
   }
 
+  arrowKeyPush = async event => {
+    if (this.state.detailVisible && event.keyCode === 37) {
+      // left arrow
+      this.onLeftClick()
+    } else if (this.state.detailVisible && event.keyCode === 39) {
+      this.onRightClick()
+    }
+  }
+
   jobModal = () => (
     <div>
       <Modal
@@ -427,6 +449,7 @@ export default class Job extends Component {
     <div>
       <Modal
         title=""
+        width="50%"
         visible={this.state.updateVisible}
         onOk={this.handleUpdateModalOk}
         onCancel={this.handleUpdateModalCancel}
@@ -527,7 +550,7 @@ export default class Job extends Component {
           <Col span={2} />
         </Row>
         <Divider />
-        <Row style={{ textAlign: 'left' }}>
+        {/* <Row style={{ textAlign: 'left' }}>
           <Col span={2} />
           <Col span={20}>
             <h3>[ Modified Date ]</h3>
@@ -540,7 +563,7 @@ export default class Job extends Component {
             <p>{this.state.clickedData.modified_date}</p>
           </Col>
           <Col span={2} />
-        </Row>
+        </Row> */}
       </Modal>
     </div>
   )
@@ -548,9 +571,7 @@ export default class Job extends Component {
   handleClick = async clickedData => {
     await this.setState({ clickedData })
     await this.setState({
-      detailTitle: `${clickedData.company} | ${
-        clickedData.title
-      } | ${clickedData.valid.toUpperCase()}`
+      detailTitle: this.detailTitle()
     })
     await this.showDetailModal()
   }
@@ -610,7 +631,7 @@ export default class Job extends Component {
     const editButtonToolTip = <span>편집을 위해서는 하나만 선택해주세요.</span>
 
     return (
-      <div style={{ marginLeft: '20px' }}>
+      <div style={{ marginLeft: '20px' }} onKeyDown={this.arrowKeyPush}>
         <div style={{ marginTop: '16px', width: '85%' }}>
           <Button
             style={{ marginRight: 5, marginBottom: 16 }}
