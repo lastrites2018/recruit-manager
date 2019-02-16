@@ -150,7 +150,7 @@ class SmsForm extends React.Component {
         {selectedRows.length !== 0 ? (
           <Form.Item label="Positions: " {...formItemLayout} hasFeedback>
             {getFieldDecorator('select', {
-              rules: positionRule
+              // rules: positionRule
             })(
               <Select
                 // value={position}
@@ -192,7 +192,7 @@ class SmsForm extends React.Component {
           <Button
             type="primary"
             htmlType="submit"
-            disabled={selectedRows.length >= 1 && !!!position}
+            // disabled={selectedRows.length >= 1 && !!!position}
           >
             SEND
           </Button>
