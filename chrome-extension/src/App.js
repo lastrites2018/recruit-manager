@@ -1,31 +1,20 @@
-import React, { Component } from 'react'
-import { Container, Header } from 'semantic-ui-react'
-
-// const userStyle = {
-//   textAlign: 'right'
-// }
+/*global chrome*/
+import React, { Component } from "react";
 
 class App extends Component {
+  constructor(props) {
+    super(props);
+    chrome.runtime.sendMessage({ action: "popupOpen" });
+  }
+
   render() {
     return (
-      <Container>
-        <Header as='h1'>Recruit Manager</Header>
-        <Header as='h3'>Name | Company</Header>
-        <div>Total Time: </div>
-        <div>Today's Resume: </div>
-        <div>Mail: </div>
-        <div>SMS: </div>
-        <br></br>
-        <Header as='h4'>[History]</Header>
-        <div>Viewed By CS. Lee | CS Kim | </div>
-        <Header as='h4'>[Position]</Header>
-        <div>SKT 텔레콤 Big Data Engineer | 2018.11.20 | CS Lee</div>
-        <div>Naver Clova Team  | 2018.11.19 | CS Kim</div>
-        <div>SDS Data Scientist | 2018.11.18 | CS Lee</div>
-        <br></br>
-      </Container>
-    )
+      <div>
+        <h1>Recruit Manager</h1>
+        <h3>Sangmo Kang | Careersherpa</h3>
+      </div>
+    );
   }
-} 
+}
 
 export default App;
