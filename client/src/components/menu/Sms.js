@@ -255,6 +255,21 @@ export default class SMS extends Component {
     await console.log('state', this.state.sms)
     await console.log('selected rows: ', this.state.selectedRowKeys)
     await console.log('preparing to send')
+    if (this.state.selectedRowKeys.length === 0) {
+      try {
+        await Axios.post(API.sendSMS, {
+          user_id: this.props.user_id,
+          rm_code: '',
+          recipient: this.state.sms.receiver,
+          body: this.state.sms.content,
+          position: ''
+        })
+        await console.log(`${this.state.sms.receiver}에 문자를 보냈습니다.`)
+        // await this.resetSelections()
+      } catch (err) {
+        console.log('send one SMS error', err)
+      }
+    }
     if (this.state.selectedRowKeys.length === 1) {
       try {
         await Axios.post(API.sendSMS, {
