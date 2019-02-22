@@ -155,6 +155,13 @@ export default class People extends Component {
           )
         }
       },
+      {
+        key: 'website',
+        title: 'WEBSITE',
+        dataIndex: 'website',
+        align: 'center',
+        ...this.getColumnSearchProps('website')
+      },
       // {
       //   key: 'email', //날짜에 맞게 데이터 맞게 들어왔는지 확인용
       //   title: 'email(테스트용)',
@@ -168,22 +175,6 @@ export default class People extends Component {
         width: 120,
         ...this.getColumnSearchProps('modified_date')
       }
-      // {
-      //   title: 'Action',
-      //   dataIndex: '',
-      //   // 이건 나중에 지워서 breadcrumb 으로 만들기
-      //   // row 삭제 api 필요 예) delete/rm_code/10 이런식
-      //   // 현재 row onClick 하면 모달이랑 같이 뜸.
-      //   render: (text, record) =>
-      //     this.state.dataSource.length >= 1 ? (
-      //       <Popconfirm
-      //         title="삭제?"
-      //         onConfirm={() => this.handleDelete(record.key)}
-      //       >
-      //         <a href="javascript:">삭제</a>
-      //       </Popconfirm>
-      //     ) : null
-      // }
     ]
   }
 
@@ -513,6 +504,10 @@ export default class People extends Component {
       const result = data.data.result.reverse().map((row, i) => {
         const each = Object.assign({}, row)
         each.key = i
+        if (each.url.includes('jobkorea')) each.website = 'jobkorea'
+        else if (each.url.includes('saramin')) each.website = 'saramin'
+        else if (each.url.includes('linkedin')) each.website = 'linkedin'
+        else if (each.url.includes('incruit')) each.website = 'incruit'
         return each
       })
       console.log('fetch-result', result)
@@ -669,7 +664,6 @@ export default class People extends Component {
   }
 
   onLeftClick = async () => {
-
     await this.setState({ currentKey: this.state.clickedData.key - 1 })
     for (let i = 0; i < this.state.dataSource.length; i++) {
       if (this.state.dataSource[i].key === this.state.currentKey) {
@@ -677,29 +671,29 @@ export default class People extends Component {
       }
     }
     const { clickedData } = await this.state
-      
+
     const resumeTitle = await {
-     mobile:
-       clickedData.mobile && clickedData.mobile !== 'null'
-         ? clickedData.mobile
-         : '등록된 번호 없음',
-     email:
-       clickedData.email && clickedData.email !== 'null'
-         ? clickedData.email
-         : '등록된 이메일 없음',
-     gender:
-       clickedData.gender && clickedData.gender !== 'nu'
-         ? clickedData.gender
-         : '등록된 성별 없음',
-     birth:
-       clickedData.birth && clickedData.birth !== 'null'
-         ? clickedData.birth
-         : '등록된 나이 없음',
-     name:
-       clickedData.name && clickedData.name !== 'null'
-         ? clickedData.name
-         : '등록된 이름 없음'
-   }
+      mobile:
+        clickedData.mobile && clickedData.mobile !== 'null'
+          ? clickedData.mobile
+          : '등록된 번호 없음',
+      email:
+        clickedData.email && clickedData.email !== 'null'
+          ? clickedData.email
+          : '등록된 이메일 없음',
+      gender:
+        clickedData.gender && clickedData.gender !== 'nu'
+          ? clickedData.gender
+          : '등록된 성별 없음',
+      birth:
+        clickedData.birth && clickedData.birth !== 'null'
+          ? clickedData.birth
+          : '등록된 나이 없음',
+      name:
+        clickedData.name && clickedData.name !== 'null'
+          ? clickedData.name
+          : '등록된 이름 없음'
+    }
     await this.setState({
       resumeDetailTitle: `${resumeTitle.name} | ${resumeTitle.birth} | ${
         resumeTitle.gender
@@ -709,7 +703,6 @@ export default class People extends Component {
   }
 
   onRightClick = async () => {
-  
     await this.setState({ currentKey: this.state.clickedData.key + 1 })
     for (let i = 0; i < this.state.dataSource.length; i++) {
       if (this.state.dataSource[i].key === this.state.currentKey) {
@@ -717,8 +710,8 @@ export default class People extends Component {
       }
     }
     const { clickedData } = await this.state
-      
-     const resumeTitle = await {
+
+    const resumeTitle = await {
       mobile:
         clickedData.mobile && clickedData.mobile !== 'null'
           ? clickedData.mobile
