@@ -15,6 +15,18 @@
     "128": "logo.png"
   },
   "content_security_policy": "script-src 'self' 'sha256-GgRxrVOKNdB4LrRsVPDSbzvfdV4UqglmviH9GoBJ5jk='; object-src 'self'",
-  "permissions": [
+  "permissions": ["tabs", "activeTab", "background"],
+  "background": {
+    "scripts": ["background.js"]
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.linkedin.com/*",
+        "*://*.jobkorea.co.kr/*",
+        "*://*.saramin.co.kr/*"
+      ],
+      "js": ["content.js"]
+    }
   ]
 }
