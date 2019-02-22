@@ -1,35 +1,90 @@
 /*global chrome*/
+const tabInfo = { url: null, html: null, candidate: {} };
+
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
-  console.log(message);
   switch (message.action) {
     case "popupOpen": {
-      chrome.tabs.executeScript(
-        null,
-        { code: "var html = document.documentElement.outerHTML; html" },
-        function(result) {
-          console.log(result);
-        }
-      );
-      chrome.tabs.executeScript(
-        null,
-        {
-          code:
-            "var name = document.querySelector('#resume_print_area > div > div.section_profile > div.personal_info.case1 > div.my_data > p > em').innerHTML; var age = document.querySelector('#resume_print_area > div > div.section_profile > div.personal_info.case1 > div.my_data > p > span > span:nth-child(1)').innerHTML; var education = document.querySelector('#resume_print_area > div > div.section_profile > div.personal_info.case1 > div.dashboard > ul > li:nth-child(1) > p').innerHTML; var career = document.querySelector('#resume_print_area > div > div.section_profile > div.personal_info.case1 > div.dashboard > ul > li:nth-child(2) > p').innerHTML.trim().replace(/ +/g, ''); var salary = document.querySelector('#resume_print_area > div > div.section_profile > div.personal_info.case1 > div.dashboard > ul > li:nth-child(3) > p').innerHTML.trim(); var mail = document.querySelector('#resume_print_area > div > div.section_profile > div.personal_info.case1 > div.my_data > ul > li.mail > span').innerHTML; var cell = document.querySelector('#resume_print_area > div > div.section_profile > div.personal_info.case1 > div.my_data > ul > li.phone > span > a').innerHTML; var candidate = { name: name, age: age, career: career, salary: salary, mail: mail, cell: cell }; candidate"
-        },
-        function(candidate) {
-          console.log("candidate", candidate);
-        }
-      );
-      chrome.tabs.query({ active: true, lastFocusedWindow: true }, function(
-        tabs
-      ) {
-        var currentTab = tabs[0].url;
-        console.log(currentTab);
-      });
+      init();
+      console.log(tabInfo);
       break;
     }
     default: {
-      console.log("default");
+      console.log("no popup");
     }
   }
 });
+
+async function init() {
+  await getURL();
+  await getHTML();
+}
+
+function getURL() {
+  return chrome.tabs.query({ currentWindow: true, active: true }, function(
+    tabs
+  ) {
+    tabInfo.url = tabs[0].url;
+  });
+}
+function getHTML() {
+  return chrome.tabs.executeScript(
+    null,
+    { code: "var html = document.documentElement.outerHTML; html" },
+    function(html) {
+      tabInfo.html = html;
+      parse();
+    }
+  );
+}
+
+function parse() {
+  if (tabInfo.url && tabInfo.url.includes("saramin")) {
+    runQuery("saramin");
+  } else if (tabInfo.url && tabInfo.url.includes("jobkorea")) {
+    runQuery("jobkorea");
+  }
+}
+
+function runQuery(website) {
+  const query = {
+    saramin:
+      "var mail = document.querySelector('#resume_print_area > div > div.section_profile > div.personal_info.case1 > div.my_data > ul > li.mail > span').innerHTML; var cell = document.querySelector('#resume_print_area > div > div.section_profile > div.personal_info.case1 > div.my_data > ul > li.phone > span > a').innerHTML; var candidate = { mail: mail, cell: cell }; candidate",
+    jobkorea:
+      "var mail = document.querySelector('body > div.resume-view-page > div.resume-view-wrapper > div > div.base.profile > div.container > div > div.info-detail > div:nth-child(1) > div.value').innerHTML; var cell = document.querySelector('body > div.resume-view-page > div.resume-view-wrapper > div > div.base.profile > div.container > div > div.info-detail > div:nth-child(1) > div.value').innerHTML; var candidate = { mail: mail, cell: cell }; candidate"
+  };
+
+  for (let props in query) {
+    if (props === website) {
+      const code = query[props];
+      return chrome.tabs.executeScript(
+        null,
+        {
+          code: code
+        },
+        function(candidate) {
+          tabInfo.candidate = candidate;
+          sendRequest();
+        }
+      );
+    } else {
+      console.log("wrong website!");
+    }
+  }
+}
+
+function sendRequest() {
+  const api = "http://128.199.203.161:8500/extension/parsing";
+  const input = { user_id: "rmrm", url: tabInfo.url, html: tabInfo.html[0] };
+  const headers = {
+    "Content-Type": "application/json",
+    "Access-Control-Origin": "*"
+  };
+  fetch(api, {
+    method: "POST",
+    headers: headers,
+    body: JSON.stringify(input)
+  })
+    .then(response => response.json())
+    .then(responseJson => console.log(responseJson))
+    .catch(error => console.log(error));
+}

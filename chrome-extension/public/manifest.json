@@ -18,5 +18,15 @@
   "permissions": ["tabs", "activeTab", "background"],
   "background": {
     "scripts": ["background.js"]
-  }
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.linkedin.com/*",
+        "*://*.jobkorea.co.kr/*",
+        "*://*.saramin.co.kr/*"
+      ],
+      "js": ["content.js"]
+    }
+  ]
 }
