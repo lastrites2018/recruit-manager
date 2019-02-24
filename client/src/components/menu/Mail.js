@@ -161,14 +161,24 @@ export default class Mail extends Component {
       // Read total count from server
       // pagination.total = data.totalCount
       console.log('mail-fetch', data.data.result)
-      const mailSort = sortBy(data.data.result, [
-        function(mail) {
-          return Number(mail.mail_id.slice(5))
-        }
-      ])
+      // const mailSort = sortBy(data.data.result, [
+      //   function(mail) {
+      //     return Number(mail.mail_id.slice(5))
+      //   }
+      // ])
+
+      const dateSortedData = data.data.result.sort((a, b) => {
+        // descend
+        return (
+          new Date(b.modified_date).getTime() -
+          new Date(a.modified_date).getTime()
+        )
+      })
+
       this.setState({
         loading: false,
-        data: mailSort.reverse(),
+        data: dateSortedData,
+        // data: mailSort.reverse(),
         pagination
       })
     })
