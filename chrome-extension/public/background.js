@@ -42,6 +42,8 @@ function parse() {
     runQuery("saramin");
   } else if (tabInfo.url && tabInfo.url.includes("jobkorea")) {
     runQuery("jobkorea");
+  } else if (tabInfo.url && tabInfo.url.includes("linkedin")) {
+    sendRequest();
   }
 }
 
