@@ -38,6 +38,13 @@ export default class SMS extends Component {
         ...this.getColumnSearchProps('modified_date')
       },
       {
+        title: 'Content',
+        dataIndex: 'body',
+        width: '25%',
+        align: 'center',
+        ...this.getColumnSearchProps('body')
+      },
+      {
         title: 'Client',
         dataIndex: 'client',
         width: '50px',
@@ -50,21 +57,15 @@ export default class SMS extends Component {
         width: '50px',
         align: 'center',
         ...this.getColumnSearchProps('position')
-      },
-      {
-        title: 'Content',
-        dataIndex: 'body',
-        width: '25%',
-        align: 'center',
-        ...this.getColumnSearchProps('body')
-      },
-      {
-        title: '수신확인',
-        dataIndex: '수신확인',
-        width: '15%',
-        align: 'center',
-        ...this.getColumnSearchProps('수신확인')
       }
+
+      // {
+      //   title: '수신확인',
+      //   dataIndex: '수신확인',
+      //   width: '15%',
+      //   align: 'center',
+      //   ...this.getColumnSearchProps('수신확인')
+      // }
     ]
   }
   getColumnSearchProps = dataIndex => ({
