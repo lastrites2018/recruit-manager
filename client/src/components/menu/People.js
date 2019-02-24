@@ -115,6 +115,7 @@ export default class People extends Component {
         title: '핵심 키워드',
         dataIndex: 'keyword',
         align: 'center',
+        width: 120,
         ...this.getColumnSearchProps('keyword')
       },
       {
@@ -122,14 +123,14 @@ export default class People extends Component {
         title: 'Resume Title',
         dataIndex: 'resume_title',
         align: 'center',
-        width: 130,
+        width: 120,
         ...this.getColumnSearchProps('resume_title')
       },
       {
         key: 'salary',
         title: '연봉',
         dataIndex: 'salary',
-        width: 120,
+        width: 100,
         ...this.getColumnSearchProps('salary')
       },
       {
@@ -138,7 +139,7 @@ export default class People extends Component {
         dataIndex: 'rate',
         sorter: (a, b) => a.rate - b.rate,
         sortOrder: 'descend',
-        width: 60,
+        width: 30,
         align: 'center',
         ...this.getColumnSearchProps('rate')
       },
@@ -159,6 +160,7 @@ export default class People extends Component {
         key: 'website',
         title: 'WEBSITE',
         dataIndex: 'website',
+        width: 60,
         align: 'center',
         ...this.getColumnSearchProps('website')
       },
@@ -172,7 +174,7 @@ export default class People extends Component {
         key: 'modified_date', //날짜에 맞게 데이터 맞게 들어왔는지 확인용
         title: '마지막 수정 일시',
         dataIndex: 'modified_date',
-        width: 120,
+        width: '120',
         ...this.getColumnSearchProps('modified_date')
       }
     ]
@@ -501,7 +503,16 @@ export default class People extends Component {
       // pagination.total = data.totalCount
       pagination.total = 200
 
-      const result = data.data.result.reverse().map((row, i) => {
+      const dateSortedData = data.data.result.sort((a, b) => {
+        // descend
+        return (
+          new Date(b.modified_date).getTime() -
+          new Date(a.modified_date).getTime()
+        )
+      })
+
+      const result = dateSortedData.map((row, i) => {
+        // const result = data.data.result.reverse().map((row, i) => {
         const each = Object.assign({}, row)
         each.key = i
         if (each.url.includes('jobkorea')) each.website = 'jobkorea'
@@ -1314,7 +1325,7 @@ export default class People extends Component {
             bordered
             dataSource={dataSource}
             components={components}
-            rowKey="rm_code"
+            // rowKey="rm_code"
             loading={this.state.loading}
             rowClassName={() => 'editable-row'}
             rowSelection={rowSelection}
