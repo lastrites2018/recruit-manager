@@ -466,107 +466,107 @@ export default class Job extends Component {
     </div>
   )
 
-  detailJobModal = () => (
-    <div>
-      <Modal
-        title={this.state.detailTitle}
-        visible={this.state.detailVisible}
-        onOk={this.handleDetailModalOk}
-        onCancel={this.handleDetailModalCancel}
-        footer={null}
-        width="80%"
-      >
-        <Row style={{ textAlign: 'left' }}>
-          <Col span={2} />
-          <Col span={20}>
-            <h3>[ Company ]</h3>
-          </Col>
-          <Col span={2} />
-        </Row>
-        <Row style={{ textAlign: 'left' }}>
-          <Col span={2} />
-          <Col span={20}>
-            <p>{this.state.clickedData.company}</p>
-          </Col>
-          <Col span={2} />
-        </Row>
-        <Divider />
-        <Row style={{ textAlign: 'left' }}>
-          <Col span={2} />
-          <Col span={20}>
-            <h3>[ Position ]</h3>
-          </Col>
-          <Col span={2} />
-        </Row>
-        <Row style={{ textAlign: 'left' }}>
-          <Col span={2} />
-          <Col span={20}>
-            <p>{this.state.clickedData.title}</p>
-          </Col>
-          <Col span={2} />
-        </Row>
-        <Divider />
-        <Row style={{ textAlign: 'left' }}>
-          <Col span={2} />
-          <Col span={20}>
-            <h3>[ Keywords ]</h3>
-          </Col>
-          <Col span={2} />
-        </Row>
-        <Row style={{ textAlign: 'left' }}>
-          <Col span={2} style={{ textAlign: 'left' }}>
-            <Button
-              type="primary"
-              icon="left"
-              value="large"
-              onClick={this.onLeftClick}
-            />
-          </Col>
-          <Col span={20}>
-            <p>{this.state.clickedData.keyword}</p>
-          </Col>
-          <Col span={2} style={{ textAlign: 'right' }}>
-            <Button
-              type="primary"
-              icon="right"
-              value="large"
-              onClick={this.onRightClick}
-            />
-          </Col>
-        </Row>
-        <Divider />
-        <Row style={{ textAlign: 'left' }}>
-          <Col span={2} />
-          <Col span={20}>
-            <h3>[ Detail ]</h3>
-          </Col>
-          <Col span={2} />
-        </Row>
-        <Row style={{ textAlign: 'left' }}>
-          <Col span={2} />
-          <Col span={20}>
-            <p>{this.state.clickedData.detail}</p>
-          </Col>
-          <Col span={2} />
-        </Row>
-        <Divider />
-        {/* <Row style={{ textAlign: 'left' }}>
-          <Col span={2} />
-          <Col span={20}>
-            <h3>[ Modified Date ]</h3>
-          </Col>
-          <Col span={2} />
-        </Row>
-        <Row style={{ textAlign: 'left' }}>
-          <Col span={2} />
-          <Col span={20}>
-            <p>{this.state.clickedData.modified_date}</p>
-          </Col>
-          <Col span={2} />
-        </Row> */}
-      </Modal>
-    </div>
-  )
+  detailJobModal = () => {
+    let jobDetail =
+      this.state.clickedData.detail &&
+      this.state.clickedData.detail.split(`\n`).map(line => {
+        return (
+          <span>
+            {line}
+            <br />
+          </span>
+        )
+      })
+
+    return (
+      <div>
+        <Modal
+          title={this.state.detailTitle}
+          visible={this.state.detailVisible}
+          onOk={this.handleDetailModalOk}
+          onCancel={this.handleDetailModalCancel}
+          footer={null}
+          width="80%"
+        >
+          <Row style={{ textAlign: 'left' }}>
+            <Col span={2} />
+            <Col span={20}>
+              <h3>[ Company ]</h3>
+            </Col>
+            <Col span={2} />
+          </Row>
+          <Row style={{ textAlign: 'left' }}>
+            <Col span={2} />
+            <Col span={20}>
+              <p>{this.state.clickedData.company}</p>
+            </Col>
+            <Col span={2} />
+          </Row>
+          <Divider />
+          <Row style={{ textAlign: 'left' }}>
+            <Col span={2} />
+            <Col span={20}>
+              <h3>[ Position ]</h3>
+            </Col>
+            <Col span={2} />
+          </Row>
+          <Row style={{ textAlign: 'left' }}>
+            <Col span={2} />
+            <Col span={20}>
+              <p>{this.state.clickedData.title}</p>
+            </Col>
+            <Col span={2} />
+          </Row>
+          <Divider />
+          <Row style={{ textAlign: 'left' }}>
+            <Col span={2} />
+            <Col span={20}>
+              <h3>[ Keywords ]</h3>
+            </Col>
+            <Col span={2} />
+          </Row>
+          <Row style={{ textAlign: 'left' }}>
+            <Col span={2} style={{ textAlign: 'left' }}>
+              <Button
+                type="primary"
+                icon="left"
+                value="large"
+                onClick={this.onLeftClick}
+              />
+            </Col>
+            <Col span={20}>
+              <p>{this.state.clickedData.keyword}</p>
+            </Col>
+            <Col span={2} style={{ textAlign: 'right' }}>
+              <Button
+                type="primary"
+                icon="right"
+                value="large"
+                onClick={this.onRightClick}
+              />
+            </Col>
+          </Row>
+          <Divider />
+          <Row style={{ textAlign: 'left' }}>
+            <Col span={2} />
+            <Col span={20}>
+              <h3>[ Detail ]</h3>
+            </Col>
+            <Col span={2} />
+          </Row>
+          <Row style={{ textAlign: 'left' }}>
+            <Col span={2} />
+            <Col span={20}>
+              {/* <p>{this.state.clickedData.detail}</p> */}
+              <p>{jobDetail}</p>
+            </Col>
+            <Col span={2} />
+          </Row>
+          <Divider />
+        </Modal>
+      </div>
+    )
+  }
 
   handleClick = async clickedData => {
     await this.setState({ clickedData })

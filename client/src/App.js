@@ -54,22 +54,27 @@ class App extends Component {
             )}
 
             <Route
+              exact
               path="/job"
               render={() => <Job user_id={this.state.user_id} />}
             />
             <Route
+              exact
               path="/people"
               render={() => <People user_id={this.state.user_id} />}
             />
             <Route
+              exact
               path="/mail"
               render={() => <Mail user_id={this.state.user_id} />}
             />
             <Route
+              exact
               path="/sms"
               render={() => <Sms user_id={this.state.user_id} />}
             />
             <Route
+              exact
               path="/crawling"
               render={() => <Crawling user_id={this.state.user_id} />}
             />
