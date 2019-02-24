@@ -69,25 +69,27 @@ export default class People extends Component {
       },
       {
         key: 'birth',
-        title: '출생년도',
+        title: '한국나이',
         dataIndex: 'birth',
         width: 75,
         align: 'center',
-        ...this.getColumnSearchProps('birth')
-        // render: (text, row, index) => {
-        //   // 검색기능과 render를 같이 못 씀 -> 같이 쓸 수 있 지 만 나이 추가 데이터는 검색 안됨
-        //   let age
-        //   if (text !== 'null' && text) {
-        //     let date = new Date()
-        //     let year = date.getFullYear()
-        //     age = year - Number(text) + 1
-        //   }
-        //   return (
-        //     <span>
-        //       {text} 나이 {age}
-        //     </span>
-        //   )
-        // }
+        // ...this.getColumnSearchProps('birth'),
+        render: (text, row, index) => {
+          // 검색기능과 render를 같이 못 씀 -> 같이 쓸 수 있 지 만 나이 추가 데이터는 검색 안됨
+          let age
+          if (text !== 'null' && text) {
+            let date = new Date()
+            let year = date.getFullYear()
+            age = year - Number(text) + 1
+          }
+          return (
+            <span>
+              {/* 한국나이 {age} 출생년도 {text} */}
+              {/* {text} 한국나이 {age} */}
+              {age}
+            </span>
+          )
+        }
       },
       {
         key: 'school',
@@ -556,16 +558,22 @@ export default class People extends Component {
       positionTitle &&
       positionData.filter(data => data.title === positionTitle)[0].keyword
 
-    if (positionKeyword && positionKeyword.includes(' ')) {
-      let commaDeletedpositon = positionKeyword.replace(/,/gi, '')
-      positionSplit = commaDeletedpositon.split(' ').join('||')
-    } else {
-      positionSplit = positionKeyword
-    }
-    console.log('positionSplit', positionSplit)
+    console.log('positionKeyword', positionKeyword)
+
+    // 더 이상 클라이언트 측에서는 키워드 값을 변경하지 않고 그대로 보냄
+
+    // if (positionKeyword && positionKeyword.includes(' ')) {
+    //   let commaDeletedpositon = positionKeyword.replace(/,/gi, '')
+    //   positionSplit = commaDeletedpositon.split(' ').join('||')
+    // } else {
+    //   positionSplit = positionKeyword
+    // }
+
+    positionSplit = positionKeyword
 
     if (positionSplit && andOr) {
-      unitedSearch = `${positionSplit}||${andOr}`
+      unitedSearch = `${positionSplit},${andOr}`
+      // unitedSearch = `${positionSplit}||${andOr}`
     } else if (positionSplit) {
       unitedSearch = positionSplit
     } else if (andOr) {
@@ -573,11 +581,19 @@ export default class People extends Component {
     }
 
     console.log('unitedSearch', unitedSearch)
+
+    // 입력된 나이로 db 데이터에 맞게 나이로 계산 주의, 나이를 변환하기 때문에 순서가 변경되야 함
+    const upperBirth = under_birth && this.yearToKoreanAge(under_birth)
+    const underBirth = upper_birth && this.yearToKoreanAge(upper_birth)
+
+    // console.log('under_birth', underBirth)
+    // console.log('upper_birth', upperBirth)
+
     this.setState({ loading: true })
     Axios.post(API.viewMainTablePosition, {
       user_id: this.props.user_id,
-      under_birth: Number(under_birth) || 1900,
-      upper_birth: Number(upper_birth) || 2400,
+      under_birth: underBirth || 1900,
+      upper_birth: upperBirth || 2400,
       top_school: isTopSchool,
       keyword: unitedSearch
       // position: position
@@ -598,6 +614,12 @@ export default class People extends Component {
         searchCount: result.length
       })
     })
+  }
+
+  yearToKoreanAge(koreanYears) {
+    let today = new Date()
+    let birthYears = today.getFullYear() + 1 - Number(koreanYears)
+    return Number(birthYears)
   }
 
   checkTopschool = e => {
@@ -683,6 +705,9 @@ export default class People extends Component {
     }
     const { clickedData } = await this.state
 
+    // const koreanAge =
+    //   (await clickedData.birth) && yearToKoreanAge(clickedData.birth)
+
     const resumeTitle = await {
       mobile:
         clickedData.mobile && clickedData.mobile !== 'null'
@@ -699,7 +724,8 @@ export default class People extends Component {
       birth:
         clickedData.birth && clickedData.birth !== 'null'
           ? clickedData.birth
-          : '등록된 나이 없음',
+          : // ? `${clickedData.birth} ${koreanAge}살`
+            '등록된 나이 없음',
       name:
         clickedData.name && clickedData.name !== 'null'
           ? clickedData.name
@@ -1031,15 +1057,18 @@ export default class People extends Component {
   }
 
   handleAndOR = e => {
-    let words
-    const searchWords = e.target.value
-    if (searchWords && searchWords.includes(' ')) {
-      words = searchWords.split(' ').join('||')
-    } else {
-      words = searchWords
-    }
+    // orginial
+    // let words
+    // const searchWords = e.target.value
+    // if (searchWords && searchWords.includes(' ')) {
+    //   words = searchWords.split(' ').join('||')
+    // } else {
+    //   words = searchWords
+    // }
 
-    this.setState({ andOr: words })
+    // this.setState({ andOr: words })
+
+    this.setState({ andOr: e.target.value })
   }
 
   showAddResumeModal = () => {
@@ -1204,21 +1233,21 @@ export default class People extends Component {
           <Input
             style={{
               marginLeft: '20px',
-              width: '6%'
+              width: '8%'
             }}
-            placeholder="최소생년"
+            placeholder="최소나이"
             name="under_birth"
-            maxLength={4}
+            maxLength={2}
             value={this.state.under_birth}
             onChange={this.handleAgeChange}
           />
           <Input
             style={{
-              width: '6%'
+              width: '8%'
             }}
-            placeholder="최대생년"
+            placeholder="최대나이"
             name="upper_birth"
-            maxLength={4}
+            maxLength={2}
             value={this.state.upper_birth}
             onChange={this.handleAgeChange}
           />
@@ -1325,7 +1354,7 @@ export default class People extends Component {
             bordered
             dataSource={dataSource}
             components={components}
-            // rowKey="rm_code"
+            rowKey="rm_code"
             loading={this.state.loading}
             rowClassName={() => 'editable-row'}
             rowSelection={rowSelection}
