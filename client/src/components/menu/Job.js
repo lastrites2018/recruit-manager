@@ -136,9 +136,17 @@ export default class Job extends Component {
       if (record.valid === 'alive') validCheck = 'hold'
       else if (record.valid === 'hold') validCheck = 'expired'
       else if (record.valid === 'expired') validCheck = 'alive'
-      Axios.post(API.deletePosition, {
+      Axios.post(API.updatePosition, {
         user_id: this.props.user_id,
         position_id: record.position_id,
+        company: record.company,
+        title: record.title,
+        detail: record.detail,
+        keyword: record.keyword,
+        under_birth:
+          record.under_birth === null ? '1900' : String(record.under_birth),
+        upper_birth:
+          record.upper_birth === null ? '2000' : String(record.upper_birth),
         valid: validCheck
       }).then(res => {
         // sort 때문에 fetch 하면 무조건 내려감, 그래서... for user exp
@@ -281,7 +289,7 @@ export default class Job extends Component {
         return each
       })
 
-      // console.log('positionSort', positionSort)
+      console.log('positionSort', ketAddedPositionSort)
 
       this.setState({
         loading: false,
