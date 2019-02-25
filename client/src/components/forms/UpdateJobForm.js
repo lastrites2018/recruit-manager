@@ -54,8 +54,14 @@ class UpdateJobForm extends React.Component {
         title: this.state.newPosition.position,
         detail: this.state.newPosition.notes,
         keyword: this.state.newPosition.keyword,
-        under_birth: this.state.newPosition.under_birth,
-        upper_birth: this.state.newPosition.upper_birth,
+        under_birth:
+          this.state.newPosition.under_birth === null
+            ? '1900'
+            : String(this.state.newPosition.under_birth),
+        upper_birth:
+          this.state.newPosition.upper_birth === null
+            ? '2000'
+            : String(this.state.newPosition.upper_birth),
         valid: this.state.newPosition.status
       })
       await console.log('position added')
@@ -132,6 +138,8 @@ class UpdateJobForm extends React.Component {
       },
       { value: '서울 외', label: '서울 외' }
     ]
+
+    console.log('this.props.selected.title,', this.props.selected.title)
 
     return (
       <Form onSubmit={this.handleSubmit}>
