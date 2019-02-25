@@ -126,6 +126,26 @@ class MailForm extends React.Component {
 
     return (
       <Form onSubmit={this.handleSubmit}>
+        <Form.Item label="Positions" {...formItemLayout} hasFeedback>
+          {getFieldDecorator('position', {
+            rules: [{ required: true }]
+          })(
+            <Select
+              value={position}
+              showSearch
+              style={{ width: '90 %' }}
+              optionFilterProp="children"
+              onChange={this.handlePositionChange}
+              filterOption={(input, option) =>
+                option.props.children
+                  .toLowerCase()
+                  .indexOf(input.toLowerCase()) >= 0
+              }
+            >
+              {optionList}
+            </Select>
+          )}
+        </Form.Item>
         <Form.Item label="Title" {...formItemLayout}>
           {getFieldDecorator('title', {
             initialValue: `${positionCompany} ${position} 채용 제안`,
@@ -153,27 +173,6 @@ class MailForm extends React.Component {
             initialValue: `안녕하세요, \n\n어제 제안드렸던 [${position}] 에 대해서 어떻게 생각해보셨는지 문의차 다시 메일 드립니다. \n\n간략히 검토후 의향에 대해서 회신 주시면 감사하겠습니다.`,
             rules: [{ required: true }]
           })(<Input.TextArea rows={4} autosize={{ maxRows: 15 }} />)}
-        </Form.Item>
-
-        <Form.Item label="Positions" {...formItemLayout} hasFeedback>
-          {getFieldDecorator('position', {
-            rules: [{ required: true }]
-          })(
-            <Select
-              value={position}
-              showSearch
-              style={{ width: '90 %' }}
-              optionFilterProp="children"
-              onChange={this.handlePositionChange}
-              filterOption={(input, option) =>
-                option.props.children
-                  .toLowerCase()
-                  .indexOf(input.toLowerCase()) >= 0
-              }
-            >
-              {optionList}
-            </Select>
-          )}
         </Form.Item>
 
         <Form.Item label="Position Detail" {...formItemLayout}>
