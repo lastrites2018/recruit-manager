@@ -170,6 +170,8 @@ class SmsForm extends React.Component {
     }
 
     smsContent = recentSendSMSData && recentSendSMSData[smsContentIndex].body
+    console.log('smsContent', smsContent)
+    console.log('smsContentIndex', smsContentIndex)
 
     let beforeSmsContentIndex = smsContentIndex - 1
     let afterSmsContentIndex = smsContentIndex + 1

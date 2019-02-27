@@ -228,6 +228,7 @@ export default class SMS extends Component {
       this.props.user_id
     )
     await this.handleCancel()
+    await this.fetch()
     // await this.resetSelections()
   }
 
