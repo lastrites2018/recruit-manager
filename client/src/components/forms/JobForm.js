@@ -3,6 +3,7 @@ import Axios from 'axios'
 import { Button, Cascader, Form, Input, message } from 'antd'
 import API from '../../util/api'
 import { throttle } from 'lodash'
+import { koreanAgetoYear } from '../../util/UtilFunction'
 
 class JobForm extends React.Component {
   constructor(props) {
@@ -31,14 +32,20 @@ class JobForm extends React.Component {
   handleSubmit = e => {
     e.preventDefault()
     this.props.form.validateFieldsAndScroll((err, values) => {
-      console.log('register-job', values)
+      // console.log('register-job1', values)
+      const upper_birth = koreanAgetoYear(values.under_birth)
+      const under_birth = koreanAgetoYear(values.upper_birth)
+
+      values.under_birth = under_birth
+      values.upper_birth = upper_birth
+      // console.log('register-job2', values)
+
       // if (!err) this.setState({ newPosition: values })
       if (!err && this.state.positionTitleStatus !== 'error')
         this.setState({ newPosition: values }, () => {
           this.addPosition()
         })
     })
-    // this.addPosition()
   }
 
   addPosition = async () => {
@@ -51,8 +58,16 @@ class JobForm extends React.Component {
         detail: this.state.newPosition.notes,
         keyword: this.state.newPosition.keyword,
         valid: 'alive',
-        under_birth: this.state.newPosition.under_birth,
-        upper_birth: this.state.newPosition.upper_birth
+        // under_birth: this.state.newPosition.under_birth,
+        // upper_birth: this.state.newPosition.upper_birth
+        under_birth:
+          this.state.newPosition.under_birth === null
+            ? '1900'
+            : String(this.state.newPosition.under_birth),
+        upper_birth:
+          this.state.newPosition.upper_birth === null
+            ? '2000'
+            : String(this.state.newPosition.upper_birth)
       })
       await console.log('position added')
       await this.props.close()
@@ -157,15 +172,17 @@ class JobForm extends React.Component {
         </Form.Item>
 
         <Form.Item
-          label="Birth Year"
+          label="한국 나이"
+          // label="Birth Year"
           {...formItemLayout}
           style={{ marginBottom: 0 }}
         >
           <Form.Item
             style={{ display: 'inline-block', width: 'calc(50% - 12px)' }}
           >
-            {getFieldDecorator('under_birth', { initialValue: 1900 })(
-              <Input />
+            {getFieldDecorator('under_birth', { initialValue: 1 })(
+              // {getFieldDecorator('under_birth', { initialValue: 1900 })(
+              <Input placeholder="최소나이" maxLength={2} />
             )}
           </Form.Item>
           <span
@@ -180,8 +197,9 @@ class JobForm extends React.Component {
           <Form.Item
             style={{ display: 'inline-block', width: 'calc(50% - 12px)' }}
           >
-            {getFieldDecorator('upper_birth', { initialValue: 2100 })(
-              <Input />
+            {getFieldDecorator('upper_birth', { initialValue: 99 })(
+              // {getFieldDecorator('upper_birth', { initialValue: 2100 })(
+              <Input placeholder="최대나이" maxLength={2} />
             )}
           </Form.Item>
         </Form.Item>

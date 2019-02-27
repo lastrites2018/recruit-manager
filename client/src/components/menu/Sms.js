@@ -141,6 +141,10 @@ export default class SMS extends Component {
     this.setState({ searchText: '' })
   }
 
+  setLoading = () => {
+    this.setState({ loading: !this.state.loading })
+  }
+
   componentDidMount() {
     this.fetch()
   }
@@ -218,10 +222,10 @@ export default class SMS extends Component {
   }
 
   writeSmsContent = async form => {
-    await this.setState({ sms: form })
+    await this.setState({ sms: form, loading: true })
     await console.log('state', this.state.sms)
     // await this.sendSMS()
-    sendSMS(
+    await sendSMS(
       this.state.sms,
       this.state.selectedRowKeys,
       this.state.selectedRows,
@@ -229,6 +233,7 @@ export default class SMS extends Component {
     )
     await this.handleCancel()
     await this.fetch()
+
     // await this.resetSelections()
   }
 
@@ -271,62 +276,62 @@ export default class SMS extends Component {
     )
   }
 
-  sendSMS = async () => {
-    await console.log('state', this.state.sms)
-    await console.log('selected rows: ', this.state.selectedRowKeys)
-    await console.log('preparing to send')
-    if (this.state.selectedRowKeys.length === 0) {
-      try {
-        await Axios.post(API.sendSMS, {
-          user_id: this.props.user_id,
-          rm_code: '',
-          recipient: this.state.sms.receiver,
-          body: this.state.sms.content,
-          position: ''
-        })
-        await console.log(`${this.state.sms.receiver}에 문자를 보냈습니다.`)
-        // await this.resetSelections()
-      } catch (err) {
-        console.log('send one SMS error', err)
-      }
-    }
-    if (this.state.selectedRowKeys.length === 1) {
-      try {
-        await Axios.post(API.sendSMS, {
-          user_id: this.props.user_id,
-          rm_code: this.state.selectedRowKeys[0],
-          recipient: this.state.selectedRows[0].recipient,
-          body: this.state.sms.content,
-          // position: ''
-          position: `${this.state.sms.positionCompany}|${this.state.sms.select}`
-        })
-        await console.log(`문자를 보냈습니다.`)
-        // await this.resetSelections()
-      } catch (err) {
-        console.log('send one SMS error', err)
-      }
-    } else {
-      try {
-        for (let i = 0; i < this.state.selectedRowKeys.length; i++) {
-          await setTimeout(() => {
-            Axios.post(API.sendSMS, {
-              user_id: this.props.user_id,
-              rm_code: this.state.selectedRowKeys[i],
-              recipient: this.state.selectedRows[i].recipient,
-              body: this.state.sms.content,
-              position: `${this.state.sms.positionCompany}|${
-                this.state.sms.select
-              }`
-            })
-          }, 100)
-        }
-        await alert(`문자를 보냈습니다.`)
-        // await this.resetSelections()
-      } catch (err) {
-        console.log('sending multiple SMS error', err)
-      }
-    }
-  }
+  // sendSMS = async () => {
+  //   await console.log('state', this.state.sms)
+  //   await console.log('selected rows: ', this.state.selectedRowKeys)
+  //   await console.log('preparing to send')
+  //   if (this.state.selectedRowKeys.length === 0) {
+  //     try {
+  //       await Axios.post(API.sendSMS, {
+  //         user_id: this.props.user_id,
+  //         rm_code: '',
+  //         recipient: this.state.sms.receiver,
+  //         body: this.state.sms.content,
+  //         position: ''
+  //       })
+  //       await console.log(`${this.state.sms.receiver}에 문자를 보냈습니다.`)
+  //       // await this.resetSelections()
+  //     } catch (err) {
+  //       console.log('send one SMS error', err)
+  //     }
+  //   }
+  //   if (this.state.selectedRowKeys.length === 1) {
+  //     try {
+  //       await Axios.post(API.sendSMS, {
+  //         user_id: this.props.user_id,
+  //         rm_code: this.state.selectedRowKeys[0],
+  //         recipient: this.state.selectedRows[0].recipient,
+  //         body: this.state.sms.content,
+  //         // position: ''
+  //         position: `${this.state.sms.positionCompany}|${this.state.sms.select}`
+  //       })
+  //       await console.log(`문자를 보냈습니다.`)
+  //       // await this.resetSelections()
+  //     } catch (err) {
+  //       console.log('send one SMS error', err)
+  //     }
+  //   } else {
+  //     try {
+  //       for (let i = 0; i < this.state.selectedRowKeys.length; i++) {
+  //         await setTimeout(() => {
+  //           Axios.post(API.sendSMS, {
+  //             user_id: this.props.user_id,
+  //             rm_code: this.state.selectedRowKeys[i],
+  //             recipient: this.state.selectedRows[i].recipient,
+  //             body: this.state.sms.content,
+  //             position: `${this.state.sms.positionCompany}|${
+  //               this.state.sms.select
+  //             }`
+  //           })
+  //         }, 100)
+  //       }
+  //       await alert(`문자를 보냈습니다.`)
+  //       // await this.resetSelections()
+  //     } catch (err) {
+  //       console.log('sending multiple SMS error', err)
+  //     }
+  //   }
+  // }
 
   // resetSelections = async () => {
   //   await this.setState({
