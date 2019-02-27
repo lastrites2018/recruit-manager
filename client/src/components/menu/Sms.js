@@ -4,6 +4,7 @@ import API from '../../util/api'
 import SmsForm from '../forms/SmsForm'
 import { Modal, Table, Input, Button, Icon } from 'antd'
 import Highlighter from 'react-highlight-words'
+import { sendSMS } from '../../util/UtilFunction'
 
 export default class SMS extends Component {
   constructor(props) {
@@ -149,18 +150,34 @@ export default class SMS extends Component {
       user_id: this.props.user_id,
       rm_code: '*'
     }).then(data => {
-      const pagination = { ...this.state.pagination }
+      // const pagination = { ...this.state.pagination }
       // Read total count from server
       // pagination.total = data.totalCount
-      console.log('sms-fetch', data.data.result)
+
+      const dateSortedData = data.data.result.sort((a, b) => {
+        // descend
+        return (
+          new Date(b.modified_date).getTime() -
+          new Date(a.modified_date).getTime()
+        )
+      })
+
+      // const keyAddedData = dateSortedData.map(data => data = data.key)
+
+      for (let i = 0; i < dateSortedData.length; i++) {
+        dateSortedData[i].key = i
+      }
+
+      console.log('sms-fetch', dateSortedData)
       this.setState({
         loading: false,
-        data: data.data.result.reverse(),
-        pagination
+        data: dateSortedData
+        // pagination
       })
     })
   }
 
+  // onSelectChange = selectedRowKeys => {
   onSelectChange = (selectedRowKeys, selectedRows) => {
     console.log(
       `selectedRowKeys: ${selectedRowKeys}`,
@@ -168,25 +185,25 @@ export default class SMS extends Component {
       selectedRows
     )
     this.setState({
-      selectedRowKeys: selectedRowKeys,
-      selectedRows: selectedRows
+      selectedRowKeys,
+      selectedRows
     })
   }
 
-  handleTableChange = (pagination, filters, sorter) => {
-    const pager = { ...this.state.pagination }
-    pager.current = pagination.current
-    this.setState({
-      pagination: pager
-    })
-    this.fetch({
-      results: pagination.pageSize,
-      page: pagination.current,
-      sortField: sorter.field,
-      sortOrder: sorter.order,
-      ...filters
-    })
-  }
+  // handleTableChange = (pagination, filters, sorter) => {
+  //   const pager = { ...this.state.pagination }
+  //   pager.current = pagination.current
+  //   this.setState({
+  //     pagination: pager
+  //   })
+  //   this.fetch({
+  //     results: pagination.pageSize,
+  //     page: pagination.current,
+  //     sortField: sorter.field,
+  //     sortOrder: sorter.order,
+  //     ...filters
+  //   })
+  // }
 
   showModal = () => {
     this.setState({ visible: true })
@@ -200,29 +217,29 @@ export default class SMS extends Component {
     this.setState({ visible: false })
   }
 
-  // writeSmsContent = form => {
-  //   this.setState({ sms: form })
-  //   this.sendSMS()
-  //   this.handleCancel()
-  //   this.resetSelections()
-  // }
-
   writeSmsContent = async form => {
     await this.setState({ sms: form })
-    await this.sendSMS()
+    await console.log('state', this.state.sms)
+    // await this.sendSMS()
+    sendSMS(
+      this.state.sms,
+      this.state.selectedRowKeys,
+      this.state.selectedRows,
+      this.props.user_id
+    )
     await this.handleCancel()
-    await this.resetSelections()
+    // await this.resetSelections()
   }
 
-  resetSelections = () => {
-    setTimeout(() => {
-      console.log('sms-resetting row selection')
-      this.setState({
-        selectedRowKeys: [],
-        selectedRows: []
-      })
-    }, 1000)
-  }
+  // resetSelections = () => {
+  //   setTimeout(() => {
+  //     console.log('sms-resetting row selection')
+  //     this.setState({
+  //       selectedRowKeys: [],
+  //       selectedRows: []
+  //     })
+  //   }, 1000)
+  // }
 
   smsModal = () => {
     let title
@@ -246,6 +263,7 @@ export default class SMS extends Component {
           <SmsForm.SmsRegistration
             selectedRows={this.state.selectedRows}
             writeSmsContent={this.writeSmsContent}
+            user_id={this.props.user_id}
           />
         </Modal>
       </div>
@@ -282,7 +300,7 @@ export default class SMS extends Component {
           position: `${this.state.sms.positionCompany}|${this.state.sms.select}`
         })
         await console.log(`문자를 보냈습니다.`)
-        await this.resetSelections()
+        // await this.resetSelections()
       } catch (err) {
         console.log('send one SMS error', err)
       }
@@ -302,29 +320,30 @@ export default class SMS extends Component {
           }, 100)
         }
         await alert(`문자를 보냈습니다.`)
-        await this.resetSelections()
+        // await this.resetSelections()
       } catch (err) {
         console.log('sending multiple SMS error', err)
       }
     }
   }
 
-  resetSelections = async () => {
-    await this.setState({
-      selectedRowKeys: [],
-      selectedRows: []
-    })
-    await console.log('resetting row selection')
-  }
+  // resetSelections = async () => {
+  //   await this.setState({
+  //     selectedRowKeys: [],
+  //     selectedRows: []
+  //   })
+  //   await console.log('resetting row selection')
+  // }
 
   render() {
-    const { visible } = this.state
+    const { selectedRowKeys, visible } = this.state
     const rowSelection = {
-      onChange: this.onSelectChange,
-      getCheckboxProps: record => ({
-        disabled: record.name === 'Disabled User', // Column configuration not to be checked
-        name: record.name
-      })
+      selectedRowKeys,
+      onChange: this.onSelectChange
+      // getCheckboxProps: record => ({
+      //   disabled: record.name === 'Disabled User', // Column configuration not to be checked
+      //   name: record.name
+      // })
     }
 
     return (
@@ -345,9 +364,9 @@ export default class SMS extends Component {
           style={{ marginTop: '16px' }}
           // style={{ marginTop: '16px', width: '85%' }}
           dataSource={this.state.data}
-          pagination={this.state.pagination}
+          // pagination={this.state.pagination}
           loading={this.state.loading}
-          onChange={this.handleTableChange}
+          // onChange={this.handleTableChange}
           rowSelection={rowSelection}
         />
         {visible && <this.smsModal />}

@@ -22,6 +22,7 @@ import {
   Table
 } from 'antd'
 import Highlighter from 'react-highlight-words'
+import { sendSMS, yearToKoreanAge } from '../../util/UtilFunction'
 
 export default class People extends Component {
   constructor(props) {
@@ -319,7 +320,14 @@ export default class People extends Component {
   writeSmsContent = form => {
     console.log('people-sms-form', form)
     this.setState({ sms: form })
-    this.sendSMS()
+    // this.sendSMS()
+    sendSMS(
+      this.state.sms,
+      this.state.selectedRowKeys,
+      this.state.selectedRows,
+      this.props.user_id
+    )
+
     this.handleSmsCancel()
   }
 
@@ -357,64 +365,64 @@ export default class People extends Component {
     )
   }
 
-  sendSMS = async () => {
-    await console.log('state', this.state.sms)
-    await console.log('selected rows: ', this.state.selectedRowKeys)
-    await console.log('preparing to send')
-    if (this.state.selectedRowKeys.length === 0) {
-      try {
-        await Axios.post(API.sendSMS, {
-          user_id: this.props.user_id,
-          rm_code: '',
-          recipient: this.state.sms.receiver,
-          body: this.state.sms.content,
-          position: ''
-        })
-        await console.log(`${this.state.sms.receiver}에 문자를 보냈습니다.`)
-        // await this.resetSelections()
-      } catch (err) {
-        console.log('send one SMS error', err)
-      }
-    }
+  // sendSMS = async () => {
+  //   await console.log('state', this.state.sms)
+  //   await console.log('selected rows: ', this.state.selectedRowKeys)
+  //   await console.log('preparing to send')
+  //   if (this.state.selectedRowKeys.length === 0) {
+  //     try {
+  //       await Axios.post(API.sendSMS, {
+  //         user_id: this.props.user_id,
+  //         rm_code: '',
+  //         recipient: this.state.sms.receiver,
+  //         body: this.state.sms.content,
+  //         position: ''
+  //       })
+  //       await console.log(`${this.state.sms.receiver}에 문자를 보냈습니다.`)
+  //       // await this.resetSelections()
+  //     } catch (err) {
+  //       console.log('send one SMS error', err)
+  //     }
+  //   }
 
-    if (this.state.selectedRowKeys.length === 1) {
-      try {
-        await Axios.post(API.sendSMS, {
-          user_id: this.props.user_id,
-          rm_code: this.state.selectedRowKeys[0],
-          recipient: this.state.selectedRows[0].mobile,
-          body: this.state.sms.content,
-          position: `${this.state.sms.positionCompany}|${this.state.sms.select}`
-        })
-        await console.log(
-          `${this.state.selectedRows[0].mobile}에 문자를 보냈습니다.`
-        )
-        // await this.resetSelections()
-      } catch (err) {
-        console.log('send one SMS error', err)
-      }
-    } else {
-      try {
-        for (let i = 0; i < this.state.selectedRowKeys.length; i++) {
-          await setTimeout(() => {
-            Axios.post(API.sendSMS, {
-              user_id: this.props.user_id,
-              rm_code: this.state.selectedRowKeys[i],
-              recipient: this.state.selectedRows[i].mobile,
-              body: this.state.sms.content,
-              position: `${this.state.sms.positionCompany}|${
-                this.state.sms.select
-              }`
-            })
-          }, 100)
-        }
-        await alert(`문자를 보냈습니다.`)
-        // await this.resetSelections()
-      } catch (err) {
-        console.log('sending multiple SMS error', err)
-      }
-    }
-  }
+  //   if (this.state.selectedRowKeys.length === 1) {
+  //     try {
+  //       await Axios.post(API.sendSMS, {
+  //         user_id: this.props.user_id,
+  //         rm_code: this.state.selectedRowKeys[0],
+  //         recipient: this.state.selectedRows[0].mobile,
+  //         body: this.state.sms.content,
+  //         position: `${this.state.sms.positionCompany}|${this.state.sms.select}`
+  //       })
+  //       await console.log(
+  //         `${this.state.selectedRows[0].mobile}에 문자를 보냈습니다.`
+  //       )
+  //       // await this.resetSelections()
+  //     } catch (err) {
+  //       console.log('send one SMS error', err)
+  //     }
+  //   } else {
+  //     try {
+  //       for (let i = 0; i < this.state.selectedRowKeys.length; i++) {
+  //         await setTimeout(() => {
+  //           Axios.post(API.sendSMS, {
+  //             user_id: this.props.user_id,
+  //             rm_code: this.state.selectedRowKeys[i],
+  //             recipient: this.state.selectedRows[i].mobile,
+  //             body: this.state.sms.content,
+  //             position: `${this.state.sms.positionCompany}|${
+  //               this.state.sms.select
+  //             }`
+  //           })
+  //         }, 100)
+  //       }
+  //       await alert(`문자를 보냈습니다.`)
+  //       // await this.resetSelections()
+  //     } catch (err) {
+  //       console.log('sending multiple SMS error', err)
+  //     }
+  //   }
+  // }
 
   resetSelections = () => {
     console.log('resetting row selection')
@@ -583,8 +591,8 @@ export default class People extends Component {
     console.log('unitedSearch', unitedSearch)
 
     // 입력된 나이로 db 데이터에 맞게 나이로 계산 주의, 나이를 변환하기 때문에 순서가 변경되야 함
-    const upperBirth = under_birth && this.yearToKoreanAge(under_birth)
-    const underBirth = upper_birth && this.yearToKoreanAge(upper_birth)
+    const upperBirth = under_birth && yearToKoreanAge(under_birth)
+    const underBirth = upper_birth && yearToKoreanAge(upper_birth)
 
     // console.log('under_birth', underBirth)
     // console.log('upper_birth', upperBirth)
@@ -616,12 +624,6 @@ export default class People extends Component {
     })
   }
 
-  yearToKoreanAge(koreanYears) {
-    let today = new Date()
-    let birthYears = today.getFullYear() + 1 - Number(koreanYears)
-    return Number(birthYears)
-  }
-
   checkTopschool = e => {
     console.log(`isTopSchool === ${e.target.checked}`)
     this.setState({ isTopSchool: e.target.checked })
@@ -636,8 +638,29 @@ export default class People extends Component {
   }
 
   handleSubmit = () => {
+    console.log('submit', this.state)
+    this.setState({ selectedKeys: [], searchText: '' })
     this.fetchAgain()
   }
+
+  // _this.handleClearFilters = function () {
+  //   _this.setState({
+  //     selectedKeys: []
+  //   }, _this.handleConfirm);
+  // };
+
+  // _this.handleConfirm = function () {
+  //   _this.setVisible(false); // Call `setSelectedKeys` & `confirm` in the same time will make filter data not up to date
+  //   // https://github.com/ant-design/ant-design/issues/12284
+
+  //   _this.setState({}, _this.confirmFilter);
+  // };
+
+  // clearFilters = () => {
+  //   this.setState({
+  //     selectedKeys: []
+  //   }
+  // }
 
   handleDelete = key => {
     const dataSource = [...this.state.dataSource]
