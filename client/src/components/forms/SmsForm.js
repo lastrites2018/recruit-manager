@@ -46,14 +46,13 @@ class SmsForm extends React.Component {
       this.setState({
         positionData: keyAddedResult
       })
-      console.log('position data', data.data.result)
+      // console.log('position data', data.data.result)
       console.log('position data + key', keyAddedResult)
     })
   }
 
   fetchRecentSendSMSData = () => {
     Axios.post(API.recentSendSMS, {
-      // user_id: 'rmrm'
       user_id: this.props.user_id
     }).then(data => {
       this.setState({
@@ -70,7 +69,7 @@ class SmsForm extends React.Component {
     if (smsContentIndex < 0 || smsContentIndex === -2) {
       smsContentIndex = 9
     }
-    this.setState({ smsContentIndex })
+    this.setState({ smsContentIndex, position: '' })
     console.log('smsContentIndex-l', smsContentIndex)
   }
 
@@ -81,7 +80,7 @@ class SmsForm extends React.Component {
       smsContentIndex = 0
     }
     console.log('smsContentIndex-r', smsContentIndex)
-    this.setState({ smsContentIndex })
+    this.setState({ smsContentIndex, position: '' })
   }
 
   checkSmsLength = event => {
@@ -172,6 +171,10 @@ class SmsForm extends React.Component {
 
     if (smsContentIndex !== -1) {
       smsContent = recentSendSMSData && recentSendSMSData[smsContentIndex].body
+    }
+
+    if (position) {
+      smsContent = `안녕하세요, 어제 제안드렸던 ${position} 에 대해서 어떻게 생각해보셨는지 문의차 다시 문자 드립니다. 간략히 검토후 의향에 대해서 회신 주시면 감사하겠습니다.`
     }
 
     return (
