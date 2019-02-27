@@ -19,10 +19,11 @@ import {
   Modal,
   Row,
   Select,
-  Table
+  Table,
+  Tooltip
 } from 'antd'
 import Highlighter from 'react-highlight-words'
-import { sendSMS, yearToKoreanAge } from '../../util/UtilFunction'
+import { sendSMS, koreanAgetoYear } from '../../util/UtilFunction'
 
 export default class People extends Component {
   constructor(props) {
@@ -359,6 +360,7 @@ export default class People extends Component {
           <SmsForm.SmsRegistration
             selectedRows={this.state.selectedRows}
             writeSmsContent={this.writeSmsContent}
+            user_id={this.props.user_id}
           />
         </Modal>
       </div>
@@ -591,8 +593,8 @@ export default class People extends Component {
     console.log('unitedSearch', unitedSearch)
 
     // 입력된 나이로 db 데이터에 맞게 나이로 계산 주의, 나이를 변환하기 때문에 순서가 변경되야 함
-    const upperBirth = under_birth && yearToKoreanAge(under_birth)
-    const underBirth = upper_birth && yearToKoreanAge(upper_birth)
+    const upperBirth = under_birth && koreanAgetoYear(under_birth)
+    const underBirth = upper_birth && koreanAgetoYear(upper_birth)
 
     // console.log('under_birth', underBirth)
     // console.log('upper_birth', upperBirth)
@@ -729,7 +731,7 @@ export default class People extends Component {
     const { clickedData } = await this.state
 
     // const koreanAge =
-    //   (await clickedData.birth) && yearToKoreanAge(clickedData.birth)
+    //   (await clickedData.birth) && koreanAgetoYear(clickedData.birth)
 
     const resumeTitle = await {
       mobile:
