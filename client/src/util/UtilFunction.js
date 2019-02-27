@@ -1,9 +1,9 @@
 import Axios from 'axios'
 import API from '../util/api'
 
-export const yearToKoreanAge = koreanYears => {
+export const koreanAgetoYear = koreanAge => {
   let today = new Date()
-  let birthYears = today.getFullYear() + 1 - Number(koreanYears)
+  let birthYears = today.getFullYear() + 1 - Number(koreanAge)
   return Number(birthYears)
 }
 
