@@ -318,18 +318,19 @@ export default class People extends Component {
     this.setState({ smsVisible: false })
   }
 
-  writeSmsContent = form => {
-    console.log('people-sms-form', form)
-    this.setState({ sms: form })
-    // this.sendSMS()
-    sendSMS(
+  writeSmsContent = async form => {
+    await this.setState({ sms: form, loading: true })
+    await console.log('people-sms-form', form)
+    // await this.sendSMS()
+    await sendSMS(
       this.state.sms,
       this.state.selectedRowKeys,
       this.state.selectedRows,
       this.props.user_id
     )
 
-    this.handleSmsCancel()
+    await this.handleSmsCancel()
+    await this.setState({ loading: false })
   }
 
   smsModal = () => {

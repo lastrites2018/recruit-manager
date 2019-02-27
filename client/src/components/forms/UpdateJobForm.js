@@ -3,6 +3,7 @@ import Axios from 'axios'
 import { Button, Form, Input, Radio } from 'antd'
 import API from '../../util/api'
 import { throttle } from 'lodash'
+import { koreanAgetoYear } from '../../util/UtilFunction'
 
 class UpdateJobForm extends React.Component {
   constructor(props) {
@@ -34,6 +35,14 @@ class UpdateJobForm extends React.Component {
   handleSubmit = e => {
     e.preventDefault()
     this.props.form.validateFieldsAndScroll((err, values) => {
+      console.log('values', values)
+      const under_birth = koreanAgetoYear(values.under_birth)
+      const upper_birth = koreanAgetoYear(values.upper_birth)
+
+      values.under_birth = under_birth
+      values.upper_birth = upper_birth
+
+      console.log('values2', values)
       if (!err && this.state.positionTitleStatus !== 'error')
         this.setState({ newPosition: values }, () => {
           this.updatePosition()
@@ -57,11 +66,11 @@ class UpdateJobForm extends React.Component {
         under_birth:
           this.state.newPosition.under_birth === null
             ? '1900'
-            : String(this.state.newPosition.under_birth),
+            : String(this.state.newPosition.upper_birth),
         upper_birth:
           this.state.newPosition.upper_birth === null
             ? '2000'
-            : String(this.state.newPosition.upper_birth),
+            : String(this.state.newPosition.under_birth),
         valid: this.state.newPosition.status
       })
       await console.log('position added')
@@ -139,8 +148,7 @@ class UpdateJobForm extends React.Component {
       { value: '서울 외', label: '서울 외' }
     ]
 
-    console.log('this.props.selected.title,', this.props.selected.title)
-
+    console.log('this.props-slected,', this.props.selected)
     return (
       <Form onSubmit={this.handleSubmit}>
         <Form.Item
@@ -183,7 +191,7 @@ class UpdateJobForm extends React.Component {
           )}
         </Form.Item>
         <Form.Item
-          label="Birth Year"
+          label="한국 나이"
           {...formItemLayout}
           style={{ marginBottom: 0 }}
         >
@@ -191,9 +199,9 @@ class UpdateJobForm extends React.Component {
             style={{ display: 'inline-block', width: 'calc(50% - 12px)' }}
           >
             {getFieldDecorator('under_birth', {
-              initialValue: 1900,
-              rules: [{ type: 'number' }, { required: true }]
-            })(<Input />)}
+              initialValue: koreanAgetoYear(this.props.selected.upper_birth),
+              rules: [{ required: true }]
+            })(<Input placeholder="최소나이" maxLength={2} />)}
           </Form.Item>
           <span
             style={{
@@ -208,9 +216,9 @@ class UpdateJobForm extends React.Component {
             style={{ display: 'inline-block', width: 'calc(50% - 12px)' }}
           >
             {getFieldDecorator('upper_birth', {
-              initialValue: 2100,
-              rules: [{ type: 'number' }, { required: true }]
-            })(<Input />)}
+              initialValue: koreanAgetoYear(this.props.selected.under_birth),
+              rules: [{ required: true }]
+            })(<Input placeholder="최소나이" maxLength={2} />)}
           </Form.Item>
         </Form.Item>
 
