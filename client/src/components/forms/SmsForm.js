@@ -1,6 +1,6 @@
 import React from 'react'
 import Axios from 'axios'
-import { Button, Form, Input, Select, Row, Col } from 'antd'
+import { Button, Form, Input, Select, Row, Col, Tooltip } from 'antd'
 import API from '../../util/api'
 import ShortId from 'shortid'
 
@@ -10,7 +10,7 @@ class SmsForm extends React.Component {
     positionData: [],
     smsLength: 0,
     positionCompany: '',
-    smsContentIndex: -1
+    smsContentIndex: 0
   }
 
   handleSubmit = e => {
@@ -66,7 +66,7 @@ class SmsForm extends React.Component {
     let { smsContentIndex } = this.state
     smsContentIndex -= 1
 
-    if (smsContentIndex < 0 || smsContentIndex === -2) {
+    if (smsContentIndex < 0) {
       smsContentIndex = 9
     }
     this.setState({ smsContentIndex, position: '' })
@@ -169,9 +169,25 @@ class SmsForm extends React.Component {
       recipientPlaceholder = ''
     }
 
-    if (smsContentIndex !== -1) {
-      smsContent = recentSendSMSData && recentSendSMSData[smsContentIndex].body
+    smsContent = recentSendSMSData && recentSendSMSData[smsContentIndex].body
+
+    let beforeSmsContentIndex = smsContentIndex - 1
+    let afterSmsContentIndex = smsContentIndex + 1
+    if (beforeSmsContentIndex < 0) {
+      beforeSmsContentIndex = 9
     }
+
+    if (afterSmsContentIndex > 9) {
+      afterSmsContentIndex = 0
+    }
+
+    let leftTooltip =
+      recentSendSMSData &&
+      `이전\n${recentSendSMSData[beforeSmsContentIndex].modified_date}`
+
+    let rightTooltip =
+      recentSendSMSData &&
+      `다음\n${recentSendSMSData[afterSmsContentIndex].modified_date}`
 
     if (position) {
       smsContent = `안녕하세요, 어제 제안드렸던 ${position} 에 대해서 어떻게 생각해보셨는지 문의차 다시 문자 드립니다. 간략히 검토후 의향에 대해서 회신 주시면 감사하겠습니다.`
@@ -224,29 +240,39 @@ class SmsForm extends React.Component {
           })(<Input.TextArea rows={4} onChange={this.checkSmsLength} />)}
           <Row>
             <Col span={2} style={{ textAlign: 'left' }}>
-              <Button
-                type="primary"
-                icon="left"
-                value="large"
-                onClick={this.onLeftClick}
-              />
+              <Tooltip placement="left" title={leftTooltip}>
+                <Button
+                  type="primary"
+                  icon="left"
+                  value="large"
+                  onClick={this.onLeftClick}
+                />
+              </Tooltip>
             </Col>
             <Col span={20} style={{ textAlign: 'center' }}>
               {' '}
-              <span>
+              {
+                <span>
+                  {recentSendSMSData &&
+                    recentSendSMSData[smsContentIndex].modified_date}
+                </span>
+              }
+              {/* <span>
                 {this.state.smsLength
                   ? this.state.smsLength
                   : smsContent && smsContent.length}
                 /90
-              </span>
+              </span> */}
             </Col>
             <Col span={2} style={{ textAlign: 'right' }}>
-              <Button
-                type="primary"
-                icon="right"
-                value="large"
-                onClick={this.onRightClick}
-              />
+              <Tooltip placement="right" title={rightTooltip}>
+                <Button
+                  type="primary"
+                  icon="right"
+                  value="large"
+                  onClick={this.onRightClick}
+                />
+              </Tooltip>
             </Col>
           </Row>
         </Form.Item>
