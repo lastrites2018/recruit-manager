@@ -10,7 +10,8 @@ class SmsForm extends React.Component {
     positionData: [],
     smsLength: 0,
     positionCompany: '',
-    smsContentIndex: 0
+    smsContentIndex: 0,
+    recentSendSMSData: ''
   }
 
   handleSubmit = e => {
@@ -63,20 +64,21 @@ class SmsForm extends React.Component {
   }
 
   onLeftClick = () => {
-    let { smsContentIndex } = this.state
+    let { smsContentIndex, recentSendSMSData } = this.state
+
     smsContentIndex -= 1
 
     if (smsContentIndex < 0) {
-      smsContentIndex = 9
+      smsContentIndex = recentSendSMSData.length - 1
     }
     this.setState({ smsContentIndex, position: '' })
     console.log('smsContentIndex-l', smsContentIndex)
   }
 
   onRightClick = () => {
-    let { smsContentIndex } = this.state
+    let { smsContentIndex, recentSendSMSData } = this.state
     smsContentIndex += 1
-    if (smsContentIndex > 9) {
+    if (smsContentIndex > recentSendSMSData.length - 1) {
       smsContentIndex = 0
     }
     console.log('smsContentIndex-r', smsContentIndex)
@@ -99,9 +101,9 @@ class SmsForm extends React.Component {
     const { selectedRows } = this.props
     const {
       smsContentIndex,
+      recentSendSMSData,
       position,
-      positionData,
-      recentSendSMSData
+      positionData
     } = this.state
     const Option = Select.Option
 
@@ -176,7 +178,7 @@ class SmsForm extends React.Component {
     let beforeSmsContentIndex = smsContentIndex - 1
     let afterSmsContentIndex = smsContentIndex + 1
     if (beforeSmsContentIndex < 0) {
-      beforeSmsContentIndex = 9
+      beforeSmsContentIndex = recentSendSMSData.length - 1
     }
 
     if (afterSmsContentIndex > 9) {
@@ -185,11 +187,15 @@ class SmsForm extends React.Component {
 
     let leftTooltip =
       recentSendSMSData &&
-      `이전\n${recentSendSMSData[beforeSmsContentIndex].modified_date}`
+      `이전\nNo. ${beforeSmsContentIndex + 1} : ${
+        recentSendSMSData[beforeSmsContentIndex].modified_date
+      }`
 
     let rightTooltip =
       recentSendSMSData &&
-      `다음\n${recentSendSMSData[afterSmsContentIndex].modified_date}`
+      `다음\nNo. ${afterSmsContentIndex + 1} : ${
+        recentSendSMSData[afterSmsContentIndex].modified_date
+      }`
 
     if (position) {
       smsContent = `안녕하세요, 어제 제안드렸던 ${position} 에 대해서 어떻게 생각해보셨는지 문의차 다시 문자 드립니다. 간략히 검토후 의향에 대해서 회신 주시면 감사하겠습니다.`
@@ -248,17 +254,20 @@ class SmsForm extends React.Component {
                   icon="left"
                   value="large"
                   onClick={this.onLeftClick}
+                  disabled={leftTooltip ? false : true}
                 />
               </Tooltip>
             </Col>
             <Col span={20} style={{ textAlign: 'center' }}>
               {' '}
-              {
+              {position ? null : (
                 <span>
                   {recentSendSMSData &&
-                    recentSendSMSData[smsContentIndex].modified_date}
+                    `No. ${smsContentIndex + 1} ${
+                      recentSendSMSData[smsContentIndex].modified_date
+                    }`}
                 </span>
-              }
+              )}
               {/* <span>
                 {this.state.smsLength
                   ? this.state.smsLength
@@ -273,6 +282,7 @@ class SmsForm extends React.Component {
                   icon="right"
                   value="large"
                   onClick={this.onRightClick}
+                  disabled={rightTooltip ? false : true}
                 />
               </Tooltip>
             </Col>
