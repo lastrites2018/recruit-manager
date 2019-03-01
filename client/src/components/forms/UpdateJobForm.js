@@ -54,7 +54,7 @@ class UpdateJobForm extends React.Component {
   updatePosition = async () => {
     await console.log('selected props: ', this.props.selected.position_id)
     await console.log('user_id: ', this.props.user_id)
-    await console.log('updatePosition: ', this.state.newPosition)
+    // await console.log('updatePosition: ', this.state.newPosition)
     try {
       await Axios.post(API.updatePosition, {
         user_id: this.props.user_id,

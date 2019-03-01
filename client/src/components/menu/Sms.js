@@ -75,38 +75,49 @@ export default class SMS extends Component {
       selectedKeys,
       confirm,
       clearFilters
-    }) => (
-      <div style={{ padding: 8 }}>
-        <Input
-          ref={node => {
-            this.searchInput = node
-          }}
-          placeholder={`Search ${dataIndex}`}
-          value={selectedKeys[0]}
-          onChange={e =>
-            setSelectedKeys(e.target.value ? [e.target.value] : [])
-          }
-          onPressEnter={() => this.handleSearch(selectedKeys, confirm)}
-          style={{ width: 188, marginBottom: 8, display: 'block' }}
-        />
-        <Button
-          type="primary"
-          onClick={() => this.handleSearch(selectedKeys, confirm)}
-          icon="search"
-          size="small"
-          style={{ width: 90, marginRight: 8 }}
-        >
-          Search
-        </Button>
-        <Button
-          onClick={() => this.handleReset(clearFilters)}
-          size="small"
-          style={{ width: 90 }}
-        >
-          Reset
-        </Button>
-      </div>
-    ),
+    }) => {
+      if (
+        !this.state.searchText &&
+        this.state.isReset &&
+        selectedKeys.length > 0
+      ) {
+        this.handleReset(clearFilters)
+        this.setState({ isReset: false })
+      }
+
+      return (
+        <div style={{ padding: 8 }}>
+          <Input
+            ref={node => {
+              this.searchInput = node
+            }}
+            placeholder={`Search ${dataIndex}`}
+            value={selectedKeys[0]}
+            onChange={e =>
+              setSelectedKeys(e.target.value ? [e.target.value] : [])
+            }
+            onPressEnter={() => this.handleSearch(selectedKeys, confirm)}
+            style={{ width: 188, marginBottom: 8, display: 'block' }}
+          />
+          <Button
+            type="primary"
+            onClick={() => this.handleSearch(selectedKeys, confirm)}
+            icon="search"
+            size="small"
+            style={{ width: 90, marginRight: 8 }}
+          >
+            Search
+          </Button>
+          <Button
+            onClick={() => this.handleReset(clearFilters)}
+            size="small"
+            style={{ width: 90 }}
+          >
+            Reset
+          </Button>
+        </div>
+      )
+    },
     filterIcon: filtered => (
       <Icon type="search" style={{ color: filtered ? '#1890ff' : undefined }} />
     ),
@@ -280,70 +291,19 @@ export default class SMS extends Component {
     )
   }
 
-  // sendSMS = async () => {
-  //   await console.log('state', this.state.sms)
-  //   await console.log('selected rows: ', this.state.selectedRowKeys)
-  //   await console.log('preparing to send')
-  //   if (this.state.selectedRowKeys.length === 0) {
-  //     try {
-  //       await Axios.post(API.sendSMS, {
-  //         user_id: this.props.user_id,
-  //         rm_code: '',
-  //         recipient: this.state.sms.receiver,
-  //         body: this.state.sms.content,
-  //         position: ''
-  //       })
-  //       await console.log(`${this.state.sms.receiver}에 문자를 보냈습니다.`)
-  //       // await this.resetSelections()
-  //     } catch (err) {
-  //       console.log('send one SMS error', err)
-  //     }
-  //   }
-  //   if (this.state.selectedRowKeys.length === 1) {
-  //     try {
-  //       await Axios.post(API.sendSMS, {
-  //         user_id: this.props.user_id,
-  //         rm_code: this.state.selectedRowKeys[0],
-  //         recipient: this.state.selectedRows[0].recipient,
-  //         body: this.state.sms.content,
-  //         // position: ''
-  //         position: `${this.state.sms.positionCompany}|${this.state.sms.select}`
-  //       })
-  //       await console.log(`문자를 보냈습니다.`)
-  //       // await this.resetSelections()
-  //     } catch (err) {
-  //       console.log('send one SMS error', err)
-  //     }
-  //   } else {
-  //     try {
-  //       for (let i = 0; i < this.state.selectedRowKeys.length; i++) {
-  //         await setTimeout(() => {
-  //           Axios.post(API.sendSMS, {
-  //             user_id: this.props.user_id,
-  //             rm_code: this.state.selectedRowKeys[i],
-  //             recipient: this.state.selectedRows[i].recipient,
-  //             body: this.state.sms.content,
-  //             position: `${this.state.sms.positionCompany}|${
-  //               this.state.sms.select
-  //             }`
-  //           })
-  //         }, 100)
-  //       }
-  //       await alert(`문자를 보냈습니다.`)
-  //       // await this.resetSelections()
-  //     } catch (err) {
-  //       console.log('sending multiple SMS error', err)
-  //     }
-  //   }
-  // }
+  resetAll = () => {
+    if (this.state.searchText) this.setState({ searchText: '', isReset: true })
 
-  // resetSelections = async () => {
-  //   await this.setState({
-  //     selectedRowKeys: [],
-  //     selectedRows: []
-  //   })
-  //   await console.log('resetting row selection')
-  // }
+    this.setState({
+      position: '',
+      positionData: [],
+      smsLength: 0,
+      positionCompany: '',
+      smsContentIndex: 0,
+      recentSendSMSData: ''
+    })
+    this.fetch()
+  }
 
   render() {
     const { selectedRowKeys, visible } = this.state
@@ -366,6 +326,13 @@ export default class SMS extends Component {
           // onClick={this.sendSMS}
         >
           Follow up
+        </Button>
+        <Button
+          type="primary"
+          onClick={this.resetAll}
+          style={{ marginLeft: '10px', marginBottom: 16 }}
+        >
+          Reset
         </Button>
         <Table
           columns={this.columns}

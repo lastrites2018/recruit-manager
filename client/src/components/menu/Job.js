@@ -33,7 +33,8 @@ export default class Job extends Component {
       updateVisible: false,
       detailVisible: false,
       detailTitle: 'Job Detail',
-      currentKey: null
+      currentKey: null,
+      isReset: false
     }
 
     this.columns = [
@@ -170,46 +171,61 @@ export default class Job extends Component {
       selectedKeys,
       confirm,
       clearFilters
-    }) => (
-      <div style={{ padding: 8 }}>
-        <Input
-          ref={node => {
-            this.searchInput = node
-          }}
-          placeholder={`Search ${dataIndex}`}
-          value={selectedKeys[0]}
-          onChange={e =>
-            setSelectedKeys(e.target.value ? [e.target.value] : [])
-          }
-          onPressEnter={() => this.handleSearch(selectedKeys, confirm)}
-          style={{ width: 188, marginBottom: 8, display: 'block' }}
-        />
-        <Button
-          type="primary"
-          onClick={() => this.handleSearch(selectedKeys, confirm)}
-          icon="search"
-          size="small"
-          style={{ width: 90, marginRight: 8 }}
-        >
-          Search
-        </Button>
-        <Button
-          onClick={() => this.handleReset(clearFilters)}
-          size="small"
-          style={{ width: 90 }}
-        >
-          Reset
-        </Button>
-      </div>
-    ),
+    }) => {
+      if (
+        !this.state.searchText &&
+        this.state.isReset &&
+        selectedKeys.length > 0
+      ) {
+        this.handleReset(clearFilters)
+        this.setState({ isReset: false })
+      }
+
+      return (
+        <div style={{ padding: 8 }}>
+          <Input
+            ref={node => {
+              this.searchInput = node
+            }}
+            placeholder={`Search ${dataIndex}`}
+            value={selectedKeys[0]}
+            onChange={e =>
+              setSelectedKeys(e.target.value ? [e.target.value] : [])
+            }
+            onPressEnter={() => this.handleSearch(selectedKeys, confirm)}
+            style={{ width: 188, marginBottom: 8, display: 'block' }}
+          />
+          <Button
+            type="primary"
+            onClick={() => this.handleSearch(selectedKeys, confirm)}
+            icon="search"
+            size="small"
+            style={{ width: 90, marginRight: 8 }}
+          >
+            Search
+          </Button>
+          <Button
+            onClick={() => this.handleReset(clearFilters)}
+            size="small"
+            style={{ width: 90 }}
+          >
+            Reset
+          </Button>
+        </div>
+      )
+    },
     filterIcon: filtered => (
       <Icon type="search" style={{ color: filtered ? '#1890ff' : undefined }} />
     ),
-    onFilter: (value, record) =>
-      record[dataIndex]
-        .toString()
-        .toLowerCase()
-        .includes(value.toLowerCase()),
+    onFilter: (value, record) => {
+      return (
+        record[dataIndex] &&
+        record[dataIndex]
+          .toString()
+          .toLowerCase()
+          .includes(value.toLowerCase())
+      )
+    },
     onFilterDropdownVisibleChange: visible => {
       if (visible) {
         setTimeout(() => this.searchInput.select())
@@ -367,6 +383,24 @@ export default class Job extends Component {
     })
   }
 
+  resetAll = () => {
+    if (this.state.searchText) this.setState({ searchText: '', isReset: true })
+
+    this.setState({
+      clickedData: [],
+      data: [],
+      pagination: {},
+      selectedRowKeys: [],
+      selectedRows: [],
+      visible: false,
+      updateVisible: false,
+      detailVisible: false,
+      detailTitle: 'Job Detail',
+      currentKey: null
+    })
+    this.fetch()
+  }
+
   resetSelections = () => {
     setTimeout(() => {
       console.log('job-resetting row selection')
@@ -409,10 +443,10 @@ export default class Job extends Component {
             valid: 'expired'
           })
         }
-        await message.success(
-          `${deletedPositions.join(', ')} 포지션이 삭제되었습니다.`
-        )
         await this.fetch()
+        await message.success(
+          `${deletedPositions.join(', ')} 포지션이 삭제되었습니다. `
+        )
       } catch (err) {
         await message.error('failed to delete positions', err)
       }
@@ -621,19 +655,18 @@ export default class Job extends Component {
   }
 
   render() {
-    const rowSelection = {
-      onChange: this.onSelectChange,
-      getCheckboxProps: record => ({
-        disabled: record.name === 'Disabled User', // Column configuration not to be checked
-        name: record.name
-      })
-    }
     const {
       visible,
       updateVisible,
       detailVisible,
       selectedRowKeys
     } = this.state
+
+    const rowSelection = {
+      selectedRowKeys,
+      onChange: this.onSelectChange
+    }
+
     const hasSelectedOne = selectedRowKeys.length === 1
     const hasSelectedMultiple = selectedRowKeys.length >= 1
     const editButtonToolTip = <span>편집을 위해서는 하나만 선택해주세요.</span>
@@ -680,7 +713,7 @@ export default class Job extends Component {
           )}
 
           <Tooltip
-            placement="right"
+            placement="bottom"
             title={editButtonToolTip}
             visible={selectedRowKeys.length > 1}
           >
@@ -694,6 +727,14 @@ export default class Job extends Component {
               편집
             </Button>
           </Tooltip>
+          {/* 테스트 */}
+          <Button
+            type="primary"
+            onClick={this.resetAll}
+            style={{ marginRight: 5, marginBottom: 16 }}
+          >
+            Reset
+          </Button>
         </div>
         {visible && <this.jobModal />}
         {updateVisible && <this.updateJobModal />}
