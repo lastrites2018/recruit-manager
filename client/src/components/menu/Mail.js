@@ -14,7 +14,6 @@ import {
   Row
 } from 'antd'
 import Highlighter from 'react-highlight-words'
-import { sortBy } from 'lodash'
 
 export default class Mail extends Component {
   constructor(props) {
@@ -42,6 +41,14 @@ export default class Mail extends Component {
         width: '15%',
         align: 'center',
         ...this.getColumnSearchProps('name')
+      },
+      {
+        title: 'recipient',
+        dataIndex: 'recipient',
+        render: text => <a href="javascript:">{text}</a>,
+        width: '15%',
+        align: 'center',
+        ...this.getColumnSearchProps('recipient')
       },
       {
         title: '발송시간',
@@ -82,46 +89,61 @@ export default class Mail extends Component {
       selectedKeys,
       confirm,
       clearFilters
-    }) => (
-      <div style={{ padding: 8 }}>
-        <Input
-          ref={node => {
-            this.searchInput = node
-          }}
-          placeholder={`Search ${dataIndex}`}
-          value={selectedKeys[0]}
-          onChange={e =>
-            setSelectedKeys(e.target.value ? [e.target.value] : [])
-          }
-          onPressEnter={() => this.handleSearch(selectedKeys, confirm)}
-          style={{ width: 188, marginBottom: 8, display: 'block' }}
-        />
-        <Button
-          type="primary"
-          onClick={() => this.handleSearch(selectedKeys, confirm)}
-          icon="search"
-          size="small"
-          style={{ width: 90, marginRight: 8 }}
-        >
-          Search
-        </Button>
-        <Button
-          onClick={() => this.handleReset(clearFilters)}
-          size="small"
-          style={{ width: 90 }}
-        >
-          Reset
-        </Button>
-      </div>
-    ),
+    }) => {
+      if (
+        !this.state.searchText &&
+        this.state.isReset &&
+        selectedKeys.length > 0
+      ) {
+        this.handleReset(clearFilters)
+        this.setState({ isReset: false })
+      }
+
+      return (
+        <div style={{ padding: 8 }}>
+          <Input
+            ref={node => {
+              this.searchInput = node
+            }}
+            placeholder={`Search ${dataIndex}`}
+            value={selectedKeys[0]}
+            onChange={e =>
+              setSelectedKeys(e.target.value ? [e.target.value] : [])
+            }
+            onPressEnter={() => this.handleSearch(selectedKeys, confirm)}
+            style={{ width: 188, marginBottom: 8, display: 'block' }}
+          />
+          <Button
+            type="primary"
+            onClick={() => this.handleSearch(selectedKeys, confirm)}
+            icon="search"
+            size="small"
+            style={{ width: 90, marginRight: 8 }}
+          >
+            Search
+          </Button>
+          <Button
+            onClick={() => this.handleReset(clearFilters)}
+            size="small"
+            style={{ width: 90 }}
+          >
+            Reset
+          </Button>
+        </div>
+      )
+    },
     filterIcon: filtered => (
       <Icon type="search" style={{ color: filtered ? '#1890ff' : undefined }} />
     ),
-    onFilter: (value, record) =>
-      record[dataIndex]
-        .toString()
-        .toLowerCase()
-        .includes(value.toLowerCase()),
+    onFilter: (value, record) => {
+      return (
+        record[dataIndex] &&
+        record[dataIndex]
+          .toString()
+          .toLowerCase()
+          .includes(value.toLowerCase())
+      )
+    },
     onFilterDropdownVisibleChange: visible => {
       if (visible) {
         setTimeout(() => this.searchInput.select())
@@ -153,6 +175,7 @@ export default class Mail extends Component {
   }
 
   fetch = () => {
+    this.setState({ loading: true })
     Axios.post(API.getMail, {
       user_id: this.props.user_id,
       rm_code: '*'
@@ -161,11 +184,6 @@ export default class Mail extends Component {
       // Read total count from server
       // pagination.total = data.totalCount
       console.log('mail-fetch', data.data.result)
-      // const mailSort = sortBy(data.data.result, [
-      //   function(mail) {
-      //     return Number(mail.mail_id.slice(5))
-      //   }
-      // ])
 
       const dateSortedData = data.data.result.sort((a, b) => {
         // descend
@@ -175,10 +193,13 @@ export default class Mail extends Component {
         )
       })
 
+      for (let i = 0; i < dateSortedData.length; i++) {
+        dateSortedData[i].key = i
+      }
+
       this.setState({
         loading: false,
         data: dateSortedData,
-        // data: mailSort.reverse(),
         pagination
       })
     })
@@ -235,6 +256,7 @@ export default class Mail extends Component {
           writeMailContent={this.writeMailContent}
           allRecipients={this.state.allRecipients}
           allEmails={this.state.allEmails}
+          user_id={this.props.user_id}
         />
       </Modal>
     </div>
@@ -301,7 +323,7 @@ export default class Mail extends Component {
   }
 
   writeMailContent = async form => {
-    await this.setState({ mail: form })
+    await this.setState({ mail: form, loading: true })
     await this.sendMail()
     await this.handleCancel()
     setTimeout(this.fetch, 2000)
@@ -394,6 +416,25 @@ export default class Mail extends Component {
     }, 2000)
   }
 
+  resetAll = () => {
+    if (this.state.searchText) this.setState({ searchText: '', isReset: true })
+
+    this.setState({
+      allRecipients: [],
+      allEmails: [],
+      data: [],
+      mail: {},
+      mailDetail: {},
+      mailDetailTitle: '',
+      pagination: {},
+      selectedRowKeys: [],
+      selectedRows: [],
+      detailVisible: false,
+      visible: false
+    })
+    this.fetch()
+  }
+
   render() {
     const rowSelection = {
       onChange: this.onSelectChange,
@@ -415,6 +456,13 @@ export default class Mail extends Component {
           style={{ marginTop: '10px' }}
         >
           Follow up
+        </Button>
+        <Button
+          type="primary"
+          onClick={this.resetAll}
+          style={{ marginLeft: '10px', marginBottom: 16 }}
+        >
+          Reset
         </Button>
         <Table
           columns={this.columns}

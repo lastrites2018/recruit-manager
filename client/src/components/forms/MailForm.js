@@ -1,13 +1,15 @@
 import React from 'react'
 import Axios from 'axios'
-import { Button, Form, Input, Select } from 'antd'
+import { Button, Form, Input, Select, Row, Col, Tooltip } from 'antd'
 import API from '../../util/api'
 class MailForm extends React.Component {
   state = {
     positon: '',
     positionCompany: '',
     positionDetail: '',
-    positionData: []
+    positionData: [],
+    smsContentIndex: 0,
+    recentSendSMSData: ''
   }
 
   handleSubmit = e => {
@@ -64,13 +66,49 @@ class MailForm extends React.Component {
     })
   }
 
+  fetchRecentSendSMSData = () => {
+    Axios.post(API.recentSendMail, {
+      user_id: this.props.user_id
+    }).then(data => {
+      this.setState({
+        recentSendSMSData: data.data.result
+      })
+      console.log('recent SMS DATA ', data.data.result)
+    })
+  }
+
+  onLeftClick = () => {
+    let { smsContentIndex, recentSendSMSData } = this.state
+
+    smsContentIndex -= 1
+
+    if (smsContentIndex < 0) {
+      smsContentIndex = recentSendSMSData.length - 1
+    }
+    this.setState({ smsContentIndex, position: '', positionDetail: '' })
+    console.log('smsContentIndex-l', smsContentIndex)
+  }
+
+  onRightClick = () => {
+    let { smsContentIndex, recentSendSMSData } = this.state
+    smsContentIndex += 1
+    if (smsContentIndex > recentSendSMSData.length - 1) {
+      smsContentIndex = 0
+    }
+    console.log('smsContentIndex-r', smsContentIndex)
+    this.setState({ smsContentIndex, position: '', positionDetail: '' })
+  }
+
   componentDidMount() {
     this.fetchPosition()
+    this.fetchRecentSendSMSData()
   }
 
   render() {
     const { getFieldDecorator } = this.props.form
     const {
+      smsContentIndex,
+      recentSendSMSData,
       position,
       positionData,
       positionCompany,
@@ -124,6 +162,38 @@ class MailForm extends React.Component {
       userSign = `커리어셀파 헤드헌터 강상모 \n+82 010 3929 7682 \nwww.careersherpa.co.kr`
     }
 
+    let smsContent = ''
+
+    smsContent = recentSendSMSData && recentSendSMSData[smsContentIndex].body
+    console.log('smsContent', smsContent)
+    console.log('smsContentIndex', smsContentIndex)
+    console.log('recentSendSMSData', recentSendSMSData)
+
+    let beforeSmsContentIndex = smsContentIndex - 1
+    let afterSmsContentIndex = smsContentIndex + 1
+    if (beforeSmsContentIndex < 0) {
+      beforeSmsContentIndex = recentSendSMSData.length - 1
+    }
+
+    if (afterSmsContentIndex > recentSendSMSData.length - 1) {
+      afterSmsContentIndex = 0
+    }
+
+    let leftTooltip =
+      recentSendSMSData &&
+      `이전\nNo. ${beforeSmsContentIndex + 1} : ${
+        recentSendSMSData[beforeSmsContentIndex].modified_date
+      }`
+
+    let rightTooltip =
+      recentSendSMSData &&
+      `다음\nNo. ${afterSmsContentIndex + 1} : ${
+        recentSendSMSData[afterSmsContentIndex].modified_date
+      }`
+    if (position) {
+      smsContent = `안녕하세요, \n\n어제 제안드렸던 [${position}] 에 대해서 어떻게 생각해보셨는지 문의차 다시 메일 드립니다. \n\n간략히 검토후 의향에 대해서 회신 주시면 감사하겠습니다.`
+      // smsContent = `안녕하세요, 어제 제안드렸던 ${position} 에 대해서 어떻게 생각해보셨는지 문의차 다시 문자 드립니다. 간략히 검토후 의향에 대해서 회신 주시면 감사하겠습니다.`
+    }
     return (
       <Form onSubmit={this.handleSubmit}>
         <Form.Item label="Positions" {...formItemLayout} hasFeedback>
@@ -169,8 +239,50 @@ class MailForm extends React.Component {
         </Form.Item>
 
         <Form.Item label="Content" {...formItemLayout}>
+          <Row>
+            <Col span={2} style={{ textAlign: 'left' }}>
+              <Tooltip placement="left" title={leftTooltip}>
+                <Button
+                  type="primary"
+                  icon="left"
+                  value="large"
+                  onClick={this.onLeftClick}
+                  disabled={leftTooltip ? false : true}
+                />
+              </Tooltip>
+            </Col>
+            <Col span={20} style={{ textAlign: 'center' }}>
+              {' '}
+              {position ? null : (
+                <span>
+                  {recentSendSMSData &&
+                    `No. ${smsContentIndex + 1} ${
+                      recentSendSMSData[smsContentIndex].modified_date
+                    }`}
+                </span>
+              )}
+              {/* <span>
+                {this.state.smsLength
+                  ? this.state.smsLength
+                  : smsContent && smsContent.length}
+                /90
+              </span> */}
+            </Col>
+            <Col span={2} style={{ textAlign: 'right' }}>
+              <Tooltip placement="right" title={rightTooltip}>
+                <Button
+                  type="primary"
+                  icon="right"
+                  value="large"
+                  onClick={this.onRightClick}
+                  disabled={rightTooltip ? false : true}
+                />
+              </Tooltip>
+            </Col>
+          </Row>
           {getFieldDecorator('content', {
-            initialValue: `안녕하세요, \n\n어제 제안드렸던 [${position}] 에 대해서 어떻게 생각해보셨는지 문의차 다시 메일 드립니다. \n\n간략히 검토후 의향에 대해서 회신 주시면 감사하겠습니다.`,
+            initialValue: smsContent,
+            // initialValue: `안녕하세요, \n\n어제 제안드렸던 [${position}] 에 대해서 어떻게 생각해보셨는지 문의차 다시 메일 드립니다. \n\n간략히 검토후 의향에 대해서 회신 주시면 감사하겠습니다.`,
             rules: [{ required: true }]
           })(<Input.TextArea rows={4} autosize={{ maxRows: 15 }} />)}
         </Form.Item>
@@ -193,7 +305,7 @@ class MailForm extends React.Component {
           <Button
             type="primary"
             htmlType="submit"
-            disabled={!!!position}
+            // disabled={!!!position}
             // onKeyPress={() => this.handleSubmit}
           >
             SEND

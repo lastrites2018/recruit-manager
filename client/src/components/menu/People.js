@@ -58,7 +58,8 @@ export default class People extends Component {
       positionData: [],
       searchCount: 0,
       currentKey: null,
-      loading: true
+      loading: true,
+      isReset: false
     }
 
     this.columns = [
@@ -216,6 +217,7 @@ export default class People extends Component {
           writeMailContent={this.writeMailContent}
           allRecipients={this.state.allRecipients}
           allEmails={this.state.allEmails}
+          user_id={this.props.user_id}
         />
       </Modal>
     </div>
@@ -503,7 +505,9 @@ export default class People extends Component {
   }
 
   fetch = () => {
-    console.log('people-fetch')
+    this.setState({
+      loading: true
+    })
     Axios.post(API.mainTable, {
       user_id: this.props.user_id,
       under_birth: 1900,
@@ -613,7 +617,18 @@ export default class People extends Component {
       const pagination = { ...this.state.pagination }
       pagination.total = 200
 
-      const result = data.data.result.reverse().map((row, i) => {
+      // const dateSortedData = data.data.result.sort((a, b) => {
+      //   // descend
+      //   return (
+      //     new Date(b.modified_date).getTime() -
+      //     new Date(a.modified_date).getTime()
+      //   )
+      // })
+
+      // fetchagain 시엔 rate로 정렬하기 때문에 날짜 정렬 없앰
+      const dateSortedData = data.data.result
+
+      const result = dateSortedData.map((row, i) => {
         const each = Object.assign({}, row)
         each.key = i
         return each
@@ -642,28 +657,9 @@ export default class People extends Component {
 
   handleSubmit = () => {
     console.log('submit', this.state)
-    this.setState({ selectedKeys: [], searchText: '' })
+    this.setState({ selectedKeys: [], searchText: '', isReset: true })
     this.fetchAgain()
   }
-
-  // _this.handleClearFilters = function () {
-  //   _this.setState({
-  //     selectedKeys: []
-  //   }, _this.handleConfirm);
-  // };
-
-  // _this.handleConfirm = function () {
-  //   _this.setVisible(false); // Call `setSelectedKeys` & `confirm` in the same time will make filter data not up to date
-  //   // https://github.com/ant-design/ant-design/issues/12284
-
-  //   _this.setState({}, _this.confirmFilter);
-  // };
-
-  // clearFilters = () => {
-  //   this.setState({
-  //     selectedKeys: []
-  //   }
-  // }
 
   handleDelete = key => {
     const dataSource = [...this.state.dataSource]
@@ -693,7 +689,10 @@ export default class People extends Component {
     this.setState({ visible: false })
   }
 
-  handleSearchReset = async () => {
+  resetAll = async () => {
+    if (this.state.searchText)
+      await this.setState({ searchText: '', isReset: true })
+
     await this.setState({
       mail: {},
       under_birth: '',
@@ -713,7 +712,6 @@ export default class People extends Component {
       phoneNumber: '',
       sms: {},
       smsVisible: false,
-      searchText: '',
       selected: '',
       andOr: '',
       positionData: [],
@@ -1016,46 +1014,62 @@ export default class People extends Component {
       selectedKeys,
       confirm,
       clearFilters
-    }) => (
-      <div style={{ padding: 8 }}>
-        <Input
-          ref={node => {
-            this.searchInput = node
-          }}
-          placeholder={`Search ${dataIndex}`}
-          value={selectedKeys[0]}
-          onChange={e =>
-            setSelectedKeys(e.target.value ? [e.target.value] : [])
-          }
-          onPressEnter={() => this.handleSearch(selectedKeys, confirm)}
-          style={{ width: 188, marginBottom: 8, display: 'block' }}
-        />
-        <Button
-          type="primary"
-          onClick={() => this.handleSearch(selectedKeys, confirm)}
-          icon="search"
-          size="small"
-          style={{ width: 90, marginRight: 8 }}
-        >
-          Search
-        </Button>
-        <Button
-          onClick={() => this.handleReset(clearFilters)}
-          size="small"
-          style={{ width: 90 }}
-        >
-          Reset
-        </Button>
-      </div>
-    ),
+    }) => {
+      if (
+        !this.state.searchText &&
+        this.state.isReset &&
+        selectedKeys.length > 0
+      ) {
+        console.log('실행?')
+        this.handleReset(clearFilters)
+        this.setState({ isReset: false })
+      }
+      return (
+        <div style={{ padding: 8 }}>
+          <Input
+            ref={node => {
+              this.searchInput = node
+            }}
+            placeholder={`Search ${dataIndex}`}
+            value={selectedKeys[0]}
+            onChange={e =>
+              setSelectedKeys(e.target.value ? [e.target.value] : [])
+            }
+            onPressEnter={() => this.handleSearch(selectedKeys, confirm)}
+            style={{ width: 188, marginBottom: 8, display: 'block' }}
+          />
+          <Button
+            type="primary"
+            onClick={() => this.handleSearch(selectedKeys, confirm)}
+            icon="search"
+            size="small"
+            style={{ width: 90, marginRight: 8 }}
+          >
+            Search
+          </Button>
+          <Button
+            onClick={() => this.handleReset(clearFilters)}
+            size="small"
+            style={{ width: 90 }}
+          >
+            Reset
+          </Button>
+        </div>
+      )
+    },
     filterIcon: filtered => (
       <Icon type="search" style={{ color: filtered ? '#1890ff' : undefined }} />
     ),
-    onFilter: (value, record) =>
-      record[dataIndex]
-        .toString()
-        .toLowerCase()
-        .includes(value.toLowerCase()),
+
+    onFilter: (value, record) => {
+      return (
+        record[dataIndex] &&
+        record[dataIndex]
+          .toString()
+          .toLowerCase()
+          .includes(value.toLowerCase())
+      )
+    },
     onFilterDropdownVisibleChange: visible => {
       if (visible) {
         setTimeout(() => this.searchInput.select())
@@ -1164,6 +1178,21 @@ export default class People extends Component {
         console.log('failed to delete resumes', err)
       }
     }
+  }
+
+  handleTableChange = (pagination, filters, sorter) => {
+    const pager = { ...this.state.pagination }
+    pager.current = pagination.current
+    this.setState({
+      pagination: pager
+    })
+    this.fetch({
+      results: pagination.pageSize,
+      page: pagination.current,
+      sortField: sorter.field,
+      sortOrder: sorter.order,
+      ...filters
+    })
   }
 
   showUpdateResumeModal = () => {
@@ -1317,7 +1346,7 @@ export default class People extends Component {
         <Button
           style={{ marginLeft: '10px' }}
           type="primary"
-          onClick={this.handleSearchReset}
+          onClick={this.resetAll}
         >
           Reset
         </Button>
@@ -1382,6 +1411,7 @@ export default class People extends Component {
             components={components}
             rowKey="rm_code"
             loading={this.state.loading}
+            // onChange={this.handleTableChange}
             rowClassName={() => 'editable-row'}
             rowSelection={rowSelection}
             onRow={record => ({
