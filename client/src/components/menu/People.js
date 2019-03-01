@@ -370,65 +370,6 @@ export default class People extends Component {
     )
   }
 
-  // sendSMS = async () => {
-  //   await console.log('state', this.state.sms)
-  //   await console.log('selected rows: ', this.state.selectedRowKeys)
-  //   await console.log('preparing to send')
-  //   if (this.state.selectedRowKeys.length === 0) {
-  //     try {
-  //       await Axios.post(API.sendSMS, {
-  //         user_id: this.props.user_id,
-  //         rm_code: '',
-  //         recipient: this.state.sms.receiver,
-  //         body: this.state.sms.content,
-  //         position: ''
-  //       })
-  //       await console.log(`${this.state.sms.receiver}에 문자를 보냈습니다.`)
-  //       // await this.resetSelections()
-  //     } catch (err) {
-  //       console.log('send one SMS error', err)
-  //     }
-  //   }
-
-  //   if (this.state.selectedRowKeys.length === 1) {
-  //     try {
-  //       await Axios.post(API.sendSMS, {
-  //         user_id: this.props.user_id,
-  //         rm_code: this.state.selectedRowKeys[0],
-  //         recipient: this.state.selectedRows[0].mobile,
-  //         body: this.state.sms.content,
-  //         position: `${this.state.sms.positionCompany}|${this.state.sms.select}`
-  //       })
-  //       await console.log(
-  //         `${this.state.selectedRows[0].mobile}에 문자를 보냈습니다.`
-  //       )
-  //       // await this.resetSelections()
-  //     } catch (err) {
-  //       console.log('send one SMS error', err)
-  //     }
-  //   } else {
-  //     try {
-  //       for (let i = 0; i < this.state.selectedRowKeys.length; i++) {
-  //         await setTimeout(() => {
-  //           Axios.post(API.sendSMS, {
-  //             user_id: this.props.user_id,
-  //             rm_code: this.state.selectedRowKeys[i],
-  //             recipient: this.state.selectedRows[i].mobile,
-  //             body: this.state.sms.content,
-  //             position: `${this.state.sms.positionCompany}|${
-  //               this.state.sms.select
-  //             }`
-  //           })
-  //         }, 100)
-  //       }
-  //       await alert(`문자를 보냈습니다.`)
-  //       // await this.resetSelections()
-  //     } catch (err) {
-  //       console.log('sending multiple SMS error', err)
-  //     }
-  //   }
-  // }
-
   resetSelections = () => {
     console.log('resetting row selection')
     this.setState({
@@ -454,7 +395,6 @@ export default class People extends Component {
       await Axios.post(API.rmDetail, {
         user_id: this.props.user_id,
         rm_code: this.state.clickedData.rm_code
-        // user_id: 'rmrm',
         // rm_code: 'incrute_2017042102318'
       })
         .then(res => {
@@ -467,41 +407,6 @@ export default class People extends Component {
           console.log(err.response)
         })
     }
-  }
-
-  handleClick = async clickedData => {
-    await this.setState({ clickedData })
-
-    const resumeTitle = {
-      mobile:
-        clickedData.mobile && clickedData.mobile !== 'null'
-          ? clickedData.mobile
-          : '등록된 번호 없음',
-      email:
-        clickedData.email && clickedData.email !== 'null'
-          ? clickedData.email
-          : '등록된 이메일 없음',
-      gender:
-        clickedData.gender && clickedData.gender !== 'nu'
-          ? clickedData.gender
-          : '등록된 성별 없음',
-      birth:
-        clickedData.birth && clickedData.birth !== 'null'
-          ? clickedData.birth
-          : '등록된 나이 없음',
-      name:
-        clickedData.name && clickedData.name !== 'null'
-          ? clickedData.name
-          : '등록된 이름 없음'
-    }
-    await this.setState({
-      resumeDetailTitle: `${resumeTitle.name} | ${resumeTitle.birth} | ${
-        resumeTitle.gender
-      } | ${resumeTitle.mobile} | ${resumeTitle.email}`
-    })
-
-    await this.getResumeDetail(clickedData.rm_code)
-    await this.showModal()
   }
 
   fetch = () => {
@@ -529,7 +434,6 @@ export default class People extends Component {
       })
 
       const result = dateSortedData.map((row, i) => {
-        // const result = data.data.result.reverse().map((row, i) => {
         const each = Object.assign({}, row)
         each.key = i
         if (each.url.includes('jobkorea')) each.website = 'jobkorea'
@@ -732,34 +636,12 @@ export default class People extends Component {
     // const koreanAge =
     //   (await clickedData.birth) && koreanAgetoYear(clickedData.birth)
 
-    const resumeTitle = await {
-      mobile:
-        clickedData.mobile && clickedData.mobile !== 'null'
-          ? clickedData.mobile
-          : '등록된 번호 없음',
-      email:
-        clickedData.email && clickedData.email !== 'null'
-          ? clickedData.email
-          : '등록된 이메일 없음',
-      gender:
-        clickedData.gender && clickedData.gender !== 'nu'
-          ? clickedData.gender
-          : '등록된 성별 없음',
-      birth:
-        clickedData.birth && clickedData.birth !== 'null'
-          ? clickedData.birth
-          : // ? `${clickedData.birth} ${koreanAge}살`
-            '등록된 나이 없음',
-      name:
-        clickedData.name && clickedData.name !== 'null'
-          ? clickedData.name
-          : '등록된 이름 없음'
-    }
+    const resumeTitle = await this.resumeTitle(clickedData)
+
     await this.setState({
-      resumeDetailTitle: `${resumeTitle.name} | ${resumeTitle.birth} | ${
-        resumeTitle.gender
-      } | ${resumeTitle.mobile} | ${resumeTitle.email}`
+      resumeDetailTitle: this.resumeDetailTitle(resumeTitle)
     })
+
     await this.getResumeDetail(this.state.clickedData.rm_code)
   }
 
@@ -771,36 +653,68 @@ export default class People extends Component {
       }
     }
     const { clickedData } = await this.state
+    const resumeTitle = await this.resumeTitle(clickedData)
 
-    const resumeTitle = await {
-      mobile:
-        clickedData.mobile && clickedData.mobile !== 'null'
-          ? clickedData.mobile
-          : '등록된 번호 없음',
-      email:
-        clickedData.email && clickedData.email !== 'null'
-          ? clickedData.email
-          : '등록된 이메일 없음',
-      gender:
-        clickedData.gender && clickedData.gender !== 'nu'
-          ? clickedData.gender
-          : '등록된 성별 없음',
-      birth:
-        clickedData.birth && clickedData.birth !== 'null'
-          ? clickedData.birth
-          : '등록된 나이 없음',
-      name:
-        clickedData.name && clickedData.name !== 'null'
-          ? clickedData.name
-          : '등록된 이름 없음'
-    }
     await this.setState({
-      resumeDetailTitle: `${resumeTitle.name} | ${resumeTitle.birth} | ${
-        resumeTitle.gender
-      } | ${resumeTitle.mobile} | ${resumeTitle.email}`
+      resumeDetailTitle: this.resumeDetailTitle(resumeTitle)
     })
     await this.getResumeDetail(this.state.clickedData.rm_code)
   }
+
+  handleClick = async clickedData => {
+    await this.setState({ clickedData })
+    const resumeTitle = await this.resumeTitle(clickedData)
+
+    await this.setState({
+      resumeDetailTitle: this.resumeDetailTitle(resumeTitle)
+    })
+
+    await this.getResumeDetail(clickedData.rm_code)
+    await this.showModal()
+  }
+
+  resumeDetailTitle = resumeTitle => (
+    <span>
+      {resumeTitle.name} | {resumeTitle.birth} | {resumeTitle.gender} |{' '}
+      {resumeTitle.mobile} | {resumeTitle.email} | {resumeTitle.url}
+    </span>
+  )
+
+  resumeTitle = clickedData => ({
+    mobile:
+      clickedData.mobile && clickedData.mobile !== 'null'
+        ? clickedData.mobile
+        : '등록된 번호 없음',
+    email:
+      clickedData.email && clickedData.email !== 'null'
+        ? clickedData.email
+        : '등록된 이메일 없음',
+    gender:
+      clickedData.gender && clickedData.gender !== 'nu'
+        ? clickedData.gender
+        : '등록된 성별 없음',
+    birth:
+      clickedData.birth && clickedData.birth !== 'null'
+        ? clickedData.birth
+        : '등록된 나이 없음',
+    name:
+      clickedData.name && clickedData.name !== 'null'
+        ? clickedData.name
+        : '등록된 이름 없음',
+    url:
+      clickedData.url && clickedData.url !== 'null' ? (
+        <a
+          href={clickedData.url}
+          rel="noopener noreferrer"
+          target="_blank"
+          onClick={this.handleCancel}
+        >
+          URL
+        </a>
+      ) : (
+        '등록된 URL 없음'
+      )
+  })
 
   arrowKeyPush = async event => {
     if (this.state.visible && event.keyCode === 37) {
@@ -810,9 +724,9 @@ export default class People extends Component {
     }
   }
   peopleModal = () => {
-    let schoolDetail = this.state.resumeDetailData[0].school
-      .split(`\\n`)
-      .map(line => {
+    let schoolDetail =
+      this.state.resumeDetailData[0] &&
+      this.state.resumeDetailData[0].school.split(`\\n`).map(line => {
         return (
           <span>
             {line}
@@ -821,21 +735,23 @@ export default class People extends Component {
         )
       })
 
-    let companyDetail = this.state.resumeDetailData[0].company
-      // .split('null')
-      .split(`\\n`)
-      .map(line => {
-        return (
-          <span>
-            {line}
-            <br />
-          </span>
-        )
-      })
+    let companyDetail =
+      this.state.resumeDetailData[0] &&
+      this.state.resumeDetailData[0].company
+        // .split('null')
+        .split(`\\n`)
+        .map(line => {
+          return (
+            <span>
+              {line}
+              <br />
+            </span>
+          )
+        })
 
-    let othersDetail = this.state.resumeDetailData[0].others
-      .split(`\\n`)
-      .map(line => {
+    let othersDetail =
+      this.state.resumeDetailData[0] &&
+      this.state.resumeDetailData[0].others.split(`\\n`).map(line => {
         return (
           <span>
             {line}
@@ -910,7 +826,8 @@ export default class People extends Component {
           <Row style={{ textAlign: 'left' }}>
             <Col span={2} />
             <Col span={20}>
-              {this.state.resumeDetailData[0].others.length > 200 ? (
+              {this.state.resumeDetailData[0] &&
+              this.state.resumeDetailData[0].others.length > 200 ? (
                 <details>
                   <summary>
                     {this.state.resumeDetailData[0].others.slice(0, 40)}
@@ -965,7 +882,7 @@ export default class People extends Component {
       }
     ]
 
-    if (!this.state.resumeDetailData[0].memo) {
+    if (!this.state.resumeDetailData[0]) {
       return (
         <div>
           <Divider />
