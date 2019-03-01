@@ -262,40 +262,54 @@ export default class Mail extends Component {
     </div>
   )
 
-  mailDetailModal = () => (
-    <div>
-      <Modal
-        title={this.state.mailDetailTitle}
-        visible={this.state.detailVisible}
-        onOK={this.handleDetailOK}
-        onCancel={this.handleDetailCancel}
-        footer={null}
-        width="50%"
-      >
-        <Row style={{ textAlign: 'left' }}>
-          <Col span={20}>
-            <h3>[ Send Content ]</h3>
-          </Col>
-        </Row>
-        <Row style={{ textAlign: 'left' }}>
-          <Col span={20}>
-            <p>{this.state.mailDetail.body}</p>
-          </Col>
-        </Row>
-        <Divider />
-        <Row style={{ textAlign: 'left' }}>
-          <Col span={20}>
-            <h3>[ Send Date ]</h3>
-          </Col>
-        </Row>
-        <Row style={{ textAlign: 'left' }}>
-          <Col span={20}>
-            <p>{this.state.mailDetail.send_date}</p>
-          </Col>
-        </Row>
-      </Modal>
-    </div>
-  )
+  mailDetailModal = () => {
+    const splitBody =
+      this.state.mailDetail.body &&
+      this.state.mailDetail.body.split(`\n`).map(line => {
+        return (
+          <span>
+            {line}
+            <br />
+          </span>
+        )
+      })
+
+    return (
+      <div>
+        <Modal
+          title={this.state.mailDetailTitle}
+          visible={this.state.detailVisible}
+          onOK={this.handleDetailOK}
+          onCancel={this.handleDetailCancel}
+          footer={null}
+          width="50%"
+        >
+          <Row style={{ textAlign: 'left' }}>
+            <Col span={20}>
+              <h3>[ Send Content ]</h3>
+            </Col>
+          </Row>
+          <Row style={{ textAlign: 'left' }}>
+            <Col span={20}>
+              <p>{splitBody}</p>
+              {/* <p>{this.state.mailDetail.body}</p> */}
+            </Col>
+          </Row>
+          <Divider />
+          <Row style={{ textAlign: 'left' }}>
+            <Col span={20}>
+              <h3>[ Send Date ]</h3>
+            </Col>
+          </Row>
+          <Row style={{ textAlign: 'left' }}>
+            <Col span={20}>
+              <p>{this.state.mailDetail.send_date}</p>
+            </Col>
+          </Row>
+        </Modal>
+      </div>
+    )
+  }
 
   showDetailModal = () => {
     console.log('show mail detail modal')
