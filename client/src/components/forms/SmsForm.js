@@ -305,7 +305,7 @@ class SmsForm extends React.Component {
             SEND
           </Button>
 
-          <Button type="primary" value="large" onClick={this.resetContent} />
+          {/* <Button type="primary" value="large" onClick={this.resetContent} /> */}
         </Form.Item>
       </Form>
     )
