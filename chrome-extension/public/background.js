@@ -1,5 +1,5 @@
 /*global chrome*/
-const tabInfo = { url: null, html: null, candidate: {}, user: null };
+const tabInfo = { url: null, html: null, candidate: {}, userEmail: null };
 
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
   switch (message.action) {
@@ -23,18 +23,19 @@ async function init() {
 
 function sendUserEmail() {
   chrome.extension.onConnect.addListener(function(port) {
-    console.log('Connected ...');
     port.onMessage.addListener(function(msg) {
-      console.log('message received: ' + msg);
-      console.log(tabInfo.user);
-      port.postMessage(tabInfo.user);
+      console.log('Received: ' + msg);
+      port.postMessage(tabInfo.userEmail);
     });
+  });
+  chrome.storage.sync.set({ userEmail: tabInfo.userEmail }, function() {
+    return tabInfo.userEmail;
   });
 }
 
 function getUser() {
   return chrome.identity.getProfileUserInfo(function(userInfo) {
-    tabInfo.user = userInfo.email;
+    tabInfo.userEmail = userInfo.email;
   });
 }
 

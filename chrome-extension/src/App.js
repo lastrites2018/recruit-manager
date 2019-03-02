@@ -32,7 +32,8 @@ class App extends Component {
         sign: '\n커리어셀파 강상모 드림. 010-3929-7682'
       },
       validated: false,
-      userEmail: null
+      userEmail: null,
+      isLoggedIn: false
     };
   }
 
@@ -111,7 +112,7 @@ class App extends Component {
     Axios.post(Api.sendMail, {
       user_id: 'rmrm',
       rm_code: 'resume_3', // 수정 필요
-      sender: this.state.user,
+      sender: this.state.userEmail,
       recipient: this.state.candidate.email,
       subject: this.state.mail.title,
       body:
@@ -162,14 +163,46 @@ class App extends Component {
     console.log('sms has been sent');
   };
 
-  requestUserIdentity = async () => {
+  requestUserIdentity = () => {
     var port = chrome.extension.connect({
       name: 'User Email Communication'
     });
-    await port.postMessage('Requesting user email address');
-    await port.onMessage.addListener(msg => {
+
+    port.postMessage('Requesting user email address');
+
+    port.onMessage.addListener(msg => {
       this.setState({ userEmail: msg });
     });
+
+    chrome.storage.sync.get(['userEmail'], result => {
+      if (result) {
+        this.setState({ isLoggedIn: true });
+        // this.validateUser();
+      }
+    });
+  };
+
+  /* timer */
+  // sleep(ms) {
+  //   return new Promise(resolve => setTimeout(resolve, ms));
+  // }
+
+  /* user validation */
+  // 이거 사용하면 로그인 버튼을 두 번 클릭해야지만 로그인 후 view 가 뜸...
+  // validateUser = () => {
+  //   const users = ['sungunkim367@gmail.com', 'lastrites2018@gmail.com];
+  //   for (let i = 0; i < users.length; i++) {
+  //     const regex = RegExp(users[i]);
+  //     if (regex.test(this.state.userEmail)) {
+  //       this.setState({ isLoggedIn: true });
+  //       break;
+  //     }
+  //   }
+  // };
+
+  logout = () => {
+    chrome.storage.sync.clear();
+    this.setState({ isLoggedIn: false });
   };
 
   render() {
@@ -190,7 +223,7 @@ class App extends Component {
 
     return (
       <Container>
-        {this.state.userEmail === null ? (
+        {this.state.isLoggedIn === false ? (
           <div>
             <h2 className="text-center">Unauthorized user</h2>
             <br />
@@ -200,7 +233,9 @@ class App extends Component {
           </div>
         ) : (
           <div>
-            <p className="text-right">{this.state.userEmail}</p>
+            <Button style={{ float: 'right' }} size="sm" onClick={this.logout}>
+              로그아웃
+            </Button>
             <h2 className="text-center">Recruit Manager</h2>
             <br />
             <Row>
@@ -215,6 +250,8 @@ class App extends Component {
             </Row>
             <Row>
               <Col>SMS: {smsCount}</Col>
+              <Col />
+              <Col className="text-right">{this.state.userEmail}</Col>
             </Row>
             <hr />
             <Row>

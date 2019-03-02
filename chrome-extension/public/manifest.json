@@ -20,7 +20,8 @@
     "activeTab",
     "background",
     "identity",
-    "identity.email"
+    "identity.email",
+    "storage"
   ],
   "background": {
     "scripts": ["background.js"],
