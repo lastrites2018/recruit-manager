@@ -21,18 +21,6 @@ async function init() {
   console.log(tabInfo);
 }
 
-function sendUserEmail() {
-  chrome.extension.onConnect.addListener(function(port) {
-    port.onMessage.addListener(function(msg) {
-      console.log('Received: ' + msg);
-      port.postMessage(tabInfo.userEmail);
-    });
-  });
-  chrome.storage.sync.set({ userEmail: tabInfo.userEmail }, function() {
-    return tabInfo.userEmail;
-  });
-}
-
 function getUser() {
   return chrome.identity.getProfileUserInfo(function(userInfo) {
     tabInfo.userEmail = userInfo.email;
@@ -113,4 +101,16 @@ function sendRequest() {
     .then(response => response.json())
     .then(responseJson => console.log(responseJson))
     .catch(error => console.log(error));
+}
+
+function sendUserEmail() {
+  chrome.extension.onConnect.addListener(function(port) {
+    port.onMessage.addListener(async function(msg) {
+      console.log('Received: ' + msg);
+      await port.postMessage(tabInfo.userEmail);
+    });
+  });
+  chrome.storage.local.set({ userEmail: tabInfo.userEmail }, function() {
+    return tabInfo.userEmail;
+  });
 }

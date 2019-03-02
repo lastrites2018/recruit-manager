@@ -38,6 +38,7 @@ class App extends Component {
   }
 
   componentDidMount() {
+    this.checkStorage();
     this.fetchPosition();
   }
 
@@ -163,21 +164,28 @@ class App extends Component {
     console.log('sms has been sent');
   };
 
+  checkStorage = () => {
+    chrome.storage.local.get(['userEmail'], result => {
+      // add more email addresses below
+      if (result.userEmail && result.userEmail === 'sungunkim367@gmail.com') {
+        this.setState({ isLoggedIn: true, userEmail: result.userEmail });
+      } else {
+        alert('unauthorized email address!');
+      }
+    });
+  };
+
   requestUserIdentity = () => {
     var port = chrome.extension.connect({
       name: 'User Email Communication'
     });
-
     port.postMessage('Requesting user email address');
-
-    port.onMessage.addListener(msg => {
-      this.setState({ userEmail: msg });
-    });
-
-    chrome.storage.sync.get(['userEmail'], result => {
-      if (result) {
-        this.setState({ isLoggedIn: true });
-        // this.validateUser();
+    port.onMessage.addListener(userEmail => {
+      // add more email addresses below
+      if (userEmail === 'sungunkim367@gmail.com') {
+        this.setState({ userEmail, isLoggedIn: true });
+      } else {
+        alert('unauthorized email address!');
       }
     });
   };
@@ -187,21 +195,8 @@ class App extends Component {
   //   return new Promise(resolve => setTimeout(resolve, ms));
   // }
 
-  /* user validation */
-  // 이거 사용하면 로그인 버튼을 두 번 클릭해야지만 로그인 후 view 가 뜸...
-  // validateUser = () => {
-  //   const users = ['sungunkim367@gmail.com', 'lastrites2018@gmail.com];
-  //   for (let i = 0; i < users.length; i++) {
-  //     const regex = RegExp(users[i]);
-  //     if (regex.test(this.state.userEmail)) {
-  //       this.setState({ isLoggedIn: true });
-  //       break;
-  //     }
-  //   }
-  // };
-
   logout = () => {
-    chrome.storage.sync.clear();
+    chrome.storage.local.clear();
     this.setState({ isLoggedIn: false });
   };
 
