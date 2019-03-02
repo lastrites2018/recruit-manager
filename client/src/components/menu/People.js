@@ -19,8 +19,7 @@ import {
   Modal,
   Row,
   Select,
-  Table,
-  Tooltip
+  Table
 } from 'antd'
 import Highlighter from 'react-highlight-words'
 import { sendSMS, koreanAgetoYear } from '../../util/UtilFunction'
@@ -155,7 +154,12 @@ export default class People extends Component {
         width: 50,
         render: (text, row, index) => {
           return (
-            <a href={text} target="_blank" onClick={this.handleCancel}>
+            <a
+              href={text}
+              rel="noopener noreferrer"
+              target="_blank"
+              onClick={this.handleCancel}
+            >
               URL
             </a>
           )
@@ -461,8 +465,8 @@ export default class People extends Component {
     })
   }
 
-  //send input data
   fetchAgain = () => {
+    //send input data
     const {
       under_birth,
       upper_birth,
@@ -723,42 +727,33 @@ export default class People extends Component {
       this.onRightClick()
     }
   }
+
+  splitLine(data) {
+    return data
+      .split(`\\n`)
+      .filter(str => !!str && /\S/.test(str))
+      .map(line => {
+        return (
+          <span>
+            {line}
+            <br />
+          </span>
+        )
+      })
+  }
+
   peopleModal = () => {
     let schoolDetail =
       this.state.resumeDetailData[0] &&
-      this.state.resumeDetailData[0].school.split(`\\n`).map(line => {
-        return (
-          <span>
-            {line}
-            <br />
-          </span>
-        )
-      })
+      this.splitLine(this.state.resumeDetailData[0].school)
 
     let companyDetail =
       this.state.resumeDetailData[0] &&
-      this.state.resumeDetailData[0].company
-        // .split('null')
-        .split(`\\n`)
-        .map(line => {
-          return (
-            <span>
-              {line}
-              <br />
-            </span>
-          )
-        })
+      this.splitLine(this.state.resumeDetailData[0].company)
 
     let othersDetail =
       this.state.resumeDetailData[0] &&
-      this.state.resumeDetailData[0].others.split(`\\n`).map(line => {
-        return (
-          <span>
-            {line}
-            <br />
-          </span>
-        )
-      })
+      this.splitLine(this.state.resumeDetailData[0].others)
 
     return (
       <div>
@@ -780,7 +775,6 @@ export default class People extends Component {
           <Row style={{ textAlign: 'left' }}>
             <Col span={2} />
             <Col span={20}>
-              {/* <p>{this.state.resumeDetailData[0].school}</p> */}
               <p>{schoolDetail}</p>
             </Col>
             <Col span={2} />
@@ -804,7 +798,6 @@ export default class People extends Component {
             </Col>
             <Col span={20}>
               <p>{companyDetail}</p>
-              {/* <p>{this.state.resumeDetailData[0].company}</p> */}
             </Col>
             <Col span={2} style={{ textAlign: 'right' }}>
               <Button
@@ -837,7 +830,6 @@ export default class People extends Component {
                 </details>
               ) : (
                 othersDetail
-                // this.state.resumeDetailData[0].others
               )}
             </Col>
             <Col span={2} />
