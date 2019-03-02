@@ -3,13 +3,13 @@ const tabInfo = { url: null, html: null, candidate: {} };
 
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
   switch (message.action) {
-    case "popupOpen": {
+    case 'popupOpen': {
       init();
       console.log(tabInfo);
       break;
     }
     default: {
-      console.log("no popup");
+      console.log('no popup');
     }
   }
 });
@@ -20,16 +20,21 @@ async function init() {
 }
 
 function getURL() {
-  return chrome.tabs.query({ currentWindow: true, active: true }, function(
-    tabs
-  ) {
-    tabInfo.url = tabs[0].url;
-  });
+  return chrome.tabs.query(
+    {
+      active: true,
+      currentWindow: true
+    },
+    ([currentTab]) => {
+      tabInfo.url = currentTab.url;
+      console.log(currentTab.url);
+    }
+  );
 }
 function getHTML() {
   return chrome.tabs.executeScript(
     null,
-    { code: "var html = document.documentElement.outerHTML; html" },
+    { code: 'var html = document.documentElement.outerHTML; html' },
     function(html) {
       tabInfo.html = html;
       parse();
@@ -38,11 +43,11 @@ function getHTML() {
 }
 
 function parse() {
-  if (tabInfo.url && tabInfo.url.includes("saramin")) {
-    runQuery("saramin");
-  } else if (tabInfo.url && tabInfo.url.includes("jobkorea")) {
-    runQuery("jobkorea");
-  } else if (tabInfo.url && tabInfo.url.includes("linkedin")) {
+  if (tabInfo.url && tabInfo.url.includes('saramin')) {
+    runQuery('saramin');
+  } else if (tabInfo.url && tabInfo.url.includes('jobkorea')) {
+    runQuery('jobkorea');
+  } else if (tabInfo.url && tabInfo.url.includes('linkedin')) {
     sendRequest();
   }
 }
@@ -69,20 +74,20 @@ function runQuery(website) {
         }
       );
     } else {
-      console.log("wrong website!");
+      console.log('wrong website!');
     }
   }
 }
 
 function sendRequest() {
-  const api = "http://128.199.203.161:8500/extension/parsing";
-  const input = { user_id: "rmrm", url: tabInfo.url, html: tabInfo.html[0] };
+  const api = 'http://128.199.203.161:8500/extension/parsing';
+  const input = { user_id: 'rmrm', url: tabInfo.url, html: tabInfo.html[0] };
   const headers = {
-    "Content-Type": "application/json",
-    "Access-Control-Origin": "*"
+    'Content-Type': 'application/json',
+    'Access-Control-Origin': '*'
   };
   fetch(api, {
-    method: "POST",
+    method: 'POST',
     headers: headers,
     body: JSON.stringify(input)
   })

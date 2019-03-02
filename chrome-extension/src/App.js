@@ -5,34 +5,52 @@ import Axios from 'axios';
 import Api from './utils/api';
 
 class App extends Component {
-  state = {
-    resumeCount: 100,
-    mailCount: 100,
-    smsCount: 100,
-    candidate: { rm_code: '', email: '', cell: '' },
-    positions: [],
-    selectedPosition: null,
-    positionDetail: '',
-    memo: [],
-    newNote: '',
-    mail: {
-      title: '',
-      content:
-        '안녕하세요, \n간략히 검토후 의향에 대해서 회신 주시면 감사하겠습니다.',
-      sign: `\n커리어셀파 헤드헌터 강상모 \n+82 010 3929 7682 \nwww.careersherpa.co.kr`
-    },
-    sms: {
-      content: `안녕하세요 ${
-        this.selectedPosition
-      }으로 제안드리오니 메일 검토를 부탁드리겠습니다. 감사합니다.`,
-      sign: '\n커리어셀파 강상모 드림. 010-3929-7682'
-    },
-    validated: false
-  };
+  constructor(props) {
+    super(props);
+    // chrome.runtime.sendMessage({ action: 'popupOpen' });
+
+    this.state = {
+      resumeCount: 100,
+      mailCount: 100,
+      smsCount: 100,
+      candidate: { rm_code: '', email: '', cell: '' },
+      positions: [],
+      selectedPosition: null,
+      positionDetail: '',
+      memo: [],
+      newNote: '',
+      mail: {
+        title: '',
+        content:
+          '안녕하세요, \n간략히 검토후 의향에 대해서 회신 주시면 감사하겠습니다.',
+        sign: `\n커리어셀파 헤드헌터 강상모 \n+82 010 3929 7682 \nwww.careersherpa.co.kr`
+      },
+      sms: {
+        content: `안녕하세요 ${
+          this.selectedPosition
+        }으로 제안드리오니 메일 검토를 부탁드리겠습니다. 감사합니다.`,
+        sign: '\n커리어셀파 강상모 드림. 010-3929-7682'
+      },
+      validated: false,
+      user: ''
+    };
+  }
 
   componentDidMount() {
+    this.getUser();
     this.fetchPosition();
   }
+
+  getUser = () => {
+    const user = chrome.identity.getProfileUserInfo(function(userInfo) {
+      console.log(user);
+      return userInfo;
+      /* Use userInfo.email, or better (for privacy) userInfo.id
+         They will be empty if user is not signed in in Chrome */
+    });
+    this.setState({ user });
+    return user;
+  };
 
   fetchPosition = async () => {
     const positions = await Axios.post(Api.getPosition, {
@@ -173,7 +191,8 @@ class App extends Component {
     console.log(this.state);
     return (
       <Container>
-        <h1 className="text-center">Recruit Manager</h1>
+        <h2>Welcome back, {this.state.user}!</h2>
+        <h2 className="text-center">Recruit Manager</h2>
         <br />
         <Row>
           <Col>Resume: {resumeCount}</Col>
