@@ -1,11 +1,10 @@
 /*global chrome*/
-const tabInfo = { url: null, html: null, candidate: {} };
+const tabInfo = { url: null, html: null, candidate: {}, user: null };
 
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
   switch (message.action) {
     case 'popupOpen': {
       init();
-      console.log(tabInfo);
       break;
     }
     default: {
@@ -15,8 +14,28 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 });
 
 async function init() {
+  await getUser();
   await getURL();
   await getHTML();
+  await sendUserEmail();
+  console.log(tabInfo);
+}
+
+function sendUserEmail() {
+  chrome.extension.onConnect.addListener(function(port) {
+    console.log('Connected ...');
+    port.onMessage.addListener(function(msg) {
+      console.log('message received: ' + msg);
+      console.log(tabInfo.user);
+      port.postMessage(tabInfo.user);
+    });
+  });
+}
+
+function getUser() {
+  return chrome.identity.getProfileUserInfo(function(userInfo) {
+    tabInfo.user = userInfo.email;
+  });
 }
 
 function getURL() {
@@ -27,7 +46,6 @@ function getURL() {
     },
     ([currentTab]) => {
       tabInfo.url = currentTab.url;
-      console.log(currentTab.url);
     }
   );
 }

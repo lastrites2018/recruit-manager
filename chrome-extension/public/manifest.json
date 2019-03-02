@@ -15,7 +15,13 @@
     "128": "logo.png"
   },
   "content_security_policy": "script-src 'self' 'sha256-GgRxrVOKNdB4LrRsVPDSbzvfdV4UqglmviH9GoBJ5jk='; object-src 'self'",
-  "permissions": ["tabs", "activeTab", "background", "identity"],
+  "permissions": [
+    "tabs",
+    "activeTab",
+    "background",
+    "identity",
+    "identity.email"
+  ],
   "background": {
     "scripts": ["background.js"],
     "persistent": false
