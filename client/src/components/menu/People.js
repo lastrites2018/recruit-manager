@@ -20,7 +20,8 @@ import {
   Modal,
   Row,
   Select,
-  Table
+  Table,
+  Popconfirm
 } from 'antd'
 import Highlighter from 'react-highlight-words'
 import { sendSMS, koreanAgetoYear } from '../../util/UtilFunction'
@@ -434,6 +435,7 @@ export default class People extends Component {
       })
         .then(res => {
           console.log('getResumeDetail_res', res.data.result)
+
           this.setState({
             resumeDetailData: res.data.result
           })
@@ -898,28 +900,53 @@ export default class People extends Component {
     )
   }
 
+  handleMemoDelete = async record => {
+    console.log('record_key', record)
+    // console.log('record_key', record_key)
+    try {
+      await Axios.post(API.deleteMemo, {
+        user_id: this.props.user_id,
+        memo_id: record.memo_id
+      })
+
+      await console.log('memo deleted')
+      await this.getResumeDetail(this.state.clickedData.rm_code)
+
+      // await this.props.handleMemoAddCancel()
+      // const memoData = await {
+      //   user_id: this.props.user_id,
+      //   rm_code: this.props.rm_code
+      // }
+      // await this.props.getResumeDetail(this.props.rm_code, memoData)
+      // // await this.getResumeDetail(memoData)
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
   memoTable = () => {
     const columns = [
       {
         title: 'Position',
         dataIndex: 'position',
         align: 'center',
-        width: '20%'
+        // width: '20%',
+        width: 80
       },
       {
         title: 'Client',
         dataIndex: 'client_name',
         align: 'center',
-        width: 100
+        width: 80
       },
       {
-        title: '담당 헤드헌터',
-        dataIndex: 'memo_username',
+        title: '담당 헤드헌터ID',
+        dataIndex: 'user_id',
         align: 'center',
-        width: 75
+        width: 50
       },
       {
-        title: '일시',
+        title: '마지막 수정 일시',
         dataIndex: 'modified_date',
         align: 'center',
         width: 90
@@ -929,13 +956,24 @@ export default class People extends Component {
         dataIndex: 'note',
         align: 'center',
         width: '30%'
+      },
+      {
+        title: 'Action',
+        dataIndex: 'Action',
+        align: 'center',
+        width: 60,
+        render: (text, record) =>
+          this.state.resumeDetailData.length >= 1 ? (
+            <Popconfirm
+              title="Sure to delete?"
+              onConfirm={() => this.handleMemoDelete(record)}
+              // onConfirm={() => this.handleMemoDelete(record.key)}
+            >
+              <a href="javascript:;">Delete</a>
+            </Popconfirm>
+          ) : null
       }
     ]
-
-    console.log(
-      'this.state.resumeDetailData[0].memo',
-      this.state.resumeDetailData[0].memo
-    )
 
     let dateSortedMemo = []
     if (
@@ -950,6 +988,10 @@ export default class People extends Component {
           new Date(a.modified_date).getTime()
         )
       })
+
+      for (let i = 0; i < dateSortedMemo.length; i++) {
+        dateSortedMemo[i].key = i
+      }
     }
 
     return (
@@ -964,7 +1006,7 @@ export default class People extends Component {
         </Row>
 
         <Row>
-          <Button
+          {/* <Button
             type="primary"
             icon="edit"
             size="small"
@@ -978,8 +1020,8 @@ export default class People extends Component {
             // disabled={!hasSelectedOne}
           >
             메모 편집
-          </Button>
-          <Button
+          </Button> */}
+          {/* <Button
             type="primary"
             icon="delete"
             size="small"
@@ -993,7 +1035,7 @@ export default class People extends Component {
             // disabled={!hasSelectedMultiple}
           >
             메모 삭제
-          </Button>
+          </Button> */}
           <Button
             style={{
               float: 'right',
@@ -1012,22 +1054,31 @@ export default class People extends Component {
           <span
             style={{
               float: 'left',
-              marginLeft: 8,
+              // marginLeft: 8,
+              // marginLeft: 65,
               marginTop: 10,
               marginBottom: 5
             }}
           >
-            {this.state.resumeDetailData[0].memo.length > 0
-              ? `Total ${this.state.resumeDetailData[0].memo.length} Memos`
-              : ''}
+            {dateSortedMemo.length > 0
+              ? `Total ${dateSortedMemo.length} Memos`
+              : // ? `Total ${this.state.resumeDetailData[0].memo.length} Memos`
+                ''}
           </span>
         </Row>
-        <Table
-          bordered
-          columns={columns}
-          dataSource={dateSortedMemo}
-          size="middle"
-        />
+
+        <Row style={{ textAlign: 'left' }}>
+          {/* <Col span={2} /> */}
+          <Col span={24}>
+            <Table
+              bordered
+              columns={columns}
+              dataSource={dateSortedMemo}
+              size="middle"
+            />
+          </Col>
+          {/* <Col span={2} /> */}
+        </Row>
       </div>
     )
   }
