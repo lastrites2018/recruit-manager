@@ -5,6 +5,7 @@ import ResumeForm from '../forms/ResumeForm'
 import UpdateResumeForm from '../forms/UpdateResumeForm'
 import MailForm from '../forms/MailForm'
 import SmsForm from '../forms/SmsForm'
+import MemoForm from '../forms/MemoForm'
 import { EditableFormRow, EditableCell } from '../../util/Table'
 import 'react-table/react-table.css'
 import './menu.css'
@@ -58,7 +59,8 @@ export default class People extends Component {
       searchCount: 0,
       currentKey: null,
       loading: true,
-      isReset: false
+      isReset: false,
+      memoAddVisible: false
     }
 
     this.columns = [
@@ -339,6 +341,31 @@ export default class People extends Component {
     await this.setState({ loading: false })
   }
 
+  addMemoModal = () => {
+    console.log('addMemoModal', this.state.clickedData)
+    return (
+      <div>
+        <Modal
+          // title={title}
+          title="add memo"
+          visible={this.state.memoAddVisible}
+          onOk={this.handleMemoAddOk}
+          onCancel={this.handleMemoAddCancel}
+          footer={null}
+        >
+          <MemoForm.MemoRegistration
+            selectedRows={this.state.selectedRows}
+            // writeSmsContent={this.writeSmsContent}
+            user_id={this.props.user_id}
+            rm_code={this.state.clickedData.rm_code}
+            handleMemoAddCancel={this.handleMemoAddCancel}
+            getResumeDetail={this.getResumeDetail}
+          />
+        </Modal>
+      </div>
+    )
+  }
+
   smsModal = () => {
     // let receiversMobileNumber =
     //   this.state.selectedRows.length > 1
@@ -394,8 +421,12 @@ export default class People extends Component {
     await this.getAllRecipients()
   }
 
-  async getResumeDetail(rm_code) {
-    if (rm_code) {
+  getResumeDetail = async (rm_code, memoData) => {
+    // await console.log('rmcode', rm_code)
+    // await console.log('this.props.user_id--ppp', this.props)
+    // await console.log('this.props.user_id', this.props.user_id)
+    // await console.log('this.props.user_id2', this.state.clickedData.rm_code)
+    if (rm_code && !memoData) {
       await Axios.post(API.rmDetail, {
         user_id: this.props.user_id,
         rm_code: this.state.clickedData.rm_code
@@ -403,6 +434,20 @@ export default class People extends Component {
       })
         .then(res => {
           console.log('getResumeDetail_res', res.data.result)
+          this.setState({
+            resumeDetailData: res.data.result
+          })
+        })
+        .catch(err => {
+          console.log(err.response)
+        })
+    } else if (memoData) {
+      await Axios.post(API.rmDetail, {
+        user_id: memoData.user_id,
+        rm_code: memoData.rm_code
+      })
+        .then(res => {
+          console.log('this-memoData?', res.data.result)
           this.setState({
             resumeDetailData: res.data.result
           })
@@ -587,6 +632,18 @@ export default class People extends Component {
 
   showModal = () => {
     this.setState({ visible: true })
+  }
+
+  showMemoModal = () => {
+    this.setState({ memoAddVisible: true })
+  }
+
+  handleMemoAddOk = () => {
+    this.setState({ memoAddVisible: false })
+  }
+
+  handleMemoAddCancel = () => {
+    this.setState({ memoAddVisible: false })
   }
 
   handleOk = () => {
@@ -834,7 +891,8 @@ export default class People extends Component {
             </Col>
             <Col span={2} />
           </Row>
-          <this.memoTable />
+          {this.state.resumeDetailData && <this.memoTable />}
+          {/* <this.memoTable /> */}
         </Modal>
       </div>
     )
@@ -844,13 +902,13 @@ export default class People extends Component {
     const columns = [
       {
         title: 'Position',
-        dataIndex: 'memo_position',
+        dataIndex: 'position',
         align: 'center',
         width: '20%'
       },
       {
         title: 'Client',
-        dataIndex: 'memo_client',
+        dataIndex: 'client_name',
         align: 'center',
         width: 100
       },
@@ -862,38 +920,36 @@ export default class People extends Component {
       },
       {
         title: '일시',
-        dataIndex: 'memo_date',
+        dataIndex: 'modified_date',
         align: 'center',
         width: 90
       },
       {
         title: '메모',
-        dataIndex: 'memo_text',
+        dataIndex: 'note',
         align: 'center',
         width: '30%'
       }
     ]
 
-    if (!this.state.resumeDetailData[0]) {
-      return (
-        <div>
-          <Divider />
-          <Row style={{ textAlign: 'left' }}>
-            <Col span={2} />
-            <Col span={20}>
-              <h3>[ Position & Memo ]</h3>
-            </Col>
-            <Col span={2} />
-          </Row>
-          <Row style={{ textAlign: 'left' }}>
-            <Col span={2} />
-            <Col span={20}>
-              <div>메모 내용이 없습니다.</div>
-            </Col>
-            <Col span={2} />
-          </Row>
-        </div>
-      )
+    console.log(
+      'this.state.resumeDetailData[0].memo',
+      this.state.resumeDetailData[0].memo
+    )
+
+    let dateSortedMemo = []
+    if (
+      this.state.resumeDetailData[0].memo !== null ||
+      this.state.resumeDetailData[0].memo ||
+      this.state.resumeDetailData[0].memo !== 'null'
+    ) {
+      dateSortedMemo = this.state.resumeDetailData[0].memo.sort((a, b) => {
+        // descend
+        return (
+          new Date(b.modified_date).getTime() -
+          new Date(a.modified_date).getTime()
+        )
+      })
     }
 
     return (
@@ -907,10 +963,69 @@ export default class People extends Component {
           <Col span={2} />
         </Row>
 
+        <Row>
+          <Button
+            type="primary"
+            icon="edit"
+            size="small"
+            onClick={this.showMemoUpdateModal}
+            style={{
+              float: 'right',
+              marginRight: 5,
+              marginTop: 10,
+              marginBottom: 5
+            }}
+            // disabled={!hasSelectedOne}
+          >
+            메모 편집
+          </Button>
+          <Button
+            type="primary"
+            icon="delete"
+            size="small"
+            style={{
+              float: 'right',
+              marginRight: 5,
+              marginTop: 10,
+              marginBottom: 5
+            }}
+
+            // disabled={!hasSelectedMultiple}
+          >
+            메모 삭제
+          </Button>
+          <Button
+            style={{
+              float: 'right',
+              marginRight: 5,
+              marginTop: 10,
+              marginBottom: 5
+            }}
+            type="primary"
+            icon="user-add"
+            size="small"
+            onClick={this.showMemoModal}
+          >
+            메모 등록
+          </Button>
+
+          <span
+            style={{
+              float: 'left',
+              marginLeft: 8,
+              marginTop: 10,
+              marginBottom: 5
+            }}
+          >
+            {this.state.resumeDetailData[0].memo.length > 0
+              ? `Total ${this.state.resumeDetailData[0].memo.length} Memos`
+              : ''}
+          </span>
+        </Row>
         <Table
           bordered
           columns={columns}
-          dataSource={this.state.resumeDetailData[0].memo}
+          dataSource={dateSortedMemo}
           size="middle"
         />
       </div>
@@ -929,7 +1044,6 @@ export default class People extends Component {
         this.state.isReset &&
         selectedKeys.length > 0
       ) {
-        console.log('실행?')
         this.handleReset(clearFilters)
         this.setState({ isReset: false })
       }
@@ -1330,6 +1444,8 @@ export default class People extends Component {
               }
             })}
           />
+
+          {this.state.memoAddVisible && <this.addMemoModal />}
           {this.state.visible && <this.peopleModal />}
           {this.state.mailVisible && <this.mailModal />}
           {this.state.smsVisible && <this.smsModal />}
