@@ -31,9 +31,11 @@ class App extends Component {
         }으로 제안드리오니 메일 검토를 부탁드리겠습니다. 감사합니다.`,
         sign: '\n커리어셀파 강상모 드림. 010-3929-7682'
       },
+      fetchingUserData: false,
       validated: false,
       userEmail: null,
-      isLoggedIn: false
+      isLoggedIn: false,
+      user: {}
     };
   }
 
@@ -113,7 +115,7 @@ class App extends Component {
     Axios.post(Api.sendMail, {
       user_id: 'rmrm',
       rm_code: 'resume_3', // 수정 필요
-      sender: this.state.userEmail,
+      sender: this.state.user.user_email,
       recipient: this.state.candidate.email,
       subject: this.state.mail.title,
       body:
@@ -165,35 +167,36 @@ class App extends Component {
   };
 
   checkStorage = () => {
-    chrome.storage.local.get(['userEmail'], result => {
-      // add more email addresses below
-      if (result.userEmail && result.userEmail === 'sungunkim367@gmail.com') {
-        this.setState({ isLoggedIn: true, userEmail: result.userEmail });
-      } else {
-        alert('unauthorized email address!');
+    chrome.storage.local.get(['user'], result => {
+      if (result.user && result.user.check === true) {
+        this.setState({
+          isLoggedIn: true,
+          user: result.user,
+          userEmail: result.user.user_email
+        });
       }
     });
   };
 
   requestUserIdentity = () => {
+    this.setState({ fetchingUserData: true });
     var port = chrome.extension.connect({
       name: 'User Email Communication'
     });
     port.postMessage('Requesting user email address');
-    port.onMessage.addListener(userEmail => {
-      // add more email addresses below
-      if (userEmail === 'sungunkim367@gmail.com') {
-        this.setState({ userEmail, isLoggedIn: true });
+    port.onMessage.addListener(result => {
+      if (result.user && result.user.check === true) {
+        this.setState({
+          userEmail: result.user.user_email,
+          isLoggedIn: true,
+          fetchingUserData: false
+        });
       } else {
-        alert('unauthorized email address!');
+        alert('Unauthorized email address');
+        this.setState({ fetchingUserData: false });
       }
     });
   };
-
-  /* timer */
-  // sleep(ms) {
-  //   return new Promise(resolve => setTimeout(resolve, ms));
-  // }
 
   logout = () => {
     chrome.storage.local.clear();
@@ -212,20 +215,35 @@ class App extends Component {
       memo,
       mail,
       sms,
-      validated
+      validated,
+      user
     } = this.state;
     console.log(this.state);
 
     return (
       <Container>
         {this.state.isLoggedIn === false ? (
-          <div>
-            <h2 className="text-center">Unauthorized user</h2>
-            <br />
-            <Button block onClick={this.requestUserIdentity}>
-              <i class="fas fa-sign-in-alt"> 로그인</i>
-            </Button>
-          </div>
+          this.state.fetchingUserData === false ? (
+            <div>
+              <h2 className="text-center">Unauthorized user</h2>
+              <br />
+              <Button block onClick={this.requestUserIdentity}>
+                <i class="fas fa-sign-in-alt"> 로그인</i>
+              </Button>
+            </div>
+          ) : (
+            <div>
+              <h2 className="text-center">Unauthorized user</h2>
+              <br />
+              <Button block disabled>
+                <span
+                  className="spinner-border spinner-border-sm"
+                  role="status"
+                  aria-hidden="true"
+                />
+              </Button>
+            </div>
+          )
         ) : (
           <div>
             <Button style={{ float: 'right' }} size="sm" onClick={this.logout}>
@@ -246,7 +264,7 @@ class App extends Component {
             <Row>
               <Col>SMS: {smsCount}</Col>
               <Col />
-              <Col className="text-right">{this.state.userEmail}</Col>
+              <Col className="text-right">{user.user_email}</Col>
             </Row>
             <hr />
             <Row>
