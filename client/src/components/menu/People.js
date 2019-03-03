@@ -939,8 +939,8 @@ export default class People extends Component {
 
     let dateSortedMemo = []
     if (
-      this.state.resumeDetailData[0].memo !== null ||
-      this.state.resumeDetailData[0].memo ||
+      this.state.resumeDetailData[0].memo !== null &&
+      this.state.resumeDetailData[0].memo &&
       this.state.resumeDetailData[0].memo !== 'null'
     ) {
       dateSortedMemo = this.state.resumeDetailData[0].memo.sort((a, b) => {
