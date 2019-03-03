@@ -18,6 +18,7 @@ class SmsForm extends React.Component {
     e.preventDefault()
     this.props.form.validateFieldsAndScroll((err, values) => {
       if (!err) {
+        values.receiver = values.receiver.replace(/-|(\s*)/gi, '')
         values.positionCompany = this.state.positionCompany
         this.props.writeSmsContent(values)
         console.log('Received values of form: ', values)
@@ -172,8 +173,8 @@ class SmsForm extends React.Component {
     }
 
     smsContent = recentSendSMSData && recentSendSMSData[smsContentIndex].body
-    console.log('smsContent', smsContent)
-    console.log('smsContentIndex', smsContentIndex)
+    // console.log('smsContent', smsContent)
+    // console.log('smsContentIndex', smsContentIndex)
 
     let beforeSmsContentIndex = smsContentIndex - 1
     let afterSmsContentIndex = smsContentIndex + 1
