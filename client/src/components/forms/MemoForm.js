@@ -30,20 +30,9 @@ class MemoForm extends React.Component {
         position: this.state.newMemo.position,
         body: this.state.newMemo.memo
       })
-      // "user_id":"rmrm_2",
-      // "rm_code":"linkedin_1",
-      // "client":"강남상사",
-      // "position":"경리",
-      // "body":"추천을 하려고 했었음"
-
-      // name: this.state.newMemo.name,
-      // birth: this.state.newMemo.birth_year,
-      // gender: this.state.newMemo.gender,
-      // mobile: this.state.newMemo.mobile,
 
       await console.log('memo added')
       // await this.props.resetSelections()
-      // await this.props.peopleFetch()
       // await this.props.addSuccess()
       await this.props.handleMemoAddCancel()
       const memoData = await {
