@@ -1,5 +1,6 @@
 /*global chrome*/
 const tabInfo = { url: null, html: null, candidate: {}, userEmail: null };
+// const user = { id: '', name: '', gmail: '', email: null, cell: '' };
 
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
   switch (message.action) {
@@ -13,11 +14,20 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
   }
 });
 
+chrome.extension.onConnect.addListener(function(port) {
+  port.onMessage.addListener(async function(msg) {
+    console.log('Received: ' + msg);
+    chrome.storage.local.set({ userEmail: tabInfo.userEmail }, function() {
+      return tabInfo.userEmail;
+    });
+    await port.postMessage(tabInfo.userEmail);
+  });
+});
+
 async function init() {
   await getUser();
   await getURL();
   await getHTML();
-  await sendUserEmail();
   console.log(tabInfo);
 }
 
@@ -103,14 +113,26 @@ function sendRequest() {
     .catch(error => console.log(error));
 }
 
-function sendUserEmail() {
-  chrome.extension.onConnect.addListener(function(port) {
-    port.onMessage.addListener(async function(msg) {
-      console.log('Received: ' + msg);
-      await port.postMessage(tabInfo.userEmail);
-    });
+function fetchStorage() {
+  chrome.storage.local.get(['userEmail'], function(result) {
+    return result;
   });
-  chrome.storage.local.set({ userEmail: tabInfo.userEmail }, function() {
-    return tabInfo.userEmail;
-  });
+}
+
+function validateEmail() {
+  const api = 'http://128.199.203.161:8500/extension/SOMETHING'; // need to change
+  const storage = fetchStorage();
+  const input = { user_email: storage.userEmail };
+  const headers = {
+    'Content-Type': 'application/json',
+    'Access-Control-Origin': '*'
+  };
+  fetch(api, {
+    method: 'POST',
+    headers: headers,
+    body: JSON.stringify(input)
+  })
+    .then(response => response.json())
+    .then(responseJson => console.log(responseJson))
+    .catch(error => console.log(error));
 }
