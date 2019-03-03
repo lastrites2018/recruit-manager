@@ -209,6 +209,20 @@ export default class SMS extends Component {
     })
   }
 
+  selectRow = record => {
+    const selectedRowKeys = [...this.state.selectedRowKeys]
+    const selectedRows = [...this.state.selectedRows]
+    if (selectedRowKeys.indexOf(record.key) >= 0) {
+      selectedRowKeys.splice(selectedRowKeys.indexOf(record.key), 1)
+      selectedRows.splice(selectedRows.indexOf(record.key), 1)
+    } else {
+      selectedRowKeys.push(record.key)
+      selectedRows.push(record)
+    }
+
+    this.setState({ selectedRowKeys, selectedRows })
+  }
+
   // handleTableChange = (pagination, filters, sorter) => {
   //   const pager = { ...this.state.pagination }
   //   pager.current = pagination.current
@@ -238,8 +252,6 @@ export default class SMS extends Component {
 
   writeSmsContent = async form => {
     await this.setState({ sms: form, loading: true })
-    await console.log('state', this.state.sms)
-    // await this.sendSMS()
     await sendSMS(
       this.state.sms,
       this.state.selectedRowKeys,
@@ -248,8 +260,6 @@ export default class SMS extends Component {
     )
     await this.handleCancel()
     await this.fetch()
-
-    // await this.resetSelections()
   }
 
   // resetSelections = () => {
@@ -300,7 +310,9 @@ export default class SMS extends Component {
       smsLength: 0,
       positionCompany: '',
       smsContentIndex: 0,
-      recentSendSMSData: ''
+      recentSendSMSData: '',
+      selectedRowKeys: [],
+      selectedRows: []
     })
     this.fetch()
   }
@@ -310,11 +322,8 @@ export default class SMS extends Component {
     const rowSelection = {
       selectedRowKeys,
       onChange: this.onSelectChange
-      // getCheckboxProps: record => ({
-      //   disabled: record.name === 'Disabled User', // Column configuration not to be checked
-      //   name: record.name
-      // })
     }
+    const hasSelected = selectedRowKeys.length > 0
 
     return (
       <div style={{ marginLeft: '20px', width: '90%' }}>
@@ -323,7 +332,6 @@ export default class SMS extends Component {
           icon="message"
           onClick={this.showModal}
           style={{ marginTop: '10px' }}
-          // onClick={this.sendSMS}
         >
           Follow up
         </Button>
@@ -334,6 +342,9 @@ export default class SMS extends Component {
         >
           Reset
         </Button>
+        <span style={{ marginLeft: 8 }}>
+          {hasSelected ? `Selected ${selectedRowKeys.length} items` : ''}
+        </span>
         <Table
           columns={this.columns}
           // rowKey={record => record.login.uuid}
@@ -345,6 +356,11 @@ export default class SMS extends Component {
           loading={this.state.loading}
           // onChange={this.handleTableChange}
           rowSelection={rowSelection}
+          onRow={record => ({
+            onClick: () => {
+              this.selectRow(record)
+            }
+          })}
         />
         {visible && <this.smsModal />}
       </div>

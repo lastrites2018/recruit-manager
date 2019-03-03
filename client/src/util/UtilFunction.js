@@ -27,8 +27,8 @@ export const sendSMS = async (
         body: thisStateSms.content,
         position: ''
       })
+      // await alert(`${thisStateSms.receiver}에 문자를 보냈습니다.`)
       await console.log(`${thisStateSms.receiver}에 문자를 보냈습니다.`)
-      // await this.resetSelections()
     } catch (err) {
       console.log('send one SMS error', err)
     }
@@ -39,32 +39,36 @@ export const sendSMS = async (
       await Axios.post(API.sendSMS, {
         user_id: thisPropsUserId,
         rm_code: thisStateSelectedRowKeys[0],
-        recipient: thisStateSelectedRows[0].mobile,
+        recipient: thisStateSms.receiver,
+        // recipient: thisStateSelectedRows[0].mobile,
         body: thisStateSms.content,
         position: `${thisStateSms.positionCompany}|${thisStateSms.select}`
       })
+      // await alert(`${thisStateSms.receiver}에 문자를 보냈습니다.`)
       await console.log(
-        `${thisStateSelectedRows[0].mobile}에 문자를 보냈습니다.`
+        `${thisStateSms.receiver}에 문자를 보냈습니다.`
+        // `${thisStateSelectedRows[0].mobile}에 문자를 보냈습니다.`
       )
-      // await this.resetSelections()
     } catch (err) {
       console.log('send one SMS error', err)
     }
   } else {
     try {
-      for (let i = 0; i < thisStateSelectedRowKeys.length; i++) {
+      const receivers = thisStateSms.receiver.split(',')
+      for (let i = 0; i < receivers.length; i++) {
+        // for (let i = 0; i < thisStateSelectedRowKeys.length; i++) { // 보내는 번호가 바뀌었을 수 있기에, 입력값을 기준으로 보냄
         await setTimeout(() => {
           Axios.post(API.sendSMS, {
             user_id: thisPropsUserId,
             rm_code: thisStateSelectedRowKeys[i],
-            recipient: thisStateSelectedRows[i].mobile,
+            recipient: receivers[i],
+            // recipient: thisStateSelectedRows[i].mobile,
             body: thisStateSms.content,
             position: `${thisStateSms.positionCompany}|${thisStateSms.select}`
           })
         }, 100)
       }
-      await alert(`문자를 보냈습니다.`)
-      // await this.resetSelections()
+      await alert(`문자를 ${receivers.join(' 님, ')} 님에게 보냈습니다.`)
     } catch (err) {
       console.log('sending multiple SMS error', err)
     }
