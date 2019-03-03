@@ -458,7 +458,8 @@ export default class Mail extends Component {
         name: record.name
       })
     }
-    const { visible, detailVisible } = this.state
+    const { visible, detailVisible, selectedRowKeys } = this.state
+    const hasSelected = selectedRowKeys.length > 0
 
     return (
       <div style={{ marginLeft: '20px' }}>
@@ -478,6 +479,9 @@ export default class Mail extends Component {
         >
           Reset
         </Button>
+        <span style={{ marginLeft: 8 }}>
+          {hasSelected ? `Selected ${selectedRowKeys.length} items` : ''}
+        </span>
         <Table
           columns={this.columns}
           // rowKey={record => record.login.uuid}
