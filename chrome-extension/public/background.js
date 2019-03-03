@@ -1,6 +1,5 @@
 /*global chrome*/
-const tabInfo = { url: null, html: null, candidate: {}, userEmail: null };
-// const user = { id: '', name: '', gmail: '', email: null, cell: '' };
+const tabInfo = { url: null, html: null, candidate: {} };
 
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
   switch (message.action) {
@@ -17,10 +16,17 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 chrome.extension.onConnect.addListener(function(port) {
   port.onMessage.addListener(async function(msg) {
     console.log('Received: ' + msg);
-    chrome.storage.local.set({ userEmail: tabInfo.userEmail }, function() {
-      return tabInfo.userEmail;
+    chrome.storage.local.get(['user'], async function(result) {
+      if (result && result.user) {
+        await port.postMessage(result);
+      } else {
+        await getUser();
+        await sleep(1000);
+        chrome.storage.local.get(['user'], async function(result) {
+          await port.postMessage(result);
+        });
+      }
     });
-    await port.postMessage(tabInfo.userEmail);
   });
 });
 
@@ -32,8 +38,18 @@ async function init() {
 }
 
 function getUser() {
-  return chrome.identity.getProfileUserInfo(function(userInfo) {
-    tabInfo.userEmail = userInfo.email;
+  chrome.storage.local.get(['user'], async function(result) {
+    try {
+      if (result && result.user && result.user.check === true) {
+        return result.user.user_email;
+      } else {
+        return chrome.identity.getProfileUserInfo(function(userInfo) {
+          validateEmail(userInfo.email);
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
   });
 }
 
@@ -113,16 +129,9 @@ function sendRequest() {
     .catch(error => console.log(error));
 }
 
-function fetchStorage() {
-  chrome.storage.local.get(['userEmail'], function(result) {
-    return result;
-  });
-}
-
-function validateEmail() {
-  const api = 'http://128.199.203.161:8500/extension/SOMETHING'; // need to change
-  const storage = fetchStorage();
-  const input = { user_email: storage.userEmail };
+function validateEmail(email) {
+  const api = 'http://128.199.203.161:8500/extension/login';
+  const input = { email: email };
   const headers = {
     'Content-Type': 'application/json',
     'Access-Control-Origin': '*'
@@ -133,6 +142,18 @@ function validateEmail() {
     body: JSON.stringify(input)
   })
     .then(response => response.json())
-    .then(responseJson => console.log(responseJson))
+    .then(responseJson => {
+      if (responseJson.result.check === true) {
+        chrome.storage.local.set({ user: responseJson.result }, function() {
+          console.log(responseJson);
+        });
+      } else {
+        console.log('Unauthorized user!');
+      }
+    })
     .catch(error => console.log(error));
+}
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
