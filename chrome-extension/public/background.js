@@ -16,17 +16,19 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 chrome.extension.onConnect.addListener(function(port) {
   port.onMessage.addListener(async function(msg) {
     console.log('Received: ' + msg);
-    chrome.storage.local.get(['user'], async function(result) {
-      if (result && result.user) {
-        await port.postMessage(result);
-      } else {
-        await getUser();
-        await sleep(1000);
-        chrome.storage.local.get(['user'], async function(result) {
+    if (msg === 'Requesting user email address') {
+      chrome.storage.local.get(['user'], async function(result) {
+        if (result && result.user) {
           await port.postMessage(result);
-        });
-      }
-    });
+        } else {
+          await getUser();
+          await sleep(1000);
+          chrome.storage.local.get(['user'], async function(result) {
+            await port.postMessage(result);
+          });
+        }
+      });
+    }
   });
 });
 
@@ -35,6 +37,8 @@ async function init() {
   await getURL();
   await getHTML();
   console.log(tabInfo);
+  // await printStorage();
+  await countResume();
 }
 
 function getUser() {
@@ -154,6 +158,28 @@ function validateEmail(email) {
     .catch(error => console.log(error));
 }
 
+function countResume() {
+  // needs fix
+  // shows 0 twice after logging out
+  chrome.storage.local.get('user', function(result) {
+    if (result.user && result.user.check === true) {
+      chrome.storage.local.get('resumeCount', function(result) {
+        chrome.storage.local.set({ resumeCount: result.resumeCount + 1 });
+      });
+    } else {
+      console.log('Failed to increment resume count. Unauthorized user!');
+    }
+  });
+}
+
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
+
+// function printStorage() {
+//   chrome.storage.local.get(null, function(items) {
+//     for (let key in items) {
+//       console.log(key, items[key]);
+//     }
+//   });
+// }
