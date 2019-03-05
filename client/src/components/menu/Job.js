@@ -73,13 +73,25 @@ export default class Job extends Component {
         title: '키워드',
         dataIndex: 'keyword',
         ...this.getColumnSearchProps('keyword'),
-        render: e => (
-          <span>
-            {e.split(', ').map(tag => (
-              <Tag color="blue">{tag}</Tag>
-            ))}
-          </span>
-        ),
+        // render: e => (
+        //   <span>
+        //     {e.split(', ').map(tag => (
+        //       <Tag color="blue">{tag}</Tag>
+        //     ))}
+        //   </span>
+        // ),
+        render: e => {
+          console.log('e', e)
+          return (
+            <span>
+              {e.split(', ').map(tag => {
+                // console.log('tag', tag)
+                if (tag) return <Tag color="blue">{tag}</Tag>
+                else return ''
+              })}
+            </span>
+          )
+        },
         onCell: this.cellClickEvent
       },
       {
