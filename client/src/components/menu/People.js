@@ -6,6 +6,7 @@ import UpdateResumeForm from '../forms/UpdateResumeForm'
 import MailForm from '../forms/MailForm'
 import SmsForm from '../forms/SmsForm'
 import MemoForm from '../forms/MemoForm'
+import UpdateMemoForm from '../forms/UpdateMemoForm'
 import { EditableFormRow, EditableCell } from '../../util/Table'
 import 'react-table/react-table.css'
 import './menu.css'
@@ -61,7 +62,9 @@ export default class People extends Component {
       currentKey: null,
       loading: true,
       isReset: false,
-      memoAddVisible: false
+      memoAddVisible: false,
+      memoUpdateVisible: false,
+      editRecord: {}
     }
 
     this.columns = [
@@ -342,8 +345,53 @@ export default class People extends Component {
     await this.setState({ loading: false })
   }
 
-  addMemoModal = () => {
+  handleUpdateMemoOk = () => {
+    this.setState({ memoUpdateVisible: false })
+  }
+
+  handleUpdateMemoCancel = () => {
+    this.setState({ memoUpdateVisible: false })
+  }
+
+  showUpdateMemoModal = async record => {
+    // await this.setState(prevState => ({ memoUpdateVisible: true }))
+
+    await this.setState({ memoUpdateVisible: true, editRecord: record })
+    await this.updateMemoModal()
+  }
+
+  updateMemoModal = () => {
     console.log('addMemoModal', this.state.clickedData)
+    // showMemoModal = () => {
+    // this.setState({ memoUpdateVisible: true })
+    // }
+
+    return (
+      <div>
+        <Modal
+          // title={title}
+          title="update memo"
+          visible={this.state.memoUpdateVisible}
+          onOk={this.handleUpdateMemoOk}
+          onCancel={this.handleUpdateMemoCancel}
+          footer={null}
+        >
+          <UpdateMemoForm.UpdateMemoRegistration
+            selectedRows={this.state.selectedRows}
+            // writeSmsContent={this.writeSmsContent}
+            user_id={this.props.user_id}
+            rm_code={this.state.clickedData.rm_code}
+            handleUpdateMemoCancel={this.handleUpdateMemoCancel}
+            getResumeDetail={this.getResumeDetail}
+            memoRecord={this.state.editRecord}
+          />
+        </Modal>
+      </div>
+    )
+  }
+
+  addMemoModal = () => {
+    // console.log('addMemoModal', this.state.clickedData)
     return (
       <div>
         <Modal
@@ -964,14 +1012,34 @@ export default class People extends Component {
         width: 60,
         render: (text, record) =>
           this.state.resumeDetailData.length >= 1 ? (
-            <Popconfirm
-              title="Sure to delete?"
-              onConfirm={() => this.handleMemoDelete(record)}
-              // onConfirm={() => this.handleMemoDelete(record.key)}
-            >
-              <a href="javascript:;">Delete</a>
-            </Popconfirm>
-          ) : null
+            <div>
+              <Button
+                size="small"
+                style={{ marginRight: 5 }}
+                onClick={() => this.showUpdateMemoModal(record)}
+              >
+                Edit
+              </Button>
+              {/* <Button
+                size="small"
+                onClick={() => this.handleMemoDelete(record)}
+              >
+                Delete
+              </Button> */}
+              <Popconfirm
+                title="Sure to delete?"
+                onConfirm={() => this.handleMemoDelete(record)}
+              >
+                <Button size="small"> Delete</Button>
+              </Popconfirm>
+            </div>
+          ) : // <Popconfirm
+          //   title="Sure to delete?"
+          //   onConfirm={() => this.handleMemoDelete(record)}
+          // >
+          //   <a href="javascript:;">Delete</a>
+          // </Popconfirm>
+          null
       }
     ]
 
@@ -1010,7 +1078,7 @@ export default class People extends Component {
             type="primary"
             icon="edit"
             size="small"
-            onClick={this.showMemoUpdateModal}
+            onClick={this.updateMemoModal}
             style={{
               float: 'right',
               marginRight: 5,
@@ -1496,6 +1564,7 @@ export default class People extends Component {
             })}
           />
 
+          {this.state.memoUpdateVisible && <this.updateMemoModal />}
           {this.state.memoAddVisible && <this.addMemoModal />}
           {this.state.visible && <this.peopleModal />}
           {this.state.mailVisible && <this.mailModal />}
