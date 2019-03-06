@@ -10,9 +10,10 @@ class App extends Component {
     chrome.runtime.sendMessage({ action: 'popupOpen' });
 
     this.state = {
-      resumeCount: 100,
-      mailCount: 100,
-      smsCount: 100,
+      resumeCount: 0,
+      mailCount: 0,
+      smsCount: 0,
+      history: '',
       candidate: { rm_code: '', email: '', cell: '' },
       positions: [],
       selectedPosition: null,
@@ -42,6 +43,9 @@ class App extends Component {
   componentDidMount() {
     this.checkStorage();
     this.fetchPosition();
+    this.getResumeCount();
+    this.getCount('mailCount');
+    this.getCount('smsCount');
   }
 
   fetchPosition = async () => {
@@ -107,27 +111,27 @@ class App extends Component {
       event.stopPropagation();
     }
     event.preventDefault();
-    this.setState({ validated: true, mailCount: this.state.mailCount + 1 });
-    // this.sendMail();
+    this.setState({ validated: true });
+    this.sendMail();
   };
 
   sendMail = () => {
-    Axios.post(Api.sendMail, {
-      user_id: 'rmrm',
-      rm_code: 'resume_3', // 수정 필요
-      sender: this.state.user.user_email,
-      recipient: this.state.candidate.email,
-      subject: this.state.mail.title,
-      body:
-        this.state.mail.content +
-        '\n\n' +
-        '[Position Detail]\n\n' +
-        this.state.positionDetail +
-        '\n\n' +
-        this.state.mail.sign,
-      position: this.state.selectedPosition
-    });
-    console.log('mail has been sent');
+    // Axios.post(Api.sendMail, {
+    //   user_id: 'rmrm',
+    //   rm_code: 'resume_3', // 수정 필요
+    //   sender: this.state.user.user_email,
+    //   recipient: this.state.candidate.email,
+    //   subject: this.state.mail.title,
+    //   body:
+    //     this.state.mail.content +
+    //     '\n\n' +
+    //     '[Position Detail]\n\n' +
+    //     this.state.positionDetail +
+    //     '\n\n' +
+    //     this.state.mail.sign,
+    //   position: this.state.selectedPosition
+    // });
+    this.addCount('mailCount');
   };
 
   updateSmsContent = () => {
@@ -150,20 +154,60 @@ class App extends Component {
       event.stopPropagation();
     } else {
       event.preventDefault();
-      this.setState({ validated: true, smsCount: this.state.smsCount + 1 });
-      // this.sendSMS();
+      this.setState({ validated: true });
+      this.sendSMS();
     }
   };
 
   sendSMS = () => {
-    Axios.post(Api.sendSMS, {
-      user_id: 'rmrm',
-      rm_code: 'resume_3', // 수정 필요
-      recipient: this.candidate.cell,
-      body: this.state.sms.content,
-      position: this.state.selectedPosition
+    // Axios.post(Api.sendSMS, {
+    //   user_id: 'rmrm',
+    //   rm_code: 'resume_3', // 수정 필요
+    //   recipient: this.candidate.cell,
+    //   body: this.state.sms.content,
+    //   position: this.state.selectedPosition
+    // });
+    // console.log('sms has been sent');
+    this.addCount('smsCount');
+  };
+
+  getResumeCount = () => {
+    const storage = chrome.storage.local;
+    storage.get('resumeCount', result => {
+      if (!result.resumeCount) storage.set({ resumeCount: 1 });
+      else this.setState({ resumeCount: result.resumeCount + 1 });
     });
-    console.log('sms has been sent');
+  };
+
+  getCount = key => {
+    const storage = chrome.storage.local;
+    storage.get(key, result => {
+      const currCount = result[key];
+      this.setState({ [key]: currCount });
+    });
+  };
+
+  addCount = key => {
+    chrome.storage.local.get(key, async result => {
+      if (result[key]) {
+        const currCount = result[key];
+        await chrome.storage.local.set({ [key]: currCount + 1 }, () => {
+          this.setState({ [key]: currCount + 1 });
+        });
+      } else {
+        await chrome.storage.local.set({ [key]: 1 }, () => {
+          this.setState({ [key]: 1 });
+        });
+      }
+    });
+  };
+
+  getHistory = async () => {
+    const history = await Axios.post(Api.blablabla, {
+      // waiting
+      user_id: 'rmrm'
+    });
+    this.setState({ history });
   };
 
   checkStorage = () => {
@@ -186,10 +230,12 @@ class App extends Component {
     port.postMessage('Requesting user email address');
     port.onMessage.addListener(result => {
       if (result.user && result.user.check === true) {
+        chrome.storage.local.set({ resumeCount: 1 });
         this.setState({
           userEmail: result.user.user_email,
           isLoggedIn: true,
-          fetchingUserData: false
+          fetchingUserData: false,
+          resumeCount: 1
         });
       } else {
         alert('Unauthorized email address');
@@ -200,7 +246,13 @@ class App extends Component {
 
   logout = () => {
     chrome.storage.local.clear();
-    this.setState({ isLoggedIn: false });
+    chrome.storage.local.set({ resumeCount: 0, mailCount: 0, smsCount: 0 });
+    this.setState({
+      isLoggedIn: false,
+      resumeCount: 0,
+      mailCount: 0,
+      smsCount: 0
+    });
   };
 
   render() {
@@ -218,7 +270,6 @@ class App extends Component {
       validated,
       user
     } = this.state;
-    console.log(this.state);
 
     return (
       <Container>
