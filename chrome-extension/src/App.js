@@ -13,6 +13,7 @@ class App extends Component {
       resumeCount: 0,
       mailCount: 0,
       smsCount: 0,
+      history: '',
       candidate: { rm_code: '', email: '', cell: '' },
       positions: [],
       selectedPosition: null,
@@ -173,20 +174,16 @@ class App extends Component {
   getResumeCount = () => {
     const storage = chrome.storage.local;
     storage.get('resumeCount', result => {
-      this.setState({ resumeCount: result.resumeCount });
+      if (!result.resumeCount) storage.set({ resumeCount: 1 });
+      else this.setState({ resumeCount: result.resumeCount + 1 });
     });
   };
 
   getCount = key => {
     const storage = chrome.storage.local;
-    storage.get(key, async result => {
-      if (result[key]) {
-        this.setState({ [key]: result[key] });
-      } else {
-        await storage.set({ [key]: 0 }, () => {
-          this.setState({ [key]: 0 });
-        });
-      }
+    storage.get(key, result => {
+      const currCount = result[key];
+      this.setState({ [key]: currCount });
     });
   };
 
@@ -203,6 +200,14 @@ class App extends Component {
         });
       }
     });
+  };
+
+  getHistory = async () => {
+    const history = await Axios.post(Api.blablabla, {
+      // waiting
+      user_id: 'rmrm'
+    });
+    this.setState({ history });
   };
 
   checkStorage = () => {
@@ -225,10 +230,12 @@ class App extends Component {
     port.postMessage('Requesting user email address');
     port.onMessage.addListener(result => {
       if (result.user && result.user.check === true) {
+        chrome.storage.local.set({ resumeCount: 1 });
         this.setState({
           userEmail: result.user.user_email,
           isLoggedIn: true,
-          fetchingUserData: false
+          fetchingUserData: false,
+          resumeCount: 1
         });
       } else {
         alert('Unauthorized email address');
@@ -239,7 +246,7 @@ class App extends Component {
 
   logout = () => {
     chrome.storage.local.clear();
-    chrome.storage.local.set({ resumeCount: 0 });
+    chrome.storage.local.set({ resumeCount: 0, mailCount: 0, smsCount: 0 });
     this.setState({
       isLoggedIn: false,
       resumeCount: 0,
@@ -263,7 +270,6 @@ class App extends Component {
       validated,
       user
     } = this.state;
-    console.log(this.state);
 
     return (
       <Container>

@@ -37,8 +37,8 @@ async function init() {
   await getURL();
   await getHTML();
   console.log(tabInfo);
-  // await printStorage();
   await countResume();
+  await printStorage();
 }
 
 function getUser() {
@@ -159,12 +159,11 @@ function validateEmail(email) {
 }
 
 function countResume() {
-  // needs fix
-  // shows 0 twice after logging out
   chrome.storage.local.get('user', function(result) {
     if (result.user && result.user.check === true) {
       chrome.storage.local.get('resumeCount', function(result) {
-        chrome.storage.local.set({ resumeCount: result.resumeCount + 1 });
+        if (result.resumeCount)
+          chrome.storage.local.set({ resumeCount: result.resumeCount + 1 });
       });
     } else {
       console.log('Failed to increment resume count. Unauthorized user!');
@@ -176,10 +175,10 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// function printStorage() {
-//   chrome.storage.local.get(null, function(items) {
-//     for (let key in items) {
-//       console.log(key, items[key]);
-//     }
-//   });
-// }
+function printStorage() {
+  chrome.storage.local.get(null, function(items) {
+    for (let key in items) {
+      console.log(key, items[key]);
+    }
+  });
+}
