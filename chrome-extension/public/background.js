@@ -22,7 +22,7 @@ chrome.extension.onConnect.addListener(function(port) {
           await port.postMessage(result);
         } else {
           await getUser();
-          await sleep(1000);
+          await sleep(1500);
           chrome.storage.local.get(['user'], async function(result) {
             await port.postMessage(result);
           });
@@ -36,9 +36,9 @@ async function init() {
   await getUser();
   await getURL();
   await getHTML();
-  console.log(tabInfo);
   await countResume();
   await printStorage();
+  console.log(tabInfo);
 }
 
 function getUser() {
@@ -117,20 +117,30 @@ function runQuery(website) {
 }
 
 function sendRequest() {
-  const api = 'http://128.199.203.161:8500/extension/parsing';
-  const input = { user_id: 'rmrm', url: tabInfo.url, html: tabInfo.html[0] };
-  const headers = {
-    'Content-Type': 'application/json',
-    'Access-Control-Origin': '*'
-  };
-  fetch(api, {
-    method: 'POST',
-    headers: headers,
-    body: JSON.stringify(input)
-  })
-    .then(response => response.json())
-    .then(responseJson => console.log(responseJson))
-    .catch(error => console.log(error));
+  chrome.storage.local.get(['user'], function(result) {
+    const user = result.user;
+    const api = 'http://128.199.203.161:8500/extension/parsing';
+    const input = {
+      user_id: user.user_id,
+      url: tabInfo.url,
+      html: tabInfo.html[0]
+    };
+    const headers = {
+      'Content-Type': 'application/json',
+      'Access-Control-Origin': '*'
+    };
+    fetch(api, {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify(input)
+    })
+      .then(response => response.json())
+      // TODO: need to press twice to refresh candidate email / mobile
+      .then(responseJson =>
+        chrome.storage.local.set({ candidate: responseJson })
+      )
+      .catch(error => console.log(error));
+  });
 }
 
 function validateEmail(email) {
@@ -148,9 +158,7 @@ function validateEmail(email) {
     .then(response => response.json())
     .then(responseJson => {
       if (responseJson.result.check === true) {
-        chrome.storage.local.set({ user: responseJson.result }, function() {
-          console.log(responseJson);
-        });
+        chrome.storage.local.set({ user: responseJson.result });
       } else {
         console.log('Unauthorized user!');
       }

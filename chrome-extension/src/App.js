@@ -14,7 +14,7 @@ class App extends Component {
       mailCount: 0,
       smsCount: 0,
       history: '',
-      candidate: { rm_code: '', email: '', cell: '' },
+      candidate: {},
       positions: [],
       selectedPosition: null,
       positionDetail: '',
@@ -34,7 +34,6 @@ class App extends Component {
       },
       fetchingUserData: false,
       validated: false,
-      userEmail: null,
       isLoggedIn: false,
       user: {}
     };
@@ -42,15 +41,34 @@ class App extends Component {
 
   componentDidMount() {
     this.checkStorage();
+    this.fetchCandidate();
     this.fetchPosition();
     this.getResumeCount();
     this.getCount('mailCount');
     this.getCount('smsCount');
   }
 
+  checkStorage = async () => {
+    await chrome.storage.local.get(['user'], result => {
+      if (result.user && result.user.check === true) {
+        this.setState({
+          isLoggedIn: true,
+          user: result.user
+        });
+      }
+    });
+  };
+
+  fetchCandidate = async () => {
+    const storage = chrome.storage.local;
+    await storage.get('candidate', response => {
+      this.setState({ candidate: response.candidate.result });
+    });
+  };
+
   fetchPosition = async () => {
     const positions = await Axios.post(Api.getPosition, {
-      user_id: 'rmrm'
+      user_id: this.state.user.user_email
     });
     this.setState({ positions });
     return positions;
@@ -82,8 +100,8 @@ class App extends Component {
   writeMemo = async (body, position) => {
     try {
       const memo = await Axios.post(Api.writeMemo, {
-        user_id: 'rmrm',
-        rm_code: 'resume_3',
+        user_id: this.state.user.user_email,
+        rm_code: this.state.candidate.rm_code,
         position: position,
         body: body,
         client: 'll'
@@ -97,8 +115,8 @@ class App extends Component {
 
   viewMemo = async () => {
     const memo = await Axios.post(Api.getMemo, {
-      user_id: 'rmrm',
-      rm_code: 'resume_3' // 수정 필요
+      user_id: this.state.user.user_email,
+      rm_code: this.state.candidate.rm_code
     });
     this.setState({ memo: memo.data.result });
     return memo;
@@ -109,16 +127,24 @@ class App extends Component {
     if (form.checkValidity() === false) {
       event.preventDefault();
       event.stopPropagation();
+    } else {
+      event.preventDefault();
+      this.setState({ validated: true });
+      this.sendMail();
     }
-    event.preventDefault();
-    this.setState({ validated: true });
-    this.sendMail();
+  };
+
+  fetchMail = () => {
+    Axios.post(Api.getMail, {
+      user_id: this.state.user.user_id,
+      rm_code: this.state.candidate.rm_code
+    });
   };
 
   sendMail = () => {
     // Axios.post(Api.sendMail, {
-    //   user_id: 'rmrm',
-    //   rm_code: 'resume_3', // 수정 필요
+    //   user_id: this.state.user.user_email,
+    //   rm_code: this.state.candidate.rm_code,
     //   sender: this.state.user.user_email,
     //   recipient: this.state.candidate.email,
     //   subject: this.state.mail.title,
@@ -161,9 +187,9 @@ class App extends Component {
 
   sendSMS = () => {
     // Axios.post(Api.sendSMS, {
-    //   user_id: 'rmrm',
-    //   rm_code: 'resume_3', // 수정 필요
-    //   recipient: this.candidate.cell,
+    //   user_id: this.state.user.user_email,
+    //   rm_code: this.state.candidate.rm_code,
+    //   recipient: this.candidate.mobile,
     //   body: this.state.sms.content,
     //   position: this.state.selectedPosition
     // });
@@ -205,20 +231,19 @@ class App extends Component {
   getHistory = async () => {
     const history = await Axios.post(Api.blablabla, {
       // waiting
-      user_id: 'rmrm'
+      user_id: this.state.user.user_email
     });
     this.setState({ history });
   };
 
-  checkStorage = () => {
-    chrome.storage.local.get(['user'], result => {
-      if (result.user && result.user.check === true) {
-        this.setState({
-          isLoggedIn: true,
-          user: result.user,
-          userEmail: result.user.user_email
-        });
-      }
+  logout = () => {
+    chrome.storage.local.clear();
+    chrome.storage.local.set({ resumeCount: 0, mailCount: 0, smsCount: 0 });
+    this.setState({
+      isLoggedIn: false,
+      resumeCount: 0,
+      mailCount: 0,
+      smsCount: 0
     });
   };
 
@@ -232,7 +257,7 @@ class App extends Component {
       if (result.user && result.user.check === true) {
         chrome.storage.local.set({ resumeCount: 1 });
         this.setState({
-          userEmail: result.user.user_email,
+          user: result.user,
           isLoggedIn: true,
           fetchingUserData: false,
           resumeCount: 1
@@ -241,17 +266,6 @@ class App extends Component {
         alert('Unauthorized email address');
         this.setState({ fetchingUserData: false });
       }
-    });
-  };
-
-  logout = () => {
-    chrome.storage.local.clear();
-    chrome.storage.local.set({ resumeCount: 0, mailCount: 0, smsCount: 0 });
-    this.setState({
-      isLoggedIn: false,
-      resumeCount: 0,
-      mailCount: 0,
-      smsCount: 0
     });
   };
 
@@ -434,7 +448,7 @@ class App extends Component {
                       <Col sm={10}>
                         <Form.Control
                           plaintext
-                          value="sungunkim367@gmail.com"
+                          value={candidate.email}
                           onChange={event =>
                             this.setState({
                               candidate: {
@@ -565,12 +579,12 @@ class App extends Component {
                         <Form.Control
                           plaintext
                           size="sm"
-                          value="01012345678"
+                          value={candidate.mobile}
                           onChange={event =>
                             this.setState({
                               candidate: {
                                 ...candidate,
-                                cell: event.target.value
+                                mobile: event.target.value
                               }
                             })
                           }
