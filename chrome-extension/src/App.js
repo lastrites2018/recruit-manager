@@ -41,7 +41,6 @@ class App extends Component {
 
   componentDidMount() {
     this.checkStorage();
-    this.fetchCandidate();
     this.fetchPosition();
     this.getResumeCount();
     this.getCount('mailCount');
@@ -49,29 +48,30 @@ class App extends Component {
   }
 
   checkStorage = async () => {
-    await chrome.storage.local.get(['user'], result => {
-      if (result.user && result.user.check === true) {
-        this.setState({
-          isLoggedIn: true,
-          user: result.user
-        });
-      }
-    });
-  };
-
-  fetchCandidate = async () => {
-    const storage = chrome.storage.local;
-    await storage.get('candidate', response => {
-      this.setState({ candidate: response.candidate.result });
-    });
+    try {
+      await chrome.storage.local.get(null, response => {
+        if (response.user && response.user.check === true) {
+          this.setState({
+            isLoggedIn: true,
+            user: response.user,
+            candidate: response.candidate.result
+          });
+        }
+      });
+    } catch (err) {
+      alert(err);
+    }
   };
 
   fetchPosition = async () => {
-    const positions = await Axios.post(Api.getPosition, {
-      user_id: this.state.user.user_email
-    });
-    this.setState({ positions });
-    return positions;
+    try {
+      const positions = await Axios.post(Api.getPosition, {
+        user_id: this.state.user.user_email
+      });
+      this.setState({ positions });
+    } catch (err) {
+      alert(err);
+    }
   };
 
   fetchPositionDetail = () => {
@@ -99,15 +99,14 @@ class App extends Component {
 
   writeMemo = async (body, position) => {
     try {
-      const memo = await Axios.post(Api.writeMemo, {
-        user_id: this.state.user.user_email,
+      await Axios.post(Api.writeMemo, {
+        user_id: this.state.user.user_id,
         rm_code: this.state.candidate.rm_code,
         position: position,
         body: body,
         client: 'll'
       });
       await this.viewMemo();
-      return memo;
     } catch (err) {
       console.log(err);
     }
@@ -115,11 +114,19 @@ class App extends Component {
 
   viewMemo = async () => {
     const memo = await Axios.post(Api.getMemo, {
-      user_id: this.state.user.user_email,
+      user_id: this.state.user.user_id,
       rm_code: this.state.candidate.rm_code
     });
     this.setState({ memo: memo.data.result });
-    return memo;
+  };
+
+  deleteMemo = async () => {
+    // const memo = await Axios.post(Api.deleteMemo, {
+    //   user_id: this.state.user.user_id,
+    //   memo_id: '' // need to change
+    // });
+    // return memo;
+    alert('testing delete memo button!');
   };
 
   mailSubmit = event => {
@@ -143,7 +150,7 @@ class App extends Component {
 
   sendMail = () => {
     // Axios.post(Api.sendMail, {
-    //   user_id: this.state.user.user_email,
+    //   user_id: this.state.user.user_id,
     //   rm_code: this.state.candidate.rm_code,
     //   sender: this.state.user.user_email,
     //   recipient: this.state.candidate.email,
@@ -161,7 +168,6 @@ class App extends Component {
   };
 
   updateSmsContent = () => {
-    console.log('sms content');
     this.setState({
       sms: {
         ...this.sms,
@@ -187,7 +193,7 @@ class App extends Component {
 
   sendSMS = () => {
     // Axios.post(Api.sendSMS, {
-    //   user_id: this.state.user.user_email,
+    //   user_id: this.state.user.user_id,
     //   rm_code: this.state.candidate.rm_code,
     //   recipient: this.candidate.mobile,
     //   body: this.state.sms.content,
@@ -231,14 +237,14 @@ class App extends Component {
   getHistory = async () => {
     const history = await Axios.post(Api.blablabla, {
       // waiting
-      user_id: this.state.user.user_email
+      user_id: this.state.user.user_id
     });
     this.setState({ history });
   };
 
   logout = () => {
     chrome.storage.local.clear();
-    chrome.storage.local.set({ resumeCount: 0, mailCount: 0, smsCount: 0 });
+    chrome.storage.local.set({ resumeCount: 1, mailCount: 0, smsCount: 0 });
     this.setState({
       isLoggedIn: false,
       resumeCount: 0,
@@ -255,7 +261,6 @@ class App extends Component {
     port.postMessage('Requesting user email address');
     port.onMessage.addListener(result => {
       if (result.user && result.user.check === true) {
-        chrome.storage.local.set({ resumeCount: 1 });
         this.setState({
           user: result.user,
           isLoggedIn: true,
@@ -394,9 +399,14 @@ class App extends Component {
                         메모를 작성해주세요.
                       </Form.Control.Feedback>
                     </Form.Group>
-                    <Button type="submit" block size="sm">
-                      입력
-                    </Button>
+                    <div>
+                      <Button type="submit" size="sm" inline>
+                        입력
+                      </Button>
+                      <Button onClick={this.viewMemo} size="sm">
+                        조회
+                      </Button>
+                    </div>
                   </Form.Row>
                 </Form>
                 <hr />
@@ -404,7 +414,7 @@ class App extends Component {
             </Row>
             <Row>
               <Col>
-                <ListGroup flush>
+                <ListGroup>
                   {memo && memo.length ? (
                     memo.map(line => {
                       return (
@@ -412,6 +422,8 @@ class App extends Component {
                           variant="light"
                           className="p-1"
                           style={{ fontSize: 14 }}
+                          action
+                          onClick={this.deleteMemo}
                         >
                           {line.note}
                         </ListGroup.Item>

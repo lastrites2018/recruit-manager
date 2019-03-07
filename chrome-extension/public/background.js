@@ -14,19 +14,11 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 });
 
 chrome.extension.onConnect.addListener(function(port) {
-  port.onMessage.addListener(async function(msg) {
+  port.onMessage.addListener(function(msg) {
     console.log('Received: ' + msg);
     if (msg === 'Requesting user email address') {
-      chrome.storage.local.get(['user'], async function(result) {
-        if (result && result.user) {
-          await port.postMessage(result);
-        } else {
-          await getUser();
-          await sleep(1500);
-          chrome.storage.local.get(['user'], async function(result) {
-            await port.postMessage(result);
-          });
-        }
+      chrome.storage.local.get(['user'], function(result) {
+        port.postMessage(result);
       });
     }
   });
@@ -36,17 +28,18 @@ async function init() {
   await getUser();
   await getURL();
   await getHTML();
-  await countResume();
   await printStorage();
-  console.log(tabInfo);
 }
 
 function getUser() {
-  chrome.storage.local.get(['user'], async function(result) {
+  chrome.storage.local.get(null, function(result) {
     try {
       if (result && result.user && result.user.check === true) {
+        console.log('user is already logged in');
+        chrome.storage.local.set({ resumeCount: result.resumeCount + 1 });
         return result.user.user_email;
       } else {
+        console.log('user is not logged in. calling user check');
         return chrome.identity.getProfileUserInfo(function(userInfo) {
           validateEmail(userInfo.email);
         });
@@ -58,7 +51,7 @@ function getUser() {
 }
 
 function getURL() {
-  return chrome.tabs.query(
+  chrome.tabs.query(
     {
       active: true,
       currentWindow: true
@@ -69,14 +62,14 @@ function getURL() {
   );
 }
 function getHTML() {
-  return chrome.tabs.executeScript(
+  chrome.tabs.executeScript(
     null,
     { code: 'var html = document.documentElement.outerHTML; html' },
     function(html) {
       tabInfo.html = html;
-      parse();
     }
   );
+  parse();
 }
 
 function parse() {
@@ -120,6 +113,7 @@ function sendRequest() {
   chrome.storage.local.get(['user'], function(result) {
     const user = result.user;
     const api = 'http://128.199.203.161:8500/extension/parsing';
+    console.log("before sending request, let's check tabInfo", tabInfo);
     const input = {
       user_id: user.user_id,
       url: tabInfo.url,
@@ -166,27 +160,17 @@ function validateEmail(email) {
     .catch(error => console.log(error));
 }
 
-function countResume() {
-  chrome.storage.local.get('user', function(result) {
-    if (result.user && result.user.check === true) {
-      chrome.storage.local.get('resumeCount', function(result) {
-        if (result.resumeCount)
-          chrome.storage.local.set({ resumeCount: result.resumeCount + 1 });
-      });
-    } else {
-      console.log('Failed to increment resume count. Unauthorized user!');
-    }
-  });
-}
-
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
+// function sleep(ms) {
+//   return new Promise(resolve => setTimeout(resolve, ms));
+// }
 
 function printStorage() {
-  chrome.storage.local.get(null, function(items) {
-    for (let key in items) {
-      console.log(key, items[key]);
-    }
+  // chrome.storage.local.get(null, function(items) {
+  //   for (let key in items) {
+  //     console.log(key, items[key]);
+  //   }
+  // });
+  chrome.storage.local.get(['candidate'], function(response) {
+    console.log(response.candidate);
   });
 }
