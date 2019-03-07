@@ -15,9 +15,11 @@ import {
   Row,
   Table,
   Tag,
-  Tooltip
+  Tooltip,
+  Switch
 } from 'antd'
 import Highlighter from 'react-highlight-words'
+// import { koreanAgetoYear } from '../../util/UtilFunction'
 
 export default class Job extends Component {
   constructor(props) {
@@ -34,7 +36,11 @@ export default class Job extends Component {
       detailVisible: false,
       detailTitle: 'Job Detail',
       currentKey: null,
-      isReset: false
+      isReset: false,
+      isMatchingOn: false,
+      peopleDataSource: [],
+      peopleSearchCount: 0,
+      fetchAgainLoading: false
     }
 
     this.columns = [
@@ -73,19 +79,10 @@ export default class Job extends Component {
         title: '키워드',
         dataIndex: 'keyword',
         ...this.getColumnSearchProps('keyword'),
-        // render: e => (
-        //   <span>
-        //     {e.split(', ').map(tag => (
-        //       <Tag color="blue">{tag}</Tag>
-        //     ))}
-        //   </span>
-        // ),
         render: e => {
-          console.log('e', e)
           return (
             <span>
               {e.split(', ').map(tag => {
-                // console.log('tag', tag)
                 if (tag) return <Tag color="blue">{tag}</Tag>
                 else return ''
               })}
@@ -264,6 +261,10 @@ export default class Job extends Component {
     this.setState({ searchText: '' })
   }
 
+  handleToggle = prop => enable => {
+    this.setState({ [prop]: enable })
+  }
+
   componentDidMount() {
     this.fetch()
   }
@@ -337,6 +338,8 @@ export default class Job extends Component {
     await this.setState({
       detailTitle: this.detailTitle()
     })
+    const { isMatchingOn } = await this.state
+    if (isMatchingOn) await this.fetchAgain()
   }
 
   detailTitle = () => (
@@ -366,6 +369,8 @@ export default class Job extends Component {
     await this.setState({
       detailTitle: this.detailTitle()
     })
+    const { isMatchingOn } = await this.state
+    if (isMatchingOn) await this.fetchAgain()
   }
 
   handleTableChange = (pagination, filters, sorter) => {
@@ -521,6 +526,7 @@ export default class Job extends Component {
   )
 
   detailJobModal = () => {
+    const { isMatchingOn } = this.state
     let jobDetail =
       this.state.clickedData.detail &&
       this.state.clickedData.detail.split(`\n`).map(line => {
@@ -531,6 +537,9 @@ export default class Job extends Component {
           </span>
         )
       })
+    // peopleDataSource: result,
+    // peopleSearchCount: result.length
+    // console.log('this.state.clickedData.', this.state.clickedData)
 
     return (
       <div>
@@ -540,7 +549,7 @@ export default class Job extends Component {
           onOk={this.handleDetailModalOk}
           onCancel={this.handleDetailModalCancel}
           footer={null}
-          width="80%"
+          width={isMatchingOn ? '95%' : '80%'}
         >
           <Row style={{ textAlign: 'left' }}>
             <Col span={2} />
@@ -617,16 +626,217 @@ export default class Job extends Component {
             <Col span={2} />
           </Row>
           <Divider />
+          {isMatchingOn && <this.peopleTable />}
         </Modal>
       </div>
     )
   }
 
+  peopleTable = () => {
+    const { peopleDataSource } = this.state
+    const columns = [
+      {
+        key: 'name',
+        title: '이름',
+        dataIndex: 'name',
+        align: 'center',
+        ...this.getColumnSearchProps('name')
+      },
+      {
+        key: 'birth',
+        title: '한국나이',
+        dataIndex: 'birth',
+        width: 75,
+        align: 'center',
+        // ...this.getColumnSearchProps('birth'),
+        render: (text, row, index) => {
+          // 검색기능과 render를 같이 못 씀 -> 같이 쓸 수 있 지 만 나이 추가 데이터는 검색 안됨
+          let age
+          if (text !== 'null' && text) {
+            let date = new Date()
+            let year = date.getFullYear()
+            age = year - Number(text) + 1
+          }
+          return (
+            <span>
+              {/* 한국나이 {age} 출생년도 {text} */}
+              {/* {text} 한국나이 {age} */}
+              {age}
+            </span>
+          )
+        }
+      },
+      {
+        key: 'school',
+        title: '최종학력',
+        dataIndex: 'school',
+        align: 'center',
+        ...this.getColumnSearchProps('school')
+      },
+      {
+        key: 'company',
+        title: '주요직장',
+        dataIndex: 'company',
+        align: 'center',
+        ...this.getColumnSearchProps('company')
+      },
+      {
+        key: 'career',
+        title: '총 경력',
+        dataIndex: 'career',
+        align: 'center',
+        ...this.getColumnSearchProps('career')
+      },
+      {
+        key: 'keyword',
+        title: '핵심 키워드',
+        dataIndex: 'keyword',
+        align: 'center',
+        width: 120,
+        ...this.getColumnSearchProps('keyword')
+      },
+      {
+        key: 'resume_title',
+        title: 'Resume Title',
+        dataIndex: 'resume_title',
+        align: 'center',
+        width: 120,
+        ...this.getColumnSearchProps('resume_title')
+      },
+      {
+        key: 'salary',
+        title: '연봉',
+        dataIndex: 'salary',
+        width: 100,
+        ...this.getColumnSearchProps('salary')
+      },
+      {
+        key: 'rate',
+        title: 'Rate',
+        dataIndex: 'rate',
+        sorter: (a, b) => a.rate - b.rate,
+        sortOrder: 'descend',
+        width: 30,
+        align: 'center',
+        ...this.getColumnSearchProps('rate')
+      }
+      // {
+      //   key: 'url',
+      //   title: 'URL',
+      //   dataIndex: 'url',
+      //   width: 50,
+      //   render: (text, row, index) => {
+      //     return (
+      //       <a
+      //         href={text}
+      //         rel="noopener noreferrer"
+      //         target="_blank"
+      //         onClick={this.handleCancel}
+      //       >
+      //         URL
+      //       </a>
+      //     )
+      //   }
+      // },
+      // {
+      //   key: 'website',
+      //   title: 'WEBSITE',
+      //   dataIndex: 'website',
+      //   width: 60,
+      //   align: 'center',
+      //   ...this.getColumnSearchProps('website')
+      // },
+      // {
+      //   key: 'email', //날짜에 맞게 데이터 맞게 들어왔는지 확인용
+      //   title: 'email(테스트용)',
+      //   dataIndex: 'email',
+      //   width: 120
+      // },
+      // {
+      //   key: 'modified_date', //날짜에 맞게 데이터 맞게 들어왔는지 확인용
+      //   title: '마지막 수정 일시',
+      //   dataIndex: 'modified_date',
+      //   width: '120',
+      //   ...this.getColumnSearchProps('modified_date')
+      // }
+    ]
+
+    return (
+      <div>
+        {' '}
+        {this.state.peopleSearchCount > 0 ? (
+          <span>{this.state.peopleSearchCount}명이 매칭되었습니다.</span>
+        ) : null}
+        <Table
+          columns={columns}
+          bordered
+          dataSource={peopleDataSource}
+          size="middle"
+          // components={components}
+          // rowKey="rm_code"
+          loading={this.state.fetchAgainLoading}
+          // onChange={this.handleTableChange}
+          // rowClassName={() => 'editable-row'}
+          // rowSelection={rowSelection}
+          // onRow={record => ({
+          //   onClick: () => {
+          //     console.log('record', record)
+          //     this.handleClick(record)
+          //   }
+          // })}
+        />
+      </div>
+    )
+  }
+
+  fetchAgain = () => {
+    const { under_birth, upper_birth, keyword } = this.state.clickedData
+
+    // console.log('this.props.clickedData', this.state.clickedData)
+    console.log('this.props.user_id', this.props.user_id)
+    console.log('this.props.under_birth', under_birth)
+    console.log('this.props.upper_birth', upper_birth)
+    console.log('this.props.keyword', keyword)
+
+    this.setState({ fetchAgainLoading: true })
+    Axios.post(API.viewMainTablePosition, {
+      user_id: this.props.user_id,
+      under_birth: under_birth || 1900,
+      upper_birth: upper_birth || 2400,
+      top_school: false,
+      keyword: keyword || ''
+      // keyword: unitedSearch
+      // position: position
+      // keyword: andOr
+    }).then(data => {
+      // const pagination = { ...this.state.pagination }
+      // pagination.total = 200
+      console.log('data', data.data.result)
+
+      const dateSortedData = data.data.result
+
+      const result = dateSortedData.map((row, i) => {
+        const each = Object.assign({}, row)
+        each.key = i
+        return each
+      })
+
+      console.log('fetchagain', result)
+      this.setState({
+        fetchAgainLoading: false,
+        peopleDataSource: result,
+        peopleSearchCount: result.length
+      })
+    })
+  }
+
   handleClick = async clickedData => {
+    const { isMatchingOn } = await this.state
     await this.setState({ clickedData })
     await this.setState({
       detailTitle: this.detailTitle()
     })
+    if (isMatchingOn) await this.fetchAgain()
     await this.showDetailModal()
   }
 
@@ -671,7 +881,8 @@ export default class Job extends Component {
       visible,
       updateVisible,
       detailVisible,
-      selectedRowKeys
+      selectedRowKeys,
+      isMatchingOn
     } = this.state
 
     const rowSelection = {
@@ -694,7 +905,6 @@ export default class Job extends Component {
           >
             등록
           </Button>
-
           {hasSelectedMultiple ? (
             <Popconfirm
               title="Are you sure you want to delete this?"
@@ -723,7 +933,6 @@ export default class Job extends Component {
               삭제
             </Button>
           )}
-
           <Tooltip
             placement="bottom"
             title={editButtonToolTip}
@@ -747,6 +956,14 @@ export default class Job extends Component {
           >
             Reset
           </Button>
+          {/* <Form.Item label="loading"> */}
+          매칭 켜기 :
+          <Switch
+            checked={isMatchingOn}
+            onChange={this.handleToggle('isMatchingOn')}
+            // style={{ marginRight: 5, marginBottom: 16 }}
+          />
+          {/* </Form.Item> */}
         </div>
         {visible && <this.jobModal />}
         {updateVisible && <this.updateJobModal />}
