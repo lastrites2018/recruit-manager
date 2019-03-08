@@ -318,7 +318,7 @@ export default class Job extends Component {
         return each
       })
 
-      console.log('positionSort', ketAddedPositionSort)
+      // console.log('fetch-positionSort', ketAddedPositionSort)
 
       this.setState({
         loading: false,
@@ -339,6 +339,7 @@ export default class Job extends Component {
       detailTitle: this.detailTitle()
     })
     const { isMatchingOn } = await this.state
+    if (isMatchingOn) await this.setState({ peopleSearchCount: 0 })
     if (isMatchingOn) await this.fetchAgain()
   }
 
@@ -370,6 +371,7 @@ export default class Job extends Component {
       detailTitle: this.detailTitle()
     })
     const { isMatchingOn } = await this.state
+    if (isMatchingOn) await this.setState({ peopleSearchCount: 0 })
     if (isMatchingOn) await this.fetchAgain()
   }
 
@@ -537,9 +539,6 @@ export default class Job extends Component {
           </span>
         )
       })
-    // peopleDataSource: result,
-    // peopleSearchCount: result.length
-    // console.log('this.state.clickedData.', this.state.clickedData)
 
     return (
       <div>
@@ -772,9 +771,9 @@ export default class Job extends Component {
           bordered
           dataSource={peopleDataSource}
           size="middle"
+          loading={this.state.fetchAgainLoading}
           // components={components}
           // rowKey="rm_code"
-          loading={this.state.fetchAgainLoading}
           // onChange={this.handleTableChange}
           // rowClassName={() => 'editable-row'}
           // rowSelection={rowSelection}
@@ -792,11 +791,10 @@ export default class Job extends Component {
   fetchAgain = () => {
     const { under_birth, upper_birth, keyword } = this.state.clickedData
 
-    // console.log('this.props.clickedData', this.state.clickedData)
-    console.log('this.props.user_id', this.props.user_id)
-    console.log('this.props.under_birth', under_birth)
-    console.log('this.props.upper_birth', upper_birth)
-    console.log('this.props.keyword', keyword)
+    // console.log('this.props.user_id', this.props.user_id)
+    // console.log('this.props.under_birth', under_birth)
+    // console.log('this.props.upper_birth', upper_birth)
+    // console.log('this.props.keyword', keyword)
 
     this.setState({ fetchAgainLoading: true })
     Axios.post(API.viewMainTablePosition, {
@@ -805,13 +803,9 @@ export default class Job extends Component {
       upper_birth: upper_birth || 2400,
       top_school: false,
       keyword: keyword || ''
-      // keyword: unitedSearch
-      // position: position
-      // keyword: andOr
     }).then(data => {
       // const pagination = { ...this.state.pagination }
       // pagination.total = 200
-      console.log('data', data.data.result)
 
       const dateSortedData = data.data.result
 
@@ -832,6 +826,7 @@ export default class Job extends Component {
 
   handleClick = async clickedData => {
     const { isMatchingOn } = await this.state
+    if (isMatchingOn) await this.setState({ peopleSearchCount: 0 })
     await this.setState({ clickedData })
     await this.setState({
       detailTitle: this.detailTitle()
@@ -963,7 +958,6 @@ export default class Job extends Component {
             onChange={this.handleToggle('isMatchingOn')}
             // style={{ marginRight: 5, marginBottom: 16 }}
           />
-          {/* </Form.Item> */}
         </div>
         {visible && <this.jobModal />}
         {updateVisible && <this.updateJobModal />}
