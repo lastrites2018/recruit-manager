@@ -140,6 +140,7 @@ export default class People extends Component {
         key: 'salary',
         title: '연봉',
         dataIndex: 'salary',
+        align: 'center',
         width: 100,
         ...this.getColumnSearchProps('salary')
       },
