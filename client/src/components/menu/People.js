@@ -632,7 +632,8 @@ export default class People extends Component {
       smsVisible: false,
       selected: '',
       andOr: '',
-      searchCount: 0
+      searchCount: 0,
+      sortedInfo: null
     })
     await this.fetch()
   }
