@@ -339,8 +339,11 @@ export default class Job extends Component {
       detailTitle: this.detailTitle()
     })
     const { isMatchingOn } = await this.state
-    if (isMatchingOn) await this.setState({ peopleSearchCount: 0 })
-    if (isMatchingOn) await this.fetchAgain()
+    if (isMatchingOn) {
+      await this.setState({ peopleSearchCount: 0 })
+      await this.fetchAgain()
+    }
+    if (this.state.searchText) this.setState({ searchText: '', isReset: true })
   }
 
   detailTitle = () => (
@@ -371,8 +374,11 @@ export default class Job extends Component {
       detailTitle: this.detailTitle()
     })
     const { isMatchingOn } = await this.state
-    if (isMatchingOn) await this.setState({ peopleSearchCount: 0 })
-    if (isMatchingOn) await this.fetchAgain()
+    if (isMatchingOn) {
+      await this.setState({ peopleSearchCount: 0 })
+      await this.fetchAgain()
+    }
+    if (this.state.searchText) this.setState({ searchText: '', isReset: true })
   }
 
   handleTableChange = (pagination, filters, sorter) => {
@@ -639,6 +645,7 @@ export default class Job extends Component {
         title: '이름',
         dataIndex: 'name',
         align: 'center',
+        width: 100,
         ...this.getColumnSearchProps('name')
       },
       {
@@ -670,6 +677,7 @@ export default class Job extends Component {
         title: '최종학력',
         dataIndex: 'school',
         align: 'center',
+        width: 130,
         ...this.getColumnSearchProps('school')
       },
       {
@@ -677,6 +685,7 @@ export default class Job extends Component {
         title: '주요직장',
         dataIndex: 'company',
         align: 'center',
+        width: 130,
         ...this.getColumnSearchProps('company')
       },
       {
@@ -684,6 +693,7 @@ export default class Job extends Component {
         title: '총 경력',
         dataIndex: 'career',
         align: 'center',
+        width: 110,
         ...this.getColumnSearchProps('career')
       },
       {
@@ -691,7 +701,7 @@ export default class Job extends Component {
         title: '핵심 키워드',
         dataIndex: 'keyword',
         align: 'center',
-        width: 120,
+        width: 130,
         ...this.getColumnSearchProps('keyword')
       },
       {
@@ -706,6 +716,7 @@ export default class Job extends Component {
         key: 'salary',
         title: '연봉',
         dataIndex: 'salary',
+        align: 'center',
         width: 100,
         ...this.getColumnSearchProps('salary')
       },
