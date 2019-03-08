@@ -654,22 +654,17 @@ export default class Job extends Component {
         dataIndex: 'birth',
         width: 75,
         align: 'center',
+        sorter: (a, b) => b.birth - a.birth,
+        sortDirections: ['descend', 'ascend'],
         // ...this.getColumnSearchProps('birth'),
         render: (text, row, index) => {
-          // 검색기능과 render를 같이 못 씀 -> 같이 쓸 수 있 지 만 나이 추가 데이터는 검색 안됨
           let age
           if (text !== 'null' && text) {
             let date = new Date()
             let year = date.getFullYear()
             age = year - Number(text) + 1
           }
-          return (
-            <span>
-              {/* 한국나이 {age} 출생년도 {text} */}
-              {/* {text} 한국나이 {age} */}
-              {age}
-            </span>
-          )
+          return <span>{age}</span>
         }
       },
       {
@@ -725,7 +720,7 @@ export default class Job extends Component {
         title: 'Rate',
         dataIndex: 'rate',
         sorter: (a, b) => a.rate - b.rate,
-        sortOrder: 'descend',
+        defaultSortOrder: 'descend',
         width: 30,
         align: 'center',
         ...this.getColumnSearchProps('rate')
@@ -783,10 +778,8 @@ export default class Job extends Component {
           dataSource={peopleDataSource}
           size="middle"
           loading={this.state.fetchAgainLoading}
-          // components={components}
           // rowKey="rm_code"
           // onChange={this.handleTableChange}
-          // rowClassName={() => 'editable-row'}
           // rowSelection={rowSelection}
           // onRow={record => ({
           //   onClick: () => {

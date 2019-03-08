@@ -7,7 +7,6 @@ import MailForm from '../forms/MailForm'
 import SmsForm from '../forms/SmsForm'
 import MemoForm from '../forms/MemoForm'
 import UpdateMemoForm from '../forms/UpdateMemoForm'
-import { EditableFormRow, EditableCell } from '../../util/Table'
 import 'react-table/react-table.css'
 import './menu.css'
 import {
@@ -64,136 +63,33 @@ export default class People extends Component {
       isReset: false,
       memoAddVisible: false,
       memoUpdateVisible: false,
-      editRecord: {}
+      editRecord: {},
+      sortedInfo: null
     }
+  }
 
-    this.columns = [
-      {
-        key: 'name',
-        title: '이름',
-        dataIndex: 'name',
-        align: 'center',
-        ...this.getColumnSearchProps('name')
-      },
-      {
-        key: 'birth',
-        title: '한국나이',
-        dataIndex: 'birth',
-        width: 75,
-        align: 'center',
-        // ...this.getColumnSearchProps('birth'),
-        render: (text, row, index) => {
-          // 검색기능과 render를 같이 못 씀 -> 같이 쓸 수 있 지 만 나이 추가 데이터는 검색 안됨
-          let age
-          if (text !== 'null' && text) {
-            let date = new Date()
-            let year = date.getFullYear()
-            age = year - Number(text) + 1
-          }
-          return (
-            <span>
-              {/* 한국나이 {age} 출생년도 {text} */}
-              {/* {text} 한국나이 {age} */}
-              {age}
-            </span>
-          )
-        }
-      },
-      {
-        key: 'school',
-        title: '최종학력',
-        dataIndex: 'school',
-        align: 'center',
-        ...this.getColumnSearchProps('school')
-      },
-      {
-        key: 'company',
-        title: '주요직장',
-        dataIndex: 'company',
-        align: 'center',
-        ...this.getColumnSearchProps('company')
-      },
-      {
-        key: 'career',
-        title: '총 경력',
-        dataIndex: 'career',
-        align: 'center',
-        ...this.getColumnSearchProps('career')
-      },
-      {
-        key: 'keyword',
-        title: '핵심 키워드',
-        dataIndex: 'keyword',
-        align: 'center',
-        width: 120,
-        ...this.getColumnSearchProps('keyword')
-      },
-      {
-        key: 'resume_title',
-        title: 'Resume Title',
-        dataIndex: 'resume_title',
-        align: 'center',
-        width: 120,
-        ...this.getColumnSearchProps('resume_title')
-      },
-      {
-        key: 'salary',
-        title: '연봉',
-        dataIndex: 'salary',
-        align: 'center',
-        width: 100,
-        ...this.getColumnSearchProps('salary')
-      },
-      {
-        key: 'rate',
-        title: 'Rate',
-        dataIndex: 'rate',
-        sorter: (a, b) => a.rate - b.rate,
-        sortOrder: 'descend',
-        width: 30,
-        align: 'center',
-        ...this.getColumnSearchProps('rate')
-      },
-      {
-        key: 'url',
-        title: 'URL',
-        dataIndex: 'url',
-        width: 50,
-        render: (text, row, index) => {
-          return (
-            <a
-              href={text}
-              rel="noopener noreferrer"
-              target="_blank"
-              onClick={this.handleCancel}
-            >
-              URL
-            </a>
-          )
-        }
-      },
-      {
-        key: 'website',
-        title: 'WEBSITE',
-        dataIndex: 'website',
-        width: 60,
-        align: 'center',
-        ...this.getColumnSearchProps('website')
-      },
-      // {
-      //   key: 'email', //날짜에 맞게 데이터 맞게 들어왔는지 확인용
-      //   title: 'email(테스트용)',
-      //   dataIndex: 'email',
-      //   width: 120
-      // },
-      {
-        key: 'modified_date', //날짜에 맞게 데이터 맞게 들어왔는지 확인용
-        title: '마지막 수정 일시',
-        dataIndex: 'modified_date',
-        width: '120',
-        ...this.getColumnSearchProps('modified_date')
-      }
-    ]
+  handleChange = (pagination, filters, sorter) => {
+    console.log('Various parameters', pagination, filters, sorter)
+    this.setState({
+      // filteredInfo: filters,
+      sortedInfo: sorter
+    })
+  }
+
+  handleTableChange = (pagination, filters, sorter) => {
+    const pager = { ...this.state.pagination }
+    pager.current = pagination.current
+    this.setState({
+      pagination: pager
+    })
+    this.fetch({
+      sortedInfo: sorter,
+      results: pagination.pageSize,
+      page: pagination.current,
+      sortField: sorter.field,
+      sortOrder: sorter.order,
+      ...filters
+    })
   }
 
   showMailModal = () => {
@@ -542,7 +438,7 @@ export default class People extends Component {
         else if (each.url.includes('incruit')) each.website = 'incruit'
         return each
       })
-      console.log('fetch-result', result)
+      // console.log('fetch-result', result)
       this.setState({
         loading: false,
         dataSource: result,
@@ -577,8 +473,6 @@ export default class People extends Component {
       positionTitle &&
       positionData.filter(data => data.title === positionTitle)[0].keyword
 
-    console.log('positionKeyword', positionKeyword)
-
     // 더 이상 클라이언트 측에서는 키워드 값을 변경하지 않고 그대로 보냄
 
     // if (positionKeyword && positionKeyword.includes(' ')) {
@@ -599,7 +493,8 @@ export default class People extends Component {
       unitedSearch = andOr
     }
 
-    console.log('unitedSearch', unitedSearch)
+    // console.log('positionKeyword', positionKeyword)
+    // console.log('unitedSearch', unitedSearch)
 
     // 입력된 나이로 db 데이터에 맞게 나이로 계산 주의, 나이를 변환하기 때문에 순서가 변경되야 함
     const upperBirth = under_birth && koreanAgetoYear(under_birth)
@@ -660,8 +555,15 @@ export default class People extends Component {
   }
 
   handleSubmit = () => {
-    console.log('submit', this.state)
-    this.setState({ selectedKeys: [], searchText: '', isReset: true })
+    this.setState({
+      selectedKeys: [],
+      searchText: '',
+      isReset: true,
+      sortedInfo: {
+        order: 'descend',
+        columnKey: 'rate'
+      }
+    })
     this.fetchAgain()
   }
 
@@ -730,7 +632,6 @@ export default class People extends Component {
       smsVisible: false,
       selected: '',
       andOr: '',
-      positionData: [],
       searchCount: 0
     })
     await this.fetch()
@@ -1323,21 +1224,6 @@ export default class People extends Component {
     }
   }
 
-  handleTableChange = (pagination, filters, sorter) => {
-    const pager = { ...this.state.pagination }
-    pager.current = pagination.current
-    this.setState({
-      pagination: pager
-    })
-    this.fetch({
-      results: pagination.pageSize,
-      page: pagination.current,
-      sortField: sorter.field,
-      sortOrder: sorter.order,
-      ...filters
-    })
-  }
-
   showUpdateResumeModal = () => {
     this.setState({ visibleUpdateResume: true })
   }
@@ -1388,27 +1274,141 @@ export default class People extends Component {
       onChange: this.onSelectChange
     }
     const hasSelected = selectedRowKeys.length > 0
-    const components = {
-      body: {
-        row: EditableFormRow,
-        cell: EditableCell
+
+    let { sortedInfo } = this.state
+    sortedInfo = sortedInfo || {}
+
+    const columns = [
+      {
+        key: 'name',
+        title: '이름',
+        dataIndex: 'name',
+        align: 'center',
+        ...this.getColumnSearchProps('name')
+      },
+      {
+        key: 'birth',
+        title: '한국나이',
+        dataIndex: 'birth',
+        width: 75,
+        align: 'center',
+        sorter: (a, b) => b.birth - a.birth,
+        sortOrder: sortedInfo.columnKey === 'birth' && sortedInfo.order,
+        // sortDirections: ['descend', 'ascend'],
+        // ...this.getColumnSearchProps('birth'),
+        render: (text, row, index) => {
+          // 검색기능과 render를 같이 못 씀 -> 같이 쓸 수 있 지 만 나이 추가 데이터는 검색 안됨
+          let age
+          if (text !== 'null' && text) {
+            let date = new Date()
+            let year = date.getFullYear()
+            age = year - Number(text) + 1
+          }
+          return (
+            <span>
+              {/* 한국나이 {age} 출생년도 {text} */}
+              {/* {text} 한국나이 {age} */}
+              {age}
+            </span>
+          )
+        }
+      },
+      {
+        key: 'school',
+        title: '최종학력',
+        dataIndex: 'school',
+        align: 'center',
+        ...this.getColumnSearchProps('school')
+      },
+      {
+        key: 'company',
+        title: '주요직장',
+        dataIndex: 'company',
+        align: 'center',
+        ...this.getColumnSearchProps('company')
+      },
+      {
+        key: 'career',
+        title: '총 경력',
+        dataIndex: 'career',
+        align: 'center',
+        ...this.getColumnSearchProps('career')
+      },
+      {
+        key: 'keyword',
+        title: '핵심 키워드',
+        dataIndex: 'keyword',
+        align: 'center',
+        width: 120,
+        ...this.getColumnSearchProps('keyword')
+      },
+      {
+        key: 'resume_title',
+        title: 'Resume Title',
+        dataIndex: 'resume_title',
+        align: 'center',
+        width: 120,
+        ...this.getColumnSearchProps('resume_title')
+      },
+      {
+        key: 'salary',
+        title: '연봉',
+        dataIndex: 'salary',
+        align: 'center',
+        width: 100,
+        ...this.getColumnSearchProps('salary')
+      },
+      {
+        key: 'rate',
+        title: 'Rate',
+        dataIndex: 'rate',
+        sorter: (a, b) => a.rate - b.rate,
+        // defaultSortOrder: 'descend',
+        sortOrder: sortedInfo.columnKey === 'rate' && sortedInfo.order,
+        width: 30,
+        align: 'center',
+        ...this.getColumnSearchProps('rate')
+      },
+      {
+        key: 'url',
+        title: 'URL',
+        dataIndex: 'url',
+        width: 50,
+        render: (text, row, index) => {
+          return (
+            <a
+              href={text}
+              rel="noopener noreferrer"
+              target="_blank"
+              onClick={this.handleCancel}
+            >
+              URL
+            </a>
+          )
+        }
+      },
+      {
+        key: 'website',
+        title: 'WEBSITE',
+        dataIndex: 'website',
+        width: 60,
+        align: 'center',
+        ...this.getColumnSearchProps('website')
+      },
+      // {
+      //   key: 'email', //날짜에 맞게 데이터 맞게 들어왔는지 확인용
+      //   title: 'email(테스트용)',
+      //   dataIndex: 'email',
+      //   width: 120
+      // },
+      {
+        key: 'modified_date', //날짜에 맞게 데이터 맞게 들어왔는지 확인용
+        title: '마지막 수정 일시',
+        dataIndex: 'modified_date',
+        width: '120',
+        ...this.getColumnSearchProps('modified_date')
       }
-    }
-    const columns = this.columns.map(col => {
-      if (!col.editable) {
-        return col
-      }
-      return {
-        ...col,
-        onCell: record => ({
-          record,
-          editable: col.editable,
-          dataIndex: col.dataIndex,
-          title: col.title,
-          handleSave: this.handleSave
-        })
-      }
-    })
+    ]
 
     const optionList = this.state.positionData
       .filter(position => position.valid === 'alive')
@@ -1551,11 +1551,9 @@ export default class People extends Component {
             columns={columns}
             bordered
             dataSource={dataSource}
-            components={components}
             rowKey="rm_code"
             loading={this.state.loading}
             // onChange={this.handleTableChange}
-            rowClassName={() => 'editable-row'}
             rowSelection={rowSelection}
             onRow={record => ({
               onClick: () => {
@@ -1563,6 +1561,7 @@ export default class People extends Component {
                 this.handleClick(record)
               }
             })}
+            onChange={this.handleChange}
           />
 
           {this.state.memoUpdateVisible && <this.updateMemoModal />}
