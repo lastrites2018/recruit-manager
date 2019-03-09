@@ -289,6 +289,8 @@ export default class People extends Component {
 
   addMemoModal = () => {
     // console.log('addMemoModal', this.state.clickedData)
+    console.log('addMemoModal', this.props.optionList)
+    console.log('addMemoModal', this.props)
     return (
       <div>
         <Modal
@@ -306,6 +308,8 @@ export default class People extends Component {
             rm_code={this.state.clickedData.rm_code}
             handleMemoAddCancel={this.handleMemoAddCancel}
             getResumeDetail={this.getResumeDetail}
+            positionData={this.state.positionData}
+            optionList={this.state.optionList}
           />
         </Modal>
       </div>
@@ -451,10 +455,29 @@ export default class People extends Component {
     Axios.post(API.getPosition, {
       user_id: this.props.user_id
     }).then(data => {
+      this.getPositionOptionList(data.data.result)
       this.setState({
         positionData: data.data.result
       })
     })
+  }
+
+  getPositionOptionList = positionData => {
+    const Option = Select.Option
+    const optionList = positionData
+      .filter(position => position.valid === 'alive')
+      .sort((a, b) => {
+        return (
+          new Date(b.modified_date).getTime() -
+          new Date(a.modified_date).getTime()
+        )
+      })
+      .map(position => (
+        <Option value={position.title} key={position.position_id}>
+          {`${position.title}: ${position.keyword}`}
+        </Option>
+      ))
+    this.setState({ optionList })
   }
 
   fetchAgain = () => {
@@ -1267,9 +1290,7 @@ export default class People extends Component {
 
   render() {
     const InputGroup = Input.Group
-    const Option = Select.Option
-
-    const { dataSource, selectedRowKeys } = this.state
+    const { optionList, dataSource, selectedRowKeys } = this.state
     const rowSelection = {
       selectedRowKeys,
       onChange: this.onSelectChange
@@ -1410,20 +1431,6 @@ export default class People extends Component {
         ...this.getColumnSearchProps('modified_date')
       }
     ]
-
-    const optionList = this.state.positionData
-      .filter(position => position.valid === 'alive')
-      .sort((a, b) => {
-        return (
-          new Date(b.modified_date).getTime() -
-          new Date(a.modified_date).getTime()
-        )
-      })
-      .map(position => (
-        <Option value={position.title} key={position.position_id}>
-          {`${position.title}: ${position.keyword}`}
-        </Option>
-      ))
 
     return (
       <div onKeyDown={this.arrowKeyPush}>
