@@ -7,14 +7,14 @@ import Api from './utils/api';
 class App extends Component {
   constructor(props) {
     super(props);
-    chrome.runtime.sendMessage({ action: 'popupOpen' });
+    // chrome.runtime.sendMessage({ action: 'popupOpen' });
 
     this.state = {
       resumeCount: 0,
       mailCount: 0,
       smsCount: 0,
-      history: '',
-      candidate: { rm_code: '', email: '', cell: '' },
+      history: {},
+      candidate: {},
       positions: [],
       selectedPosition: null,
       positionDetail: '',
@@ -33,27 +33,45 @@ class App extends Component {
         sign: '\n커리어셀파 강상모 드림. 010-3929-7682'
       },
       fetchingUserData: false,
+      fetchingCrawlingData: false,
       validated: false,
-      userEmail: null,
-      isLoggedIn: false,
+      isLoggedIn: true,
       user: {}
     };
   }
 
   componentDidMount() {
-    this.checkStorage();
+    // this.fetchUser();
     this.fetchPosition();
     this.getResumeCount();
-    this.getCount('mailCount');
-    this.getCount('smsCount');
+    // this.getCount('mailCount');
+    // this.getCount('smsCount');
   }
 
+  fetchUser = async () => {
+    try {
+      await chrome.storage.local.get(null, response => {
+        if (response.user && response.user.check === true) {
+          this.setState({
+            // isLoggedIn: true,
+            user: response.user
+          });
+        }
+      });
+    } catch (err) {
+      alert(err);
+    }
+  };
+
   fetchPosition = async () => {
-    const positions = await Axios.post(Api.getPosition, {
-      user_id: 'rmrm'
-    });
-    this.setState({ positions });
-    return positions;
+    try {
+      const positions = await Axios.post(Api.getPosition, {
+        user_id: this.state.user.user_email
+      });
+      this.setState({ positions });
+    } catch (err) {
+      alert(err);
+    }
   };
 
   fetchPositionDetail = () => {
@@ -81,15 +99,14 @@ class App extends Component {
 
   writeMemo = async (body, position) => {
     try {
-      const memo = await Axios.post(Api.writeMemo, {
-        user_id: 'rmrm',
-        rm_code: 'resume_3',
+      await Axios.post(Api.writeMemo, {
+        user_id: this.state.user.user_id,
+        rm_code: this.state.candidate.rm_code,
         position: position,
         body: body,
         client: 'll'
       });
       await this.viewMemo();
-      return memo;
     } catch (err) {
       console.log(err);
     }
@@ -97,11 +114,19 @@ class App extends Component {
 
   viewMemo = async () => {
     const memo = await Axios.post(Api.getMemo, {
-      user_id: 'rmrm',
-      rm_code: 'resume_3' // 수정 필요
+      user_id: this.state.user.user_id,
+      rm_code: this.state.candidate.rm_code
     });
     this.setState({ memo: memo.data.result });
-    return memo;
+  };
+
+  deleteMemo = async () => {
+    // const memo = await Axios.post(Api.deleteMemo, {
+    //   user_id: this.state.user.user_id,
+    //   memo_id: '' // need to change
+    // });
+    // return memo;
+    alert('testing delete memo button!');
   };
 
   mailSubmit = event => {
@@ -109,33 +134,40 @@ class App extends Component {
     if (form.checkValidity() === false) {
       event.preventDefault();
       event.stopPropagation();
+    } else {
+      event.preventDefault();
+      this.setState({ validated: true });
+      this.sendMail();
     }
-    event.preventDefault();
-    this.setState({ validated: true });
-    this.sendMail();
+  };
+
+  fetchMail = () => {
+    Axios.post(Api.getMail, {
+      user_id: this.state.user.user_id,
+      rm_code: this.state.candidate.rm_code
+    });
   };
 
   sendMail = () => {
-    // Axios.post(Api.sendMail, {
-    //   user_id: 'rmrm',
-    //   rm_code: 'resume_3', // 수정 필요
-    //   sender: this.state.user.user_email,
-    //   recipient: this.state.candidate.email,
-    //   subject: this.state.mail.title,
-    //   body:
-    //     this.state.mail.content +
-    //     '\n\n' +
-    //     '[Position Detail]\n\n' +
-    //     this.state.positionDetail +
-    //     '\n\n' +
-    //     this.state.mail.sign,
-    //   position: this.state.selectedPosition
-    // });
+    Axios.post(Api.sendMail, {
+      user_id: this.state.user.user_id,
+      rm_code: this.state.candidate.rm_code,
+      sender: this.state.user.user_email,
+      recipient: this.state.candidate.email,
+      subject: this.state.mail.title,
+      body:
+        this.state.mail.content +
+        '\n\n' +
+        '[Position Detail]\n\n' +
+        this.state.positionDetail +
+        '\n\n' +
+        this.state.mail.sign,
+      position: this.state.selectedPosition
+    });
     this.addCount('mailCount');
   };
 
   updateSmsContent = () => {
-    console.log('sms content');
     this.setState({
       sms: {
         ...this.sms,
@@ -160,22 +192,21 @@ class App extends Component {
   };
 
   sendSMS = () => {
-    // Axios.post(Api.sendSMS, {
-    //   user_id: 'rmrm',
-    //   rm_code: 'resume_3', // 수정 필요
-    //   recipient: this.candidate.cell,
-    //   body: this.state.sms.content,
-    //   position: this.state.selectedPosition
-    // });
-    // console.log('sms has been sent');
+    Axios.post(Api.sendSMS, {
+      user_id: this.state.user.user_id,
+      rm_code: this.state.candidate.rm_code,
+      // recipient: this.candidate.mobile,
+      recipient: '01072214890',
+      body: this.state.sms.content,
+      position: this.state.selectedPosition
+    });
     this.addCount('smsCount');
   };
 
   getResumeCount = () => {
     const storage = chrome.storage.local;
     storage.get('resumeCount', result => {
-      if (!result.resumeCount) storage.set({ resumeCount: 1 });
-      else this.setState({ resumeCount: result.resumeCount + 1 });
+      this.setState({ resumeCount: result.resumeCount });
     });
   };
 
@@ -202,22 +233,38 @@ class App extends Component {
     });
   };
 
-  getHistory = async () => {
-    const history = await Axios.post(Api.blablabla, {
-      // waiting
-      user_id: 'rmrm'
+  reset = () => {
+    var port = chrome.extension.connect({
+      name: 'Resetting Communication'
     });
-    this.setState({ history });
+    port.postMessage('Requesting reset');
+    this.setState({
+      // isLoggedIn: false,
+      resumeCount: 0,
+      mailCount: 0,
+      smsCount: 0
+    });
   };
 
-  checkStorage = () => {
-    chrome.storage.local.get(['user'], result => {
-      if (result.user && result.user.check === true) {
+  crawling = () => {
+    this.setState({ fetchingCrawlingData: true });
+    var port = chrome.extension.connect({
+      name: 'Crawling Communication'
+    });
+    port.postMessage('Requesting crawling');
+    port.onMessage.addListener(response => {
+      if (response.user && response.user.check === true) {
         this.setState({
+          user: response.user,
+          history: response.history,
+          candidate: response.candidate,
           isLoggedIn: true,
-          user: result.user,
-          userEmail: result.user.user_email
+          fetchingCrawlingData: false,
+          resumeCount: response.resumeCount
         });
+      } else {
+        alert('Unauthorized user');
+        this.setState({ fetchingUserData: false });
       }
     });
   };
@@ -227,31 +274,18 @@ class App extends Component {
     var port = chrome.extension.connect({
       name: 'User Email Communication'
     });
-    port.postMessage('Requesting user email address');
-    port.onMessage.addListener(result => {
-      if (result.user && result.user.check === true) {
-        chrome.storage.local.set({ resumeCount: 1 });
+    port.postMessage('Requesting user info');
+    port.onMessage.addListener(response => {
+      if (response.user && response.user.check === true) {
         this.setState({
-          userEmail: result.user.user_email,
+          user: response.user,
           isLoggedIn: true,
-          fetchingUserData: false,
-          resumeCount: 1
+          fetchingUserData: false
         });
       } else {
-        alert('Unauthorized email address');
+        alert('Unauthorized user');
         this.setState({ fetchingUserData: false });
       }
-    });
-  };
-
-  logout = () => {
-    chrome.storage.local.clear();
-    chrome.storage.local.set({ resumeCount: 0, mailCount: 0, smsCount: 0 });
-    this.setState({
-      isLoggedIn: false,
-      resumeCount: 0,
-      mailCount: 0,
-      smsCount: 0
     });
   };
 
@@ -268,7 +302,8 @@ class App extends Component {
       mail,
       sms,
       validated,
-      user
+      user,
+      history
     } = this.state;
 
     return (
@@ -297,32 +332,45 @@ class App extends Component {
           )
         ) : (
           <div>
-            <Button style={{ float: 'right' }} size="sm" onClick={this.logout}>
-              로그아웃
+            <Button
+              style={{ float: 'right' }}
+              size="sm"
+              onClick={this.crawling}
+            >
+              Save
+            </Button>
+            <Button style={{ float: 'right' }} size="sm" onClick={this.reset}>
+              Reset
             </Button>
             <h2 className="text-center">Recruit Manager</h2>
             <br />
             <Row>
-              <Col>Resume: {resumeCount}</Col>
+              <Col>Resume: {resumeCount || 'null'}</Col>
               <Col />
-              <Col className="text-right">Sangmo Kang</Col>
+              <Col className="text-right">{user.user_name || 'null'}</Col>
             </Row>
             <Row>
               <Col>Mail: {mailCount}</Col>
               <Col />
-              <Col className="text-right">Careersherpa</Col>
+              <Col className="text-right">{user.user_company || 'company'}</Col>
             </Row>
             <Row>
               <Col>SMS: {smsCount}</Col>
               <Col />
-              <Col className="text-right">{user.user_email}</Col>
+              <Col className="text-right">{user.user_email || 'null'}</Col>
             </Row>
             <hr />
             <Row>
               <Col>[History]</Col>
             </Row>
             <Row>
-              <Col>Viewed By Sangmo Kang</Col>
+              <Col>
+                {history && history.result
+                  ? history.result.map(each => {
+                      return <p>{each}</p>;
+                    })
+                  : '없음!'}
+              </Col>
             </Row>
             <hr />
             <Row />
@@ -380,9 +428,14 @@ class App extends Component {
                         메모를 작성해주세요.
                       </Form.Control.Feedback>
                     </Form.Group>
-                    <Button type="submit" block size="sm">
-                      입력
-                    </Button>
+                    <div>
+                      <Button type="submit" size="sm" inline>
+                        입력
+                      </Button>
+                      <Button onClick={this.viewMemo} size="sm">
+                        조회
+                      </Button>
+                    </div>
                   </Form.Row>
                 </Form>
                 <hr />
@@ -390,7 +443,7 @@ class App extends Component {
             </Row>
             <Row>
               <Col>
-                <ListGroup flush>
+                <ListGroup>
                   {memo && memo.length ? (
                     memo.map(line => {
                       return (
@@ -398,6 +451,8 @@ class App extends Component {
                           variant="light"
                           className="p-1"
                           style={{ fontSize: 14 }}
+                          action
+                          onClick={this.deleteMemo}
                         >
                           {line.note}
                         </ListGroup.Item>
@@ -434,7 +489,11 @@ class App extends Component {
                       <Col sm={10}>
                         <Form.Control
                           plaintext
-                          value="sungunkim367@gmail.com"
+                          value={
+                            candidate && candidate.email
+                              ? candidate.email
+                              : null
+                          }
                           onChange={event =>
                             this.setState({
                               candidate: {
@@ -565,12 +624,16 @@ class App extends Component {
                         <Form.Control
                           plaintext
                           size="sm"
-                          value="01012345678"
+                          value={
+                            candidate && candidate.mobile
+                              ? candidate.mobile
+                              : null
+                          }
                           onChange={event =>
                             this.setState({
                               candidate: {
                                 ...candidate,
-                                cell: event.target.value
+                                mobile: event.target.value
                               }
                             })
                           }
