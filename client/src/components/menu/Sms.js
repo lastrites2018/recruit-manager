@@ -7,6 +7,7 @@ import Highlighter from 'react-highlight-words'
 import { sendSMS } from '../../util/UtilFunction'
 
 export default class SMS extends Component {
+  _isMounted = false
   constructor(props) {
     super(props)
     this.state = {
@@ -24,7 +25,6 @@ export default class SMS extends Component {
       {
         title: '수신인',
         dataIndex: 'name',
-        render: e => <a href="javascript:">{e}</a>,
         width: '15%',
         align: 'center',
         ...this.getColumnSearchProps('name')
@@ -161,7 +161,12 @@ export default class SMS extends Component {
   }
 
   componentDidMount() {
+    this._isMounted = true
     this.fetch()
+  }
+
+  componentWillUnmount() {
+    this._isMounted = false
   }
 
   fetch = () => {

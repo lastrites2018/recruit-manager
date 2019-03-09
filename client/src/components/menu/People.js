@@ -27,6 +27,7 @@ import Highlighter from 'react-highlight-words'
 import { sendSMS, koreanAgetoYear } from '../../util/UtilFunction'
 
 export default class People extends Component {
+  _isMounted = false
   constructor(props) {
     super(props)
     this.state = {
@@ -767,9 +768,9 @@ export default class People extends Component {
     return data
       .split(`\\n`)
       .filter(str => !!str && /\S/.test(str))
-      .map(line => {
+      .map((line, index) => {
         return (
-          <span>
+          <span key={index}>
             {line}
             <br />
           </span>
@@ -1286,8 +1287,13 @@ export default class People extends Component {
   )
 
   async componentDidMount() {
+    this._isMounted = await true
     await this.fetch()
     await this.fetchPosition()
+  }
+
+  componentWillUnmount() {
+    this._isMounted = false
   }
 
   render() {

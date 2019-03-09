@@ -10,6 +10,7 @@ import Crawling from './components/menu/Crawling'
 import './App.css'
 
 class App extends Component {
+  _isMounted = false
   state = {
     isLoggedIn: false,
     user_id: ''
@@ -24,9 +25,15 @@ class App extends Component {
   }
 
   componentDidMount() {
+    this._isMounted = true
+
     if (this.isLoggedIn()) {
       this.login(sessionStorage.getItem('user_id'))
     } else this.logout()
+  }
+
+  componentWillUnmount() {
+    this._isMounted = false
   }
 
   render() {

@@ -22,6 +22,7 @@ import Highlighter from 'react-highlight-words'
 // import { koreanAgetoYear } from '../../util/UtilFunction'
 
 export default class Job extends Component {
+  _isMounted = false
   constructor(props) {
     super(props)
     this.state = {
@@ -82,8 +83,13 @@ export default class Job extends Component {
         render: e => {
           return (
             <span>
-              {e.split(', ').map(tag => {
-                if (tag) return <Tag color="blue">{tag}</Tag>
+              {e.split(', ').map((tag, index) => {
+                if (tag)
+                  return (
+                    <Tag color="blue" key={index}>
+                      {tag}
+                    </Tag>
+                  )
                 else return ''
               })}
             </span>
@@ -119,13 +125,17 @@ export default class Job extends Component {
         onFilter: (value, record) => record.valid.indexOf(value) === 0,
         render: e => (
           <span>
-            {e.split(', ').map(tag => {
+            {e.split(', ').map((tag, index) => {
               let color
               if (tag === 'alive') color = 'geekblue'
               else if (tag === 'hold') color = 'purple'
               else if (tag === 'expired') color = 'gray'
 
-              return <Tag color={color}>{tag}</Tag>
+              return (
+                <Tag color={color} key={index}>
+                  {tag}
+                </Tag>
+              )
             })}
           </span>
         ),
@@ -266,8 +276,14 @@ export default class Job extends Component {
   }
 
   componentDidMount() {
+    this._isMounted = true
     this.fetch()
   }
+
+  componentWillUnmount() {
+    this._isMounted = false
+  }
+
 
   fetch = () => {
     Axios.post(API.getPosition, {
@@ -537,9 +553,9 @@ export default class Job extends Component {
     const { isMatchingOn } = this.state
     let jobDetail =
       this.state.clickedData.detail &&
-      this.state.clickedData.detail.split(`\n`).map(line => {
+      this.state.clickedData.detail.split(`\n`).map((line, index) => {
         return (
-          <span>
+          <span key={index}>
             {line}
             <br />
           </span>

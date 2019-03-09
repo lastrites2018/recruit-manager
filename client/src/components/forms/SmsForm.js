@@ -155,19 +155,19 @@ class SmsForm extends React.Component {
     }
 
     let smsName
-    let positionRule
+    // let positionRule
     let smsContent = ''
     let recipientPlaceholder
 
     if (selectedRows.length === 0) {
       smsName = ''
-      positionRule = [{ required: false }]
+      // positionRule = [{ required: false }]
       recipientPlaceholder = '한 명만 보낼 수 있습니다. 폰 번호를 입력해주세요.'
     } else {
       smsName = receivers || selectedRows[0].name
-      positionRule = [
-        { required: true, message: 'Please fill in the content.' }
-      ]
+      // positionRule = [
+      //   { required: true, message: 'Please fill in the content.' }
+      // ]
       smsContent = `안녕하세요, 어제 제안드렸던 ${position} 에 대해서 어떻게 생각해보셨는지 문의차 다시 문자 드립니다. 간략히 검토후 의향에 대해서 회신 주시면 감사하겠습니다.`
       recipientPlaceholder = ''
     }
