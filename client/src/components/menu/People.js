@@ -281,6 +281,7 @@ export default class People extends Component {
             handleUpdateMemoCancel={this.handleUpdateMemoCancel}
             getResumeDetail={this.getResumeDetail}
             memoRecord={this.state.editRecord}
+            optionList={this.state.optionList}
           />
         </Modal>
       </div>

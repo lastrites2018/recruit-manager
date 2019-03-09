@@ -48,6 +48,14 @@ class MemoForm extends React.Component {
     }
   }
 
+  checkPostionFieldLength = (rule, value, callback) => {
+    if (value && Array.isArray(value) && value.join('').length > 100) {
+      callback('position 필드의 글자 수는 100자를 넘을 수 없습니다.')
+    } else {
+      callback()
+    }
+  }
+
   getResumeDetail(memoData) {
     if (memoData) {
       Axios.post(API.rmDetail, {
@@ -104,19 +112,12 @@ class MemoForm extends React.Component {
 
         <Form.Item label="Position" {...formItemLayout} hasFeedback>
           {getFieldDecorator('position', {
-            // rules: positionRule
+            rules: [
+              {
+                validator: this.checkPostionFieldLength
+              }
+            ]
           })(
-            // <Select
-            //   showSearch
-            //   style={{ width: '90 %' }}
-            //   optionFilterProp="children"
-            //   onChange={this.handlePositionChange}
-            //   filterOption={(input, option) =>
-            //     option.props.children
-            //       .toLowerCase()
-            //       .indexOf(input.toLowerCase()) >= 0
-            //   }
-            // >
             <Select
               showSearch
               mode="tags"
