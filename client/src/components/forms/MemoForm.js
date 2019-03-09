@@ -1,6 +1,6 @@
 import React from 'react'
 import Axios from 'axios'
-import { Button, Form, Input } from 'antd'
+import { Button, Form, Input, Select } from 'antd'
 import API from '../../util/api'
 
 class MemoForm extends React.Component {
@@ -12,6 +12,8 @@ class MemoForm extends React.Component {
     e.preventDefault()
     this.props.form.validateFieldsAndScroll((err, values) => {
       console.log('values', values)
+      values.position =
+        Array.isArray(values.position) && values.position.join('')
       if (!err)
         this.setState({ newMemo: values }, () => {
           this.writeMemo()
@@ -90,13 +92,47 @@ class MemoForm extends React.Component {
         }
       }
     }
+    console.log('this.state.optionList', this.state.optionList)
 
     return (
       <Form onSubmit={this.handleSubmit}>
-        <Form.Item {...formItemLayout} label="Position">
+        {/* <Form.Item {...formItemLayout} label="Position">
           {getFieldDecorator('position', {
             // rules: [{ required: true, message: 'Please fill in the Position.' }]
           })(<Input />)}
+        </Form.Item> */}
+
+        <Form.Item label="Position" {...formItemLayout} hasFeedback>
+          {getFieldDecorator('position', {
+            // rules: positionRule
+          })(
+            // <Select
+            //   showSearch
+            //   style={{ width: '90 %' }}
+            //   optionFilterProp="children"
+            //   onChange={this.handlePositionChange}
+            //   filterOption={(input, option) =>
+            //     option.props.children
+            //       .toLowerCase()
+            //       .indexOf(input.toLowerCase()) >= 0
+            //   }
+            // >
+            <Select
+              showSearch
+              mode="tags"
+              // tokenSeparators={[',']}
+              style={{ width: '90 %' }}
+              optionFilterProp="children"
+              // onChange={this.handlePositionTitleChange}
+              filterOption={(input, option) =>
+                option.props.children
+                  .toLowerCase()
+                  .indexOf(input.toLowerCase()) >= 0
+              }
+            >
+              {this.props.optionList}
+            </Select>
+          )}
         </Form.Item>
 
         <Form.Item {...formItemLayout} label="Client">
