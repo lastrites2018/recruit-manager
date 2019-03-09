@@ -1,6 +1,6 @@
 import React from 'react'
 import Axios from 'axios'
-import { Button, Form, Input } from 'antd'
+import { Button, Form, Input, Select } from 'antd'
 import API from '../../util/api'
 
 class ResumeForm extends React.Component {
@@ -69,6 +69,8 @@ class ResumeForm extends React.Component {
         }
       }
     }
+    const { Option } = Select
+
     return (
       <Form onSubmit={this.handleSubmit}>
         <Form.Item
@@ -93,14 +95,31 @@ class ResumeForm extends React.Component {
               rules: [
                 { required: true, message: 'Please fill in the birth year.' }
               ]
-            })(<Input placeholder="1993" />)}
+            })(<Input placeholder="1993" maxLength={4} />)}
           </Form.Item>
-          <Form.Item
+          {/* <Form.Item
             style={{ display: 'inline-block', width: 'calc(25% - 12px)' }}
           >
             {getFieldDecorator('gender', {
-              rules: [{ type: 'string', message: 'Gender must be a number.' }]
+              rules: [{ type: 'string', message: 'Gender must be a string.' }]
             })(<Input placeholder="남/여" />)}
+          </Form.Item> */}
+          <Form.Item
+            hasFeedback
+            style={{ display: 'inline-block', width: 'calc(25% - 12px)' }}
+          >
+            {getFieldDecorator('gender', {
+              rules: [
+                { required: false, message: 'Please fill in the gender.' }
+              ]
+            })(
+              <Select defaultValue="모름">
+                {/* <Select defaultValue="모름" style={{ width: 60 }}> */}
+                <Option value="남">남</Option>
+                <Option value="여">여</Option>
+                <Option value="모름">모름</Option>
+              </Select>
+            )}
           </Form.Item>
         </Form.Item>
 

@@ -345,6 +345,7 @@ export default class People extends Component {
             selectedRows={this.state.selectedRows}
             writeSmsContent={this.writeSmsContent}
             user_id={this.props.user_id}
+            optionList={this.state.optionList}
           />
         </Modal>
       </div>

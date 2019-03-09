@@ -100,6 +100,7 @@ class SmsForm extends React.Component {
   render() {
     const { getFieldDecorator } = this.props.form
     const { selectedRows } = this.props
+    let { optionList } = this.props
     const {
       smsContentIndex,
       recentSendSMSData,
@@ -137,34 +138,33 @@ class SmsForm extends React.Component {
         : // ? selectedRows.map((row, index) => row.name).join(',')
           null
 
-    const optionList = positionData
-      .filter(position => position.valid === 'alive')
-      .sort((a, b) => {
-        return (
-          new Date(b.modified_date).getTime() -
-          new Date(a.modified_date).getTime()
-        )
-      })
-      .map(position => (
-        <Option value={position.title} key={position.key}>
-          {`${position.title}: ${position.keyword}`}
-        </Option>
-      ))
+    if (!optionList) {
+      optionList = positionData
+        .filter(position => position.valid === 'alive')
+        .sort((a, b) => {
+          return (
+            new Date(b.modified_date).getTime() -
+            new Date(a.modified_date).getTime()
+          )
+        })
+        .map(position => (
+          <Option value={position.title} key={position.key}>
+            {`${position.title}: ${position.keyword}`}
+          </Option>
+        ))
+    }
 
     let smsName
-    // let signupRule
     let positionRule
     let smsContent = ''
     let recipientPlaceholder
 
     if (selectedRows.length === 0) {
       smsName = ''
-      // signupRule = [{ required: false }]
       positionRule = [{ required: false }]
       recipientPlaceholder = '한 명만 보낼 수 있습니다. 폰 번호를 입력해주세요.'
     } else {
       smsName = receivers || selectedRows[0].name
-      // signupRule = [{ required: true, message: 'Please fill in the sign.' }]
       positionRule = [
         { required: true, message: 'Please fill in the content.' }
       ]
@@ -213,12 +213,6 @@ class SmsForm extends React.Component {
             // initialValue: receivers || selectedRows[0].name
           })(<Input placeholder={recipientPlaceholder} />)}
         </Form.Item>
-
-        {/* <Form.Item label="Position: " {...formItemLayout}>
-          {getFieldDecorator('position', {
-            initialValue: `포지션`
-          })(<Input />)}
-        </Form.Item> */}
 
         {selectedRows.length !== 0 ? (
           <Form.Item label="Positions: " {...formItemLayout} hasFeedback>
@@ -289,13 +283,6 @@ class SmsForm extends React.Component {
             </Col>
           </Row>
         </Form.Item>
-
-        {/* <Form.Item {...formItemLayout} label="Sign">
-          {getFieldDecorator('sign', {
-            rules: signupRule
-            // rules: [{ required: true, message: 'Please fill in the sign.' }]
-          })(<Input />)}
-        </Form.Item> */}
 
         <Form.Item {...tailFormItemLayout}>
           <Button
