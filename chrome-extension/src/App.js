@@ -7,13 +7,13 @@ import Api from './utils/api';
 class App extends Component {
   constructor(props) {
     super(props);
-    chrome.runtime.sendMessage({ action: 'popupOpen' });
+    // chrome.runtime.sendMessage({ action: 'popupOpen' });
 
     this.state = {
       resumeCount: 0,
       mailCount: 0,
       smsCount: 0,
-      history: '',
+      history: {},
       candidate: {},
       positions: [],
       selectedPosition: null,
@@ -33,28 +33,28 @@ class App extends Component {
         sign: '\n커리어셀파 강상모 드림. 010-3929-7682'
       },
       fetchingUserData: false,
+      fetchingCrawlingData: false,
       validated: false,
-      isLoggedIn: false,
+      isLoggedIn: true,
       user: {}
     };
   }
 
   componentDidMount() {
-    this.checkStorage();
+    // this.fetchUser();
     this.fetchPosition();
     this.getResumeCount();
-    this.getCount('mailCount');
-    this.getCount('smsCount');
+    // this.getCount('mailCount');
+    // this.getCount('smsCount');
   }
 
-  checkStorage = async () => {
+  fetchUser = async () => {
     try {
       await chrome.storage.local.get(null, response => {
         if (response.user && response.user.check === true) {
           this.setState({
-            isLoggedIn: true,
-            user: response.user,
-            candidate: response.candidate.result
+            // isLoggedIn: true,
+            user: response.user
           });
         }
       });
@@ -149,21 +149,21 @@ class App extends Component {
   };
 
   sendMail = () => {
-    // Axios.post(Api.sendMail, {
-    //   user_id: this.state.user.user_id,
-    //   rm_code: this.state.candidate.rm_code,
-    //   sender: this.state.user.user_email,
-    //   recipient: this.state.candidate.email,
-    //   subject: this.state.mail.title,
-    //   body:
-    //     this.state.mail.content +
-    //     '\n\n' +
-    //     '[Position Detail]\n\n' +
-    //     this.state.positionDetail +
-    //     '\n\n' +
-    //     this.state.mail.sign,
-    //   position: this.state.selectedPosition
-    // });
+    Axios.post(Api.sendMail, {
+      user_id: this.state.user.user_id,
+      rm_code: this.state.candidate.rm_code,
+      sender: this.state.user.user_email,
+      recipient: this.state.candidate.email,
+      subject: this.state.mail.title,
+      body:
+        this.state.mail.content +
+        '\n\n' +
+        '[Position Detail]\n\n' +
+        this.state.positionDetail +
+        '\n\n' +
+        this.state.mail.sign,
+      position: this.state.selectedPosition
+    });
     this.addCount('mailCount');
   };
 
@@ -192,22 +192,21 @@ class App extends Component {
   };
 
   sendSMS = () => {
-    // Axios.post(Api.sendSMS, {
-    //   user_id: this.state.user.user_id,
-    //   rm_code: this.state.candidate.rm_code,
-    //   recipient: this.candidate.mobile,
-    //   body: this.state.sms.content,
-    //   position: this.state.selectedPosition
-    // });
-    // console.log('sms has been sent');
+    Axios.post(Api.sendSMS, {
+      user_id: this.state.user.user_id,
+      rm_code: this.state.candidate.rm_code,
+      // recipient: this.candidate.mobile,
+      recipient: '01072214890',
+      body: this.state.sms.content,
+      position: this.state.selectedPosition
+    });
     this.addCount('smsCount');
   };
 
   getResumeCount = () => {
     const storage = chrome.storage.local;
     storage.get('resumeCount', result => {
-      if (!result.resumeCount) storage.set({ resumeCount: 1 });
-      else this.setState({ resumeCount: result.resumeCount + 1 });
+      this.setState({ resumeCount: result.resumeCount });
     });
   };
 
@@ -234,22 +233,39 @@ class App extends Component {
     });
   };
 
-  getHistory = async () => {
-    const history = await Axios.post(Api.blablabla, {
-      // waiting
-      user_id: this.state.user.user_id
+  reset = () => {
+    var port = chrome.extension.connect({
+      name: 'Resetting Communication'
     });
-    this.setState({ history });
-  };
-
-  logout = () => {
-    chrome.storage.local.clear();
-    chrome.storage.local.set({ resumeCount: 1, mailCount: 0, smsCount: 0 });
+    port.postMessage('Requesting reset');
     this.setState({
-      isLoggedIn: false,
+      // isLoggedIn: false,
       resumeCount: 0,
       mailCount: 0,
       smsCount: 0
+    });
+  };
+
+  crawling = () => {
+    this.setState({ fetchingCrawlingData: true });
+    var port = chrome.extension.connect({
+      name: 'Crawling Communication'
+    });
+    port.postMessage('Requesting crawling');
+    port.onMessage.addListener(response => {
+      if (response.user && response.user.check === true) {
+        this.setState({
+          user: response.user,
+          history: response.history,
+          candidate: response.candidate,
+          isLoggedIn: true,
+          fetchingCrawlingData: false,
+          resumeCount: response.resumeCount
+        });
+      } else {
+        alert('Unauthorized user');
+        this.setState({ fetchingUserData: false });
+      }
     });
   };
 
@@ -258,17 +274,16 @@ class App extends Component {
     var port = chrome.extension.connect({
       name: 'User Email Communication'
     });
-    port.postMessage('Requesting user email address');
-    port.onMessage.addListener(result => {
-      if (result.user && result.user.check === true) {
+    port.postMessage('Requesting user info');
+    port.onMessage.addListener(response => {
+      if (response.user && response.user.check === true) {
         this.setState({
-          user: result.user,
+          user: response.user,
           isLoggedIn: true,
-          fetchingUserData: false,
-          resumeCount: 1
+          fetchingUserData: false
         });
       } else {
-        alert('Unauthorized email address');
+        alert('Unauthorized user');
         this.setState({ fetchingUserData: false });
       }
     });
@@ -287,7 +302,8 @@ class App extends Component {
       mail,
       sms,
       validated,
-      user
+      user,
+      history
     } = this.state;
 
     return (
@@ -316,32 +332,45 @@ class App extends Component {
           )
         ) : (
           <div>
-            <Button style={{ float: 'right' }} size="sm" onClick={this.logout}>
-              로그아웃
+            <Button
+              style={{ float: 'right' }}
+              size="sm"
+              onClick={this.crawling}
+            >
+              Save
+            </Button>
+            <Button style={{ float: 'right' }} size="sm" onClick={this.reset}>
+              Reset
             </Button>
             <h2 className="text-center">Recruit Manager</h2>
             <br />
             <Row>
-              <Col>Resume: {resumeCount}</Col>
+              <Col>Resume: {resumeCount || 'null'}</Col>
               <Col />
-              <Col className="text-right">Sangmo Kang</Col>
+              <Col className="text-right">{user.user_name || 'null'}</Col>
             </Row>
             <Row>
               <Col>Mail: {mailCount}</Col>
               <Col />
-              <Col className="text-right">Careersherpa</Col>
+              <Col className="text-right">{user.user_company || 'company'}</Col>
             </Row>
             <Row>
               <Col>SMS: {smsCount}</Col>
               <Col />
-              <Col className="text-right">{user.user_email}</Col>
+              <Col className="text-right">{user.user_email || 'null'}</Col>
             </Row>
             <hr />
             <Row>
               <Col>[History]</Col>
             </Row>
             <Row>
-              <Col>Viewed By Sangmo Kang</Col>
+              <Col>
+                {history && history.result
+                  ? history.result.map(each => {
+                      return <p>{each}</p>;
+                    })
+                  : '없음!'}
+              </Col>
             </Row>
             <hr />
             <Row />
@@ -460,7 +489,11 @@ class App extends Component {
                       <Col sm={10}>
                         <Form.Control
                           plaintext
-                          value={candidate.email}
+                          value={
+                            candidate && candidate.email
+                              ? candidate.email
+                              : null
+                          }
                           onChange={event =>
                             this.setState({
                               candidate: {
@@ -591,7 +624,11 @@ class App extends Component {
                         <Form.Control
                           plaintext
                           size="sm"
-                          value={candidate.mobile}
+                          value={
+                            candidate && candidate.mobile
+                              ? candidate.mobile
+                              : null
+                          }
                           onChange={event =>
                             this.setState({
                               candidate: {
