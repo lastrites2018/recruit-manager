@@ -16,6 +16,7 @@ import {
 import Highlighter from 'react-highlight-words'
 
 export default class Mail extends Component {
+  _isMounted = false
   constructor(props) {
     super(props)
     this.state = {
@@ -37,7 +38,7 @@ export default class Mail extends Component {
       {
         title: '수신인',
         dataIndex: 'name',
-        render: text => <a href="javascript:">{text}</a>,
+        // render: text => <a href="javascript:">{text}</a>,
         width: '15%',
         align: 'center',
         ...this.getColumnSearchProps('name')
@@ -45,7 +46,7 @@ export default class Mail extends Component {
       {
         title: 'recipient',
         dataIndex: 'recipient',
-        render: text => <a href="javascript:">{text}</a>,
+        // render: text => <a href="javascript:">{text}</a>,
         width: '15%',
         align: 'center',
         ...this.getColumnSearchProps('recipient')
@@ -170,7 +171,12 @@ export default class Mail extends Component {
     this.setState({ searchText: '' })
   }
 
+  componentWillUnmount() {
+    this._isMounted = false
+  }
+
   componentDidMount() {
+    this._isMounted = true
     this.fetch()
   }
 
@@ -312,7 +318,6 @@ export default class Mail extends Component {
   }
 
   showDetailModal = () => {
-    console.log('show mail detail modal')
     this.setState({ detailVisible: true })
   }
 

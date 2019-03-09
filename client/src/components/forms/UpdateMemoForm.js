@@ -1,6 +1,6 @@
 import React from 'react'
 import Axios from 'axios'
-import { Button, Form, Input } from 'antd'
+import { Button, Form, Input, Select } from 'antd'
 import API from '../../util/api'
 
 class UpdateMemoForm extends React.Component {
@@ -12,6 +12,8 @@ class UpdateMemoForm extends React.Component {
     e.preventDefault()
     this.props.form.validateFieldsAndScroll((err, values) => {
       console.log('values', values)
+      values.position =
+        Array.isArray(values.position) && values.position.join('')
       if (!err)
         this.setState({ updateMemo: values }, () => {
           this.updateMemo()
@@ -47,6 +49,14 @@ class UpdateMemoForm extends React.Component {
     }
   }
 
+  checkPostionFieldLength = (rule, value, callback) => {
+    if (value && Array.isArray(value) && value.join('').length > 100) {
+      callback('position 필드의 글자 수는 100자를 넘을 수 없습니다.')
+    } else {
+      callback()
+    }
+  }
+
   render() {
     const { getFieldDecorator } = this.props.form
 
@@ -73,14 +83,38 @@ class UpdateMemoForm extends React.Component {
       }
     }
 
-    console.log('his.props.memoRecord.', this.props.memoRecord)
     return (
       <Form onSubmit={this.handleSubmit}>
-        <Form.Item {...formItemLayout} label="Position">
+        {/* <Form.Item {...formItemLayout} label="Position">
           {getFieldDecorator('position', {
             initialValue: this.props.memoRecord.position
             // rules: [{ required: true, message: 'Please fill in the Position.' }]
           })(<Input />)}
+        </Form.Item> */}
+
+        <Form.Item label="Position" {...formItemLayout} hasFeedback>
+          {getFieldDecorator('position', {
+            initialValue: this.props.memoRecord.position,
+            rules: [
+              {
+                validator: this.checkPostionFieldLength
+              }
+            ]
+          })(
+            <Select
+              showSearch
+              mode="tags"
+              style={{ width: '90 %' }}
+              optionFilterProp="children"
+              filterOption={(input, option) =>
+                option.props.children
+                  .toLowerCase()
+                  .indexOf(input.toLowerCase()) >= 0
+              }
+            >
+              {this.props.optionList}
+            </Select>
+          )}
         </Form.Item>
 
         <Form.Item {...formItemLayout} label="Client">
