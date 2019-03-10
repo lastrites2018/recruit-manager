@@ -48,8 +48,9 @@ chrome.extension.onConnect.addListener(function(port) {
         getHTML(_getValue);
         getHistory();
         crawlCandidate();
-        chrome.storage.local.get(null, function(response) {
-          console.log('sending message');
+
+        await chrome.storage.local.get(null, function(response) {
+          sleep(5);
           port.postMessage({
             user: response.user,
             url: response.url,
@@ -137,7 +138,9 @@ function getHistory() {
       body: JSON.stringify(input)
     });
     const json = await data.json();
-    chrome.storage.local.set({ history: json });
+    chrome.storage.local.set({ history: json }, function() {
+      console.log('history', json);
+    });
   });
 }
 
@@ -168,6 +171,6 @@ const crawlCandidate = async () => {
   });
 };
 
-// function sleep(ms) {
-//   return new Promise(resolve => setTimeout(resolve, ms));
-// }
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
