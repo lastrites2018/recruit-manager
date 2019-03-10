@@ -109,11 +109,12 @@ class ResumeForm extends React.Component {
             style={{ display: 'inline-block', width: 'calc(25% - 12px)' }}
           >
             {getFieldDecorator('gender', {
+              initialValue: '남',
               rules: [
                 { required: false, message: 'Please fill in the gender.' }
               ]
             })(
-              <Select defaultValue="모름">
+              <Select>
                 {/* <Select defaultValue="모름" style={{ width: 60 }}> */}
                 <Option value="남">남</Option>
                 <Option value="여">여</Option>

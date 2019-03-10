@@ -92,6 +92,17 @@ class SmsForm extends React.Component {
     })
   }
 
+  checkReceiverValue = (rule, value, callback) => {
+    const numberOnly = Number(value.replace(/-|,|(\s*)/gi, ''))
+    if (isNaN(numberOnly)) {
+      callback('숫자를 입력해주세요!')
+    } else if (!numberOnly) {
+      callback('수신 번호를 입력해주세요!')
+    } else {
+      callback()
+    }
+  }
+
   componentDidMount() {
     this.fetchPosition()
     this.fetchRecentSendSMSData()
@@ -209,7 +220,12 @@ class SmsForm extends React.Component {
           {...formItemLayout}
         >
           {getFieldDecorator('receiver', {
-            initialValue: smsName
+            initialValue: smsName,
+            rules: [
+              {
+                validator: this.checkReceiverValue
+              }
+            ]
             // initialValue: receivers || selectedRows[0].name
           })(<Input placeholder={recipientPlaceholder} />)}
         </Form.Item>
